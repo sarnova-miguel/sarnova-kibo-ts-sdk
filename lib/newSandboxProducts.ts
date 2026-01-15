@@ -65,4 +65,4 @@ async function createProductAttributes() {
 
 
 // ***** ready functions *****
-// createProductAttributes();
+createProductAttributes();
