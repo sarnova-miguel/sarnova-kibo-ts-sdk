@@ -1,0 +1,154 @@
+[
+  {
+    "adminName": "image",
+    "namespace": "Tenant",
+    "attributeCode": "image",
+    "attributeFQN": "tenant~image",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": false,
+        "searchableInAdmin": false,
+        "searchDisplayValue": false,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "small_image",
+    "namespace": "Tenant",
+    "attributeCode": "small_image",
+    "attributeFQN": "tenant~small_image",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": false,
+        "searchableInAdmin": false,
+        "searchDisplayValue": false,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "thumbnail",
+    "namespace": "Tenant",
+    "attributeCode": "thumbnail",
+    "attributeFQN": "tenant~thumbnail",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": false,
+        "searchableInAdmin": false,
+        "searchDisplayValue": false,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "cost",
+    "namespace": "Tenant",
+    "attributeCode": "cost",
+    "attributeFQN": "tenant~cost",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": false,
+        "searchableInAdmin": false,
+        "searchDisplayValue": false,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "image_label",
+    "namespace": "Tenant",
+    "attributeCode": "image_label",
+    "attributeFQN": "tenant~image_label",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": false,
+        "searchableInAdmin": false,
+        "searchDisplayValue": false,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "is_returnable",
+    "namespace": "Tenant",
+    "attributeCode": "is_returnable",
+    "attributeFQN": "tenant~is_returnable",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": false,
+        "searchableInAdmin": false,
+        "searchDisplayValue": false,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "manufacturer_cp",
+    "namespace": "Tenant",
+    "attributeCode": "manufacturer_cp",
+    "attributeFQN": "tenant~manufacturer_cp",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": false,
+        "searchableInAdmin": false,
+        "searchDisplayValue": false,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "unit_of_measure",
+    "namespace": "Tenant",
+    "attributeCode": "unit_of_measure",
+    "attributeFQN": "tenant~unit_of_measure",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": false,
+        "searchableInAdmin": false,
+        "searchDisplayValue": false,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  }
+]

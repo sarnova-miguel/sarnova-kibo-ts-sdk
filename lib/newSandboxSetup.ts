@@ -1,5 +1,6 @@
 import { Configuration } from "@kibocommerce/rest-sdk";
 import { ChannelApi } from "@kibocommerce/rest-sdk/clients/Commerce/apis/ChannelApi";
+import { GeneralSettingsApi } from "@kibocommerce/rest-sdk/clients/Settings/apis/GeneralSettingsApi";
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -27,52 +28,75 @@ async function getChannels() {
   }
 }
 
-async function createChannel() {
+async function createChannels() {
   const channelClient = new ChannelApi(configuration);
   const channels = [
     {
-      tenantId: process.env.TENANT_ID,
       code: "online",
       name: "online",
       countryCode: "US",
-      siteIds: [],
     },
     {
-      tenantId: process.env.TENANT_ID,
       code: "phone",
       name: "phone",
       countryCode: "US",
-      siteIds: [],
     },
     {
-      tenantId: process.env.TENANT_ID,
       code: "crm",
       name: "crm",
       countryCode: "US",
-      siteIds: [],
     },
   ];
+
   try {
-    const channel = await channelClient.createChannel({
-      channel: {
-        name: "My Channel",
-        code: "my-channel",
-      },
-    });
-    console.log(channel);
+    for (const channelData of channels) {
+      const createdChannel = await channelClient.createChannel({
+        channel: channelData,
+      });
+      console.log(`Created channel: ${createdChannel.code}`, createdChannel);
+    }
   } catch (error) {
-    console.error(error);
+    console.error("Error creating channels:", error);
   }
 }
 
-// create catalogs
+// create catalogs - manual only?
 
-// create sites
+// create sites - manual only?
 
 // update general settings
+const generalSettings = {
+    "websiteName": process.env.WEBSITE_NAME || "Dev",
+    "siteTimeZone": "Central Standard Time",
+    "siteTimeFormat": "hh:mm:ss tt",
+    "senderEmailAddress": process.env.EMAIL_ADDRESS || "websupport@sarnova.com",
+    "replyToEmailAddress": process.env.EMAIL_ADDRESS || "websupport@sarnova.com",
+    "isGoogleAnalyticsEnabled": true,
+    "isWishlistCreationEnabled": true,
+    "isMultishipEnabled": false,
+    "isAddressValidationEnabled": true,
+    "allowInvalidAddresses": false,
+}
 
-// update payment gateway / NoOp
+async function updateGeneralSettings() {
+    const settingsClient = new GeneralSettingsApi(configuration);
+    try {
+        const updatedSettings = await settingsClient.updateGeneralSettings({
+            generalSettings,
+        });
+        console.log(updatedSettings);
+    } catch (error) {
+        console.error(error);
+    }
+}
 
-// update payment types;  select Amex & Visa CCs with NoOp, check by mail = false, purchase order = true, purchase order options
+// update payment gateway / NoOp - manual only?
 
-getChannels();
+// update payment types;  select Amex & Visa CCs with NoOp, check by mail = false, purchase order = true, purchase order options - manual only?
+
+
+
+
+// ***** ready functions *****
+// createChannels();
+// updateGeneralSettings();
