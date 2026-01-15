@@ -1,0 +1,2526 @@
+[
+    {
+        "name": "mask",
+        "isBaseProductType": false,
+        "productUsages": [
+            "Standard",
+            "Configurable",
+            "Bundle",
+            "Component"
+        ],
+        "goodsType": "Physical",
+        "options": [
+            {
+                "attributeFQN": "Tenant~size",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isAdminOnlyProperty": false,
+                "vocabularyValues": [
+                    {
+                        "value": "Small",
+                        "order": 0,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 21,
+                            "value": "Small",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Small"
+                            }
+                        }
+                    },
+                    {
+                        "value": "Medium",
+                        "order": 1,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 22,
+                            "value": "Medium",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Medium"
+                            }
+                        }
+                    },
+                    {
+                        "value": "Large",
+                        "order": 2,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 23,
+                            "value": "Large",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Large"
+                            }
+                        }
+                    },
+                    {
+                        "value": "XL",
+                        "order": 3,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 24,
+                            "value": "XL",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "XL"
+                            }
+                        }
+                    }
+                ],
+                "attributeDetail": {
+                    "adminName": "size",
+                    "namespace": "Tenant",
+                    "attributeCode": "size",
+                    "attributeFQN": "Tenant~size",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 32,
+                    "attributeDataTypeSequence": 24,
+                    "masterCatalogId": 1,
+                    "inputType": "List",
+                    "valueType": "Predefined",
+                    "dataType": "String",
+                    "isOption": true,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "size"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "size"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": true,
+                        "searchableInAdmin": true,
+                        "searchDisplayValue": true,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            }
+        ],
+        "properties": [
+            {
+                "attributeFQN": "tenant~availability",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "vocabularyValues": [
+                    {
+                        "value": "24hrs",
+                        "order": 1,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 1,
+                            "value": "24hrs",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 24 Hours"
+                            }
+                        }
+                    },
+                    {
+                        "value": "24-48hrs",
+                        "order": 2,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 2,
+                            "value": "24-48hrs",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 24 to 48 Hours"
+                            }
+                        }
+                    },
+                    {
+                        "value": "24-72hrs",
+                        "order": 3,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 3,
+                            "value": "24-72hrs",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 24 to 72 Hours"
+                            }
+                        }
+                    },
+                    {
+                        "value": "1-2days",
+                        "order": 4,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 4,
+                            "value": "1-2days",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 1 to 2 Days"
+                            }
+                        }
+                    },
+                    {
+                        "value": "2-3days",
+                        "order": 5,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 5,
+                            "value": "2-3days",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 2 to 3 Days"
+                            }
+                        }
+                    },
+                    {
+                        "value": "1-2weeks",
+                        "order": 6,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 6,
+                            "value": "1-2weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 1 to 2 Weeks"
+                            }
+                        }
+                    },
+                    {
+                        "value": "2-3weeks",
+                        "order": 7,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 7,
+                            "value": "2-3weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 2 to 3 Weeks"
+                            }
+                        }
+                    },
+                    {
+                        "value": "2-4weeks",
+                        "order": 8,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 8,
+                            "value": "2-4weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 2 to 4 Weeks"
+                            }
+                        }
+                    },
+                    {
+                        "value": "4-6weeks",
+                        "order": 9,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 9,
+                            "value": "4-6weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 4 to 6 Weeks"
+                            }
+                        }
+                    }
+                ],
+                "attributeDetail": {
+                    "adminName": "availability",
+                    "namespace": "Tenant",
+                    "attributeCode": "availability",
+                    "attributeFQN": "tenant~availability",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 2,
+                    "attributeDataTypeSequence": 1,
+                    "masterCatalogId": 1,
+                    "inputType": "List",
+                    "valueType": "Predefined",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Availability"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Availability"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": true,
+                        "searchableInAdmin": true,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~product-crosssell",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "product-crosssell",
+                    "namespace": "Tenant",
+                    "attributeCode": "product-crosssell",
+                    "attributeFQN": "tenant~product-crosssell",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 3,
+                    "attributeDataTypeSequence": 2,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "attributeMetadata": [
+                        {
+                            "key": "uicontrol",
+                            "value": "productPicker"
+                        }
+                    ],
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Product Cross-Sells"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Product Cross-Sells"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~product-upsell",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "product-upsell",
+                    "namespace": "Tenant",
+                    "attributeCode": "product-upsell",
+                    "attributeFQN": "tenant~product-upsell",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 15,
+                    "attributeDataTypeSequence": 8,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "attributeMetadata": [
+                        {
+                            "key": "uicontrol",
+                            "value": "productPicker"
+                        }
+                    ],
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Product Upsells"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Product Upsells"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~product-related",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "product-related",
+                    "namespace": "Tenant",
+                    "attributeCode": "product-related",
+                    "attributeFQN": "tenant~product-related",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 9,
+                    "attributeDataTypeSequence": 5,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "attributeMetadata": [
+                        {
+                            "key": "uicontrol",
+                            "value": "productPicker"
+                        }
+                    ],
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Related Products"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Related Products"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~rating",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "Rating",
+                    "namespace": "Tenant",
+                    "attributeCode": "rating",
+                    "attributeFQN": "tenant~rating",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 8,
+                    "attributeDataTypeSequence": 2,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "Number",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Rating"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Rating"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": true,
+                        "searchableInAdmin": true,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~popularity",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "Popularity",
+                    "namespace": "Tenant",
+                    "attributeCode": "popularity",
+                    "attributeFQN": "tenant~popularity",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 6,
+                    "attributeDataTypeSequence": 1,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "Number",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Popularity"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Popularity"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": true,
+                        "searchableInAdmin": true,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~image",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": true,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "image",
+                    "namespace": "Tenant",
+                    "attributeCode": "image",
+                    "attributeFQN": "Tenant~image",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 27,
+                    "attributeDataTypeSequence": 19,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "image"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "image"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~image_label",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": true,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "image_label",
+                    "namespace": "Tenant",
+                    "attributeCode": "image_label",
+                    "attributeFQN": "Tenant~image_label",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 30,
+                    "attributeDataTypeSequence": 22,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "image_label"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "image_label"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~cost",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": true,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "cost",
+                    "namespace": "Tenant",
+                    "attributeCode": "cost",
+                    "attributeFQN": "Tenant~cost",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 31,
+                    "attributeDataTypeSequence": 23,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "cost"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "cost"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~is_returnable",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "is_returnable",
+                    "namespace": "Tenant",
+                    "attributeCode": "is_returnable",
+                    "attributeFQN": "Tenant~is_returnable",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 33,
+                    "attributeDataTypeSequence": 25,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "is_returnable"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "is_returnable"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~manufacturer_cp",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "manufacturer_cp",
+                    "namespace": "Tenant",
+                    "attributeCode": "manufacturer_cp",
+                    "attributeFQN": "Tenant~manufacturer_cp",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 34,
+                    "attributeDataTypeSequence": 26,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "manufacturer_cp"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "manufacturer_cp"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "name": "aed",
+        "isBaseProductType": false,
+        "productUsages": [
+            "Standard",
+            "Configurable",
+            "Bundle",
+            "Component"
+        ],
+        "goodsType": "Physical",
+        "properties": [
+            {
+                "attributeFQN": "tenant~availability",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "vocabularyValues": [
+                    {
+                        "value": "24hrs",
+                        "order": 1,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 1,
+                            "value": "24hrs",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 24 Hours"
+                            }
+                        }
+                    },
+                    {
+                        "value": "24-48hrs",
+                        "order": 2,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 2,
+                            "value": "24-48hrs",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 24 to 48 Hours"
+                            }
+                        }
+                    },
+                    {
+                        "value": "24-72hrs",
+                        "order": 3,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 3,
+                            "value": "24-72hrs",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 24 to 72 Hours"
+                            }
+                        }
+                    },
+                    {
+                        "value": "1-2days",
+                        "order": 4,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 4,
+                            "value": "1-2days",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 1 to 2 Days"
+                            }
+                        }
+                    },
+                    {
+                        "value": "2-3days",
+                        "order": 5,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 5,
+                            "value": "2-3days",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 2 to 3 Days"
+                            }
+                        }
+                    },
+                    {
+                        "value": "1-2weeks",
+                        "order": 6,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 6,
+                            "value": "1-2weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 1 to 2 Weeks"
+                            }
+                        }
+                    },
+                    {
+                        "value": "2-3weeks",
+                        "order": 7,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 7,
+                            "value": "2-3weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 2 to 3 Weeks"
+                            }
+                        }
+                    },
+                    {
+                        "value": "2-4weeks",
+                        "order": 8,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 8,
+                            "value": "2-4weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 2 to 4 Weeks"
+                            }
+                        }
+                    },
+                    {
+                        "value": "4-6weeks",
+                        "order": 9,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 9,
+                            "value": "4-6weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 4 to 6 Weeks"
+                            }
+                        }
+                    }
+                ],
+                "attributeDetail": {
+                    "adminName": "availability",
+                    "namespace": "Tenant",
+                    "attributeCode": "availability",
+                    "attributeFQN": "tenant~availability",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 2,
+                    "attributeDataTypeSequence": 1,
+                    "masterCatalogId": 1,
+                    "inputType": "List",
+                    "valueType": "Predefined",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Availability"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Availability"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": true,
+                        "searchableInAdmin": true,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~product-crosssell",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "product-crosssell",
+                    "namespace": "Tenant",
+                    "attributeCode": "product-crosssell",
+                    "attributeFQN": "tenant~product-crosssell",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 3,
+                    "attributeDataTypeSequence": 2,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "attributeMetadata": [
+                        {
+                            "key": "uicontrol",
+                            "value": "productPicker"
+                        }
+                    ],
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Product Cross-Sells"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Product Cross-Sells"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~product-upsell",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "product-upsell",
+                    "namespace": "Tenant",
+                    "attributeCode": "product-upsell",
+                    "attributeFQN": "tenant~product-upsell",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 15,
+                    "attributeDataTypeSequence": 8,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "attributeMetadata": [
+                        {
+                            "key": "uicontrol",
+                            "value": "productPicker"
+                        }
+                    ],
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Product Upsells"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Product Upsells"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~product-related",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "product-related",
+                    "namespace": "Tenant",
+                    "attributeCode": "product-related",
+                    "attributeFQN": "tenant~product-related",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 9,
+                    "attributeDataTypeSequence": 5,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "attributeMetadata": [
+                        {
+                            "key": "uicontrol",
+                            "value": "productPicker"
+                        }
+                    ],
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Related Products"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Related Products"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~rating",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "Rating",
+                    "namespace": "Tenant",
+                    "attributeCode": "rating",
+                    "attributeFQN": "tenant~rating",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 8,
+                    "attributeDataTypeSequence": 2,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "Number",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Rating"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Rating"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": true,
+                        "searchableInAdmin": true,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~popularity",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "Popularity",
+                    "namespace": "Tenant",
+                    "attributeCode": "popularity",
+                    "attributeFQN": "tenant~popularity",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 6,
+                    "attributeDataTypeSequence": 1,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "Number",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Popularity"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Popularity"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": true,
+                        "searchableInAdmin": true,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~image",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": true,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "image",
+                    "namespace": "Tenant",
+                    "attributeCode": "image",
+                    "attributeFQN": "Tenant~image",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 27,
+                    "attributeDataTypeSequence": 19,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "image"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "image"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~image_label",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": true,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "image_label",
+                    "namespace": "Tenant",
+                    "attributeCode": "image_label",
+                    "attributeFQN": "Tenant~image_label",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 30,
+                    "attributeDataTypeSequence": 22,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "image_label"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "image_label"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~cost",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": true,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "cost",
+                    "namespace": "Tenant",
+                    "attributeCode": "cost",
+                    "attributeFQN": "Tenant~cost",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 31,
+                    "attributeDataTypeSequence": 23,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "cost"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "cost"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~is_returnable",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "is_returnable",
+                    "namespace": "Tenant",
+                    "attributeCode": "is_returnable",
+                    "attributeFQN": "Tenant~is_returnable",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 33,
+                    "attributeDataTypeSequence": 25,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "is_returnable"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "is_returnable"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~manufacturer_cp",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "manufacturer_cp",
+                    "namespace": "Tenant",
+                    "attributeCode": "manufacturer_cp",
+                    "attributeFQN": "Tenant~manufacturer_cp",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 34,
+                    "attributeDataTypeSequence": 26,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "manufacturer_cp"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "manufacturer_cp"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "name": "battery",
+        "isBaseProductType": false,
+        "productUsages": [
+            "Standard",
+            "Configurable",
+            "Bundle",
+            "Component"
+        ],
+        "goodsType": "Physical",
+        "properties": [
+            {
+                "attributeFQN": "tenant~availability",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "vocabularyValues": [
+                    {
+                        "value": "24hrs",
+                        "order": 1,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 1,
+                            "value": "24hrs",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 24 Hours"
+                            }
+                        }
+                    },
+                    {
+                        "value": "24-48hrs",
+                        "order": 2,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 2,
+                            "value": "24-48hrs",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 24 to 48 Hours"
+                            }
+                        }
+                    },
+                    {
+                        "value": "24-72hrs",
+                        "order": 3,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 3,
+                            "value": "24-72hrs",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 24 to 72 Hours"
+                            }
+                        }
+                    },
+                    {
+                        "value": "1-2days",
+                        "order": 4,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 4,
+                            "value": "1-2days",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 1 to 2 Days"
+                            }
+                        }
+                    },
+                    {
+                        "value": "2-3days",
+                        "order": 5,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 5,
+                            "value": "2-3days",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 2 to 3 Days"
+                            }
+                        }
+                    },
+                    {
+                        "value": "1-2weeks",
+                        "order": 6,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 6,
+                            "value": "1-2weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 1 to 2 Weeks"
+                            }
+                        }
+                    },
+                    {
+                        "value": "2-3weeks",
+                        "order": 7,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 7,
+                            "value": "2-3weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 2 to 3 Weeks"
+                            }
+                        }
+                    },
+                    {
+                        "value": "2-4weeks",
+                        "order": 8,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 8,
+                            "value": "2-4weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 2 to 4 Weeks"
+                            }
+                        }
+                    },
+                    {
+                        "value": "4-6weeks",
+                        "order": 9,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 9,
+                            "value": "4-6weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 4 to 6 Weeks"
+                            }
+                        }
+                    }
+                ],
+                "attributeDetail": {
+                    "adminName": "availability",
+                    "namespace": "Tenant",
+                    "attributeCode": "availability",
+                    "attributeFQN": "tenant~availability",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 2,
+                    "attributeDataTypeSequence": 1,
+                    "masterCatalogId": 1,
+                    "inputType": "List",
+                    "valueType": "Predefined",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Availability"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Availability"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": true,
+                        "searchableInAdmin": true,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~product-crosssell",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "product-crosssell",
+                    "namespace": "Tenant",
+                    "attributeCode": "product-crosssell",
+                    "attributeFQN": "tenant~product-crosssell",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 3,
+                    "attributeDataTypeSequence": 2,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "attributeMetadata": [
+                        {
+                            "key": "uicontrol",
+                            "value": "productPicker"
+                        }
+                    ],
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Product Cross-Sells"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Product Cross-Sells"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~product-upsell",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "product-upsell",
+                    "namespace": "Tenant",
+                    "attributeCode": "product-upsell",
+                    "attributeFQN": "tenant~product-upsell",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 15,
+                    "attributeDataTypeSequence": 8,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "attributeMetadata": [
+                        {
+                            "key": "uicontrol",
+                            "value": "productPicker"
+                        }
+                    ],
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Product Upsells"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Product Upsells"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~product-related",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "product-related",
+                    "namespace": "Tenant",
+                    "attributeCode": "product-related",
+                    "attributeFQN": "tenant~product-related",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 9,
+                    "attributeDataTypeSequence": 5,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "attributeMetadata": [
+                        {
+                            "key": "uicontrol",
+                            "value": "productPicker"
+                        }
+                    ],
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Related Products"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Related Products"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~rating",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "Rating",
+                    "namespace": "Tenant",
+                    "attributeCode": "rating",
+                    "attributeFQN": "tenant~rating",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 8,
+                    "attributeDataTypeSequence": 2,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "Number",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Rating"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Rating"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": true,
+                        "searchableInAdmin": true,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~popularity",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "Popularity",
+                    "namespace": "Tenant",
+                    "attributeCode": "popularity",
+                    "attributeFQN": "tenant~popularity",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 6,
+                    "attributeDataTypeSequence": 1,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "Number",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Popularity"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Popularity"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": true,
+                        "searchableInAdmin": true,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~image",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": true,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "image",
+                    "namespace": "Tenant",
+                    "attributeCode": "image",
+                    "attributeFQN": "Tenant~image",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 27,
+                    "attributeDataTypeSequence": 19,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "image"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "image"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~image_label",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": true,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "image_label",
+                    "namespace": "Tenant",
+                    "attributeCode": "image_label",
+                    "attributeFQN": "Tenant~image_label",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 30,
+                    "attributeDataTypeSequence": 22,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "image_label"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "image_label"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~cost",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": true,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "cost",
+                    "namespace": "Tenant",
+                    "attributeCode": "cost",
+                    "attributeFQN": "Tenant~cost",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 31,
+                    "attributeDataTypeSequence": 23,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "cost"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "cost"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~is_returnable",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "is_returnable",
+                    "namespace": "Tenant",
+                    "attributeCode": "is_returnable",
+                    "attributeFQN": "Tenant~is_returnable",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 33,
+                    "attributeDataTypeSequence": 25,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "is_returnable"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "is_returnable"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~manufacturer_cp",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "manufacturer_cp",
+                    "namespace": "Tenant",
+                    "attributeCode": "manufacturer_cp",
+                    "attributeFQN": "Tenant~manufacturer_cp",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 34,
+                    "attributeDataTypeSequence": 26,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "manufacturer_cp"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "manufacturer_cp"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "name": "case",
+        "isBaseProductType": false,
+        "productUsages": [
+            "Standard",
+            "Configurable",
+            "Bundle",
+            "Component"
+        ],
+        "goodsType": "Physical",
+        "properties": [
+            {
+                "attributeFQN": "tenant~availability",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "vocabularyValues": [
+                    {
+                        "value": "24hrs",
+                        "order": 1,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 1,
+                            "value": "24hrs",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 24 Hours"
+                            }
+                        }
+                    },
+                    {
+                        "value": "24-48hrs",
+                        "order": 2,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 2,
+                            "value": "24-48hrs",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 24 to 48 Hours"
+                            }
+                        }
+                    },
+                    {
+                        "value": "24-72hrs",
+                        "order": 3,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 3,
+                            "value": "24-72hrs",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 24 to 72 Hours"
+                            }
+                        }
+                    },
+                    {
+                        "value": "1-2days",
+                        "order": 4,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 4,
+                            "value": "1-2days",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 1 to 2 Days"
+                            }
+                        }
+                    },
+                    {
+                        "value": "2-3days",
+                        "order": 5,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 5,
+                            "value": "2-3days",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 2 to 3 Days"
+                            }
+                        }
+                    },
+                    {
+                        "value": "1-2weeks",
+                        "order": 6,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 6,
+                            "value": "1-2weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 1 to 2 Weeks"
+                            }
+                        }
+                    },
+                    {
+                        "value": "2-3weeks",
+                        "order": 7,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 7,
+                            "value": "2-3weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 2 to 3 Weeks"
+                            }
+                        }
+                    },
+                    {
+                        "value": "2-4weeks",
+                        "order": 8,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 8,
+                            "value": "2-4weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 2 to 4 Weeks"
+                            }
+                        }
+                    },
+                    {
+                        "value": "4-6weeks",
+                        "order": 9,
+                        "vocabularyValueDetail": {
+                            "valueSequence": 9,
+                            "value": "4-6weeks",
+                            "content": {
+                                "localeCode": "en-US",
+                                "stringValue": "Usually Ships in 4 to 6 Weeks"
+                            }
+                        }
+                    }
+                ],
+                "attributeDetail": {
+                    "adminName": "availability",
+                    "namespace": "Tenant",
+                    "attributeCode": "availability",
+                    "attributeFQN": "tenant~availability",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 2,
+                    "attributeDataTypeSequence": 1,
+                    "masterCatalogId": 1,
+                    "inputType": "List",
+                    "valueType": "Predefined",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Availability"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Availability"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": true,
+                        "searchableInAdmin": true,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~product-crosssell",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "product-crosssell",
+                    "namespace": "Tenant",
+                    "attributeCode": "product-crosssell",
+                    "attributeFQN": "tenant~product-crosssell",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 3,
+                    "attributeDataTypeSequence": 2,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "attributeMetadata": [
+                        {
+                            "key": "uicontrol",
+                            "value": "productPicker"
+                        }
+                    ],
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Product Cross-Sells"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Product Cross-Sells"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~product-upsell",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "product-upsell",
+                    "namespace": "Tenant",
+                    "attributeCode": "product-upsell",
+                    "attributeFQN": "tenant~product-upsell",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 15,
+                    "attributeDataTypeSequence": 8,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "attributeMetadata": [
+                        {
+                            "key": "uicontrol",
+                            "value": "productPicker"
+                        }
+                    ],
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Product Upsells"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Product Upsells"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~product-related",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "product-related",
+                    "namespace": "Tenant",
+                    "attributeCode": "product-related",
+                    "attributeFQN": "tenant~product-related",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 9,
+                    "attributeDataTypeSequence": 5,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "attributeMetadata": [
+                        {
+                            "key": "uicontrol",
+                            "value": "productPicker"
+                        }
+                    ],
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Related Products"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Related Products"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~rating",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "Rating",
+                    "namespace": "Tenant",
+                    "attributeCode": "rating",
+                    "attributeFQN": "tenant~rating",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 8,
+                    "attributeDataTypeSequence": 2,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "Number",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Rating"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Rating"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": true,
+                        "searchableInAdmin": true,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "tenant~popularity",
+                "isInheritedFromBaseType": true,
+                "order": -2147483648,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isMultiValueProperty": true,
+                "attributeDetail": {
+                    "adminName": "Popularity",
+                    "namespace": "Tenant",
+                    "attributeCode": "popularity",
+                    "attributeFQN": "tenant~popularity",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 6,
+                    "attributeDataTypeSequence": 1,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "Number",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "Popularity"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "Popularity"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": true,
+                        "searchableInAdmin": true,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~image",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": true,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "image",
+                    "namespace": "Tenant",
+                    "attributeCode": "image",
+                    "attributeFQN": "Tenant~image",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 27,
+                    "attributeDataTypeSequence": 19,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "image"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "image"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~image_label",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": true,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "image_label",
+                    "namespace": "Tenant",
+                    "attributeCode": "image_label",
+                    "attributeFQN": "Tenant~image_label",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 30,
+                    "attributeDataTypeSequence": 22,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "image_label"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "image_label"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~cost",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": true,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "cost",
+                    "namespace": "Tenant",
+                    "attributeCode": "cost",
+                    "attributeFQN": "Tenant~cost",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 31,
+                    "attributeDataTypeSequence": 23,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "cost"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "cost"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~is_returnable",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "is_returnable",
+                    "namespace": "Tenant",
+                    "attributeCode": "is_returnable",
+                    "attributeFQN": "Tenant~is_returnable",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 33,
+                    "attributeDataTypeSequence": 25,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "is_returnable"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "is_returnable"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            },
+            {
+                "attributeFQN": "Tenant~manufacturer_cp",
+                "isInheritedFromBaseType": false,
+                "order": 0,
+                "isRequiredByAdmin": false,
+                "isHiddenProperty": false,
+                "isAdminOnlyProperty": false,
+                "isProductDetailsOnlyProperty": false,
+                "isMultiValueProperty": false,
+                "attributeDetail": {
+                    "adminName": "manufacturer_cp",
+                    "namespace": "Tenant",
+                    "attributeCode": "manufacturer_cp",
+                    "attributeFQN": "Tenant~manufacturer_cp",
+                    "isValueMappingAttribute": false,
+                    "attributeSequence": 34,
+                    "attributeDataTypeSequence": 26,
+                    "masterCatalogId": 1,
+                    "inputType": "TextBox",
+                    "valueType": "AdminEntered",
+                    "dataType": "String",
+                    "isOption": false,
+                    "isExtra": false,
+                    "isProperty": true,
+                    "availableForOrderRouting": false,
+                    "content": {
+                        "localeCode": "en-US",
+                        "name": "manufacturer_cp"
+                    },
+                    "localizedContent": [
+                        {
+                            "localeCode": "en-US",
+                            "name": "manufacturer_cp"
+                        }
+                    ],
+                    "searchSettings": {
+                        "searchableInStorefront": false,
+                        "searchableInAdmin": false,
+                        "searchDisplayValue": false,
+                        "allowFilteringAndSortingInStorefront": true
+                    }
+                }
+            }
+        ]
+    }
+]

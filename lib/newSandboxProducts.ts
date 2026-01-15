@@ -1,8 +1,10 @@
 import Bottleneck from "bottleneck";
 import { Configuration } from "@kibocommerce/rest-sdk";
 import { ProductAttributesApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/ProductAttributesApi";
+import { ProductTypesApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/ProductTypesApi";
 import * as dotenv from "dotenv";
 import productAttributesData from "./data/productAttributes.json";
+import productTypesData from "./data/productTypes.json";
 
 const limiter = new Bottleneck({
   maxConcurrent: 1,
@@ -23,9 +25,10 @@ const configuration = new Configuration({
   apiEnv: process.env.API_ENV || "",
 });
 
-// create product attributes
 const productAttributes = productAttributesData;
+const productTypes = productTypesData;
 
+// create product attributes
 async function createProductAttributes() {
   const productAttributeClient = new ProductAttributesApi(configuration);
 
@@ -55,6 +58,33 @@ async function createProductAttributes() {
 }
 
 // create product types
+async function createProductTypes() {
+  const productTypeClient = new ProductTypesApi(configuration);
+
+  try {
+    for (const productTypeData of productTypes) {
+      // Use limiter to rate-limit API calls
+      await limiter.schedule(async () => {
+        try {
+          const createdProductType = await productTypeClient.addProductType({
+            productType: productTypeData,
+          });
+          console.log(
+            `Created product type: ${createdProductType.name}`
+          );
+        } catch (error) {
+          console.error(
+            `Error creating product type ${productTypeData.name}:`,
+            error
+          );
+        }
+      });
+    }
+    console.log("All product types created successfully");
+  } catch (error) {
+    console.error("Error in createProductTypes:", error);
+  }
+}
 
 // create categories
 
@@ -65,4 +95,5 @@ async function createProductAttributes() {
 
 
 // ***** ready functions *****
-createProductAttributes();
+// createProductAttributes();
+createProductTypes();
