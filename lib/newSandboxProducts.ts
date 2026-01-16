@@ -16,7 +16,7 @@ const transport = pino.transport({
     {
       target: "pino/file",
       options: {
-        destination: "./logs/sandbox-products.log",
+        destination: "./logs/add-sandbox-products.log",
         mkdir: true,
       },
     },
