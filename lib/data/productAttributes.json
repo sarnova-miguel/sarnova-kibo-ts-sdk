@@ -156,25 +156,25 @@
     "namespace": "Tenant",
     "attributeCode": "is_returnable",
     "attributeFQN": "tenant~is_returnable",
-    "inputType": "TextBox",
+    "inputType": "YesNo",
     "valueType": "AdminEntered",
-    "dataType": "String",
+    "dataType": "Bool",
     "isOption": false,
     "isExtra": false,
     "isProperty": true,
     "searchSettings": {
-        "searchableInStorefront": false,
-        "searchableInAdmin": false,
-        "searchDisplayValue": false,
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
         "allowFilteringAndSortingInStorefront": true,
         "indexValueWithCase": false
     }
   },
   {
-    "adminName": "manufacturer_cp",
+    "adminName": "manufacturer",
     "namespace": "Tenant",
-    "attributeCode": "manufacturer_cp",
-    "attributeFQN": "tenant~manufacturer_cp",
+    "attributeCode": "manufacturer",
+    "attributeFQN": "tenant~manufacturer",
     "inputType": "TextBox",
     "valueType": "AdminEntered",
     "dataType": "String",
@@ -182,9 +182,9 @@
     "isExtra": false,
     "isProperty": true,
     "searchSettings": {
-        "searchableInStorefront": false,
-        "searchableInAdmin": false,
-        "searchDisplayValue": false,
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
         "allowFilteringAndSortingInStorefront": true,
         "indexValueWithCase": false
     }
@@ -204,6 +204,293 @@
         "searchableInStorefront": false,
         "searchableInAdmin": false,
         "searchDisplayValue": false,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "resources",
+    "namespace": "Tenant",
+    "attributeCode": "resources",
+    "attributeFQN": "tenant~resources",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": false,
+        "searchableInAdmin": false,
+        "searchDisplayValue": false,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "aed_type",
+    "namespace": "Tenant",
+    "attributeCode": "aed_type",
+    "attributeFQN": "tenant~aed_type",
+    "inputType": "List",
+    "valueType": "Predefined",
+    "dataType": "String",
+    "isOption": true,
+    "isExtra": false,
+    "isProperty": true,
+    "vocabularyValues": [
+          {
+              "value": "Semi-Automatic AED",
+              "mappedGenericValues": [],
+              "content": {
+                  "localeCode": "en-US",
+                  "stringValue": "Semi-Automatic AED"
+              },
+              "displayOrder": 1
+          },
+          {
+              "value": "Fully-Automatic AED",
+              "mappedGenericValues": [],
+              "content": {
+                  "localeCode": "en-US",
+                  "stringValue": "Fully-Automatic AED"
+              },
+              "displayOrder": 2
+          }
+      ],
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "carry_case_option",
+    "namespace": "Tenant",
+    "attributeCode": "carry_case_option",
+    "attributeFQN": "tenant~carry_case_option",
+    "inputType": "List",
+    "valueType": "Predefined",
+    "dataType": "String",
+    "isOption": true,
+    "isExtra": false,
+    "isProperty": true,
+    "vocabularyValues": [
+          {
+              "value": "Carry Sleeve",
+              "mappedGenericValues": [],
+              "content": {
+                  "localeCode": "en-US",
+                  "stringValue": "Carry Sleeve"
+              },
+              "displayOrder": 1
+          },
+          {
+              "value": "Semi-Rigid Case",
+              "mappedGenericValues": [],
+              "content": {
+                  "localeCode": "en-US",
+                  "stringValue": "Semi-Rigid Case"
+              },
+              "displayOrder": 2
+          }
+      ],
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "condition",
+    "namespace": "Tenant",
+    "attributeCode": "condition",
+    "attributeFQN": "tenant~condition",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "warranty",
+    "namespace": "Tenant",
+    "attributeCode": "warranty",
+    "attributeFQN": "tenant~warranty",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "features",
+    "namespace": "Tenant",
+    "attributeCode": "features",
+    "attributeFQN": "tenant~features",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "language",
+    "namespace": "Tenant",
+    "attributeCode": "language",
+    "attributeFQN": "tenant~language",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "alternate_skus",
+    "namespace": "Tenant",
+    "attributeCode": "alternate_skus",
+    "attributeFQN": "tenant~alternate_skus",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "class_type",
+    "namespace": "Tenant",
+    "attributeCode": "class_type",
+    "attributeFQN": "tenant~class_type",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "course_length",
+    "namespace": "Tenant",
+    "attributeCode": "course_length",
+    "attributeFQN": "tenant~course_length",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": false,
+        "searchableInAdmin": false,
+        "searchDisplayValue": false,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "certificate",
+    "namespace": "Tenant",
+    "attributeCode": "certificate",
+    "attributeFQN": "tenant~certificate",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "meets_osha_req",
+    "namespace": "Tenant",
+    "attributeCode": "meets_osha_req",
+    "attributeFQN": "tenant~meets_osha_req",
+    "inputType": "YesNo",
+    "valueType": "AdminEntered",
+    "dataType": "Bool",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "meets_bls_req",
+    "namespace": "Tenant",
+    "attributeCode": "meets_bls_req",
+    "attributeFQN": "tenant~meets_bls_req",
+    "inputType": "YesNo",
+    "valueType": "AdminEntered",
+    "dataType": "Bool",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
         "allowFilteringAndSortingInStorefront": true,
         "indexValueWithCase": false
     }

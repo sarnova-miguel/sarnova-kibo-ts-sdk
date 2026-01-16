@@ -1,0 +1,108 @@
+[
+    {
+        "categoryType": "Static",
+        "categoryCode": "accessories",
+        "isActive": true,
+        "isDisplayed": true,
+        "sequence": 1,
+        "content": {
+            "localeCode": "en-US",
+            "name": "Accessories",
+            "slug": "accessories",
+            "description": "",
+            "pageTitle": "",
+            "metaTagTitle": "",
+            "metaTagDescription": "",
+            "metaTagKeywords": ""
+        }
+    },
+    {
+        "categoryType": "Static",
+        "parentCategoryName": "Accessories",
+        "parentIsActive": true,
+        "categoryCode": "batteries",
+        "isActive": true,
+        "isDisplayed": true,
+        "sequence": 1,
+        "content": {
+            "localeCode": "en-US",
+            "name": "Batteries",
+            "slug": "batteries",
+            "description": "",
+            "pageTitle": "",
+            "metaTagTitle": "",
+            "metaTagDescription": "",
+            "metaTagKeywords": ""
+        }
+    },
+    {
+        "categoryType": "Static",
+        "parentCategoryName": "Accessories",
+        "parentIsActive": true,
+        "categoryCode": "cases",
+        "isActive": true,
+        "isDisplayed": true,
+        "sequence": 2,
+        "content": {
+            "localeCode": "en-US",
+            "name": "Cases",
+            "slug": "cases",
+            "description": "",
+            "pageTitle": "",
+            "metaTagTitle": "",
+            "metaTagDescription": "",
+            "metaTagKeywords": ""
+        }
+    },
+    {
+        "categoryType": "Static",
+        "categoryCode": "aeds",
+        "isActive": true,
+        "isDisplayed": true,
+        "sequence": 2,
+        "content": {
+            "localeCode": "en-US",
+            "name": "AEDs",
+            "slug": "aeds",
+            "description": "",
+            "pageTitle": "",
+            "metaTagTitle": "",
+            "metaTagDescription": "",
+            "metaTagKeywords": ""
+        }
+    },
+    {
+        "categoryType": "Static",
+        "categoryCode": "masks",
+        "isActive": true,
+        "isDisplayed": true,
+        "sequence": 3,
+        "content": {
+            "localeCode": "en-US",
+            "name": "Masks",
+            "slug": "masks",
+            "description": "",
+            "pageTitle": "",
+            "metaTagTitle": "",
+            "metaTagDescription": "",
+            "metaTagKeywords": ""
+        }
+    },
+    {
+        "categoryType": "Static",
+        "categoryCode": "training_products",
+        "isActive": true,
+        "isDisplayed": true,
+        "sequence": 4,
+        "content": {
+            "localeCode": "en-US",
+            "name": "Training Products",
+            "slug": "training_products",
+            "description": "",
+            "pageTitle": "",
+            "metaTagTitle": "",
+            "metaTagDescription": "",
+            "metaTagKeywords": ""
+        }
+    }
+]
