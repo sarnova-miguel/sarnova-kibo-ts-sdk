@@ -1,6 +1,6 @@
-# Kibo TypeScript SDK - Sandbox Setup Tools
+# Kibo TypeScript SDK - Sarnova Sandbox Tools
 
-This repository contains utilities for setting up and managing Kibo Commerce sandbox environments using the TypeScript SDK.
+This repository contains utilities for setting up and managing Sarnova sandbox environments using the Kibo TypeScript SDK.
 
 ---
 
