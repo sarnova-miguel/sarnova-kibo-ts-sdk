@@ -4,7 +4,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 **IMPORTANT:** Before running any scripts, you must configure your environment variables in a `.env` file at the root of the project.
 
@@ -62,7 +62,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 
 ---
 
-## Logs
+## 📜 Logs
 
 All scripts generate detailed logs in the `logs/` directory:
 - `add-sandbox-products.log` - Product creation logs
@@ -72,9 +72,9 @@ Logs include timestamps, operation status, entity details, and error messages fo
 
 ---
 
-## Scripts Overview
+## 🖥️ Scripts Overview
 
-### 1. `newSandboxSetup.ts`
+### 1. 🆕 `newSandboxSetup.ts`
 
 **Purpose:** Initial sandbox environment configuration
 
@@ -99,7 +99,7 @@ ts-node .\lib\newSandboxSetup.ts
 
 ---
 
-### 2. `newSandboxProducts.ts`
+### 2. ➕ `newSandboxProducts.ts`
 
 **Purpose:** Bulk product catalog creation from JSON data files
 
@@ -136,7 +136,7 @@ All operations are logged with detailed information including success/failure st
 
 **⚠️ WARNING:** The script below permanently deletes catalog data. Use with caution!
 
-### 3. `deleteProdsCatsTypesAttributes.ts`
+### 3. ❌ `deleteProdsCatsTypesAttributes.ts`
 
 **Purpose:** Clean up sandbox environment by removing all catalog data
 
