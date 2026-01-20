@@ -134,7 +134,7 @@ All operations are logged with detailed information including success/failure st
 
 ---
 
-**⚠️ WARNING:** The script below permanently deletes catalog data. Use with caution!
+**⚠️ WARNING:** The script below permanently deletes catalog data. Use with caution! ⚠️
 
 ### 3. ❌ `deleteProdsCatsTypesAttributes.ts`
 
