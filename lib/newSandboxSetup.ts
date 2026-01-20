@@ -98,5 +98,5 @@ async function updateGeneralSettings() {
 
 
 // ***** ready functions *****
-// createChannels();
-// updateGeneralSettings();
+createChannels();
+updateGeneralSettings();
