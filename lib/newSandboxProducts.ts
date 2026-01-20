@@ -277,9 +277,9 @@ async function createProducts() {
 
 // ***** ready functions *****
 async function main() {
-    // await createProductAttributes();
-    // await createProductTypes();
-    // await createCategories();
+    await createProductAttributes();
+    await createProductTypes();
+    await createCategories();
     await createProducts();
     logger.info('*** Products load process complete!👍🏽 ***');
 }
