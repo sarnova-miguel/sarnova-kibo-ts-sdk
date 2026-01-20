@@ -5,6 +5,7 @@ import { Configuration } from "@kibocommerce/rest-sdk";
 import { ProductAttributesApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/ProductAttributesApi";
 import { ProductTypesApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/ProductTypesApi";
 import { CategoriesApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/CategoriesApi";
+import { ProductsApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/ProductsApi";
 
 const pageSize = 200;
 
@@ -56,6 +57,83 @@ const configuration = new Configuration({
 });
 
 // delete products
+async function deleteProducts() {
+  const productClient = new ProductsApi(configuration);
+
+  logger.info("Starting products deletion...");
+
+  try {
+    let totalDeleted = 0;
+    let hasMoreProducts = true;
+
+    while (hasMoreProducts) {
+      // Get products in batches
+      const productsResponse = await productClient.getProducts({
+        pageSize,
+        startIndex: 0, // Always get from the beginning since we're deleting
+      });
+
+      const products = productsResponse.items || [];
+      const productsCount = products.length;
+
+      logger.info({
+        count: productsCount,
+        totalDeleted
+      }, "Found products in this batch");
+
+      if (productsCount === 0) {
+        logger.info("No more products found to delete");
+        hasMoreProducts = false;
+        break;
+      }
+
+      for (const product of products) {
+        if (!product.productCode) {
+          logger.warn({
+            productName: product.content?.productName
+          }, "Product has no productCode, skipping");
+          continue;
+        }
+
+        // Use limiter to rate-limit API calls
+        await limiter.schedule(async () => {
+          try {
+            await productClient.deleteProduct({
+              productCode: product.productCode!,
+            });
+            logger.info({
+              productCode: product.productCode,
+              productName: product.content?.productName,
+            }, "Deleted product");
+            totalDeleted++;
+          } catch (error) {
+            logger.error({
+              productCode: product.productCode,
+              productName: product.content?.productName,
+              error: error instanceof Error ? error.message : String(error),
+            }, "Error deleting product");
+          }
+        });
+      }
+
+      logger.info({
+        batchDeleted: productsCount,
+        totalDeleted
+      }, "Completed batch deletion");
+
+      // If we got fewer products than the page size, we're done
+      if (productsCount < pageSize) {
+        hasMoreProducts = false;
+      }
+    }
+
+    logger.info({ totalDeleted }, "All products deleted successfully");
+  } catch (error) {
+    logger.error({
+      error: error instanceof Error ? error.message : String(error),
+    }, "Error in deleteProducts");
+  }
+}
 
 // delete categories
 async function deleteCategories() {
@@ -349,10 +427,11 @@ async function deleteProductAttributes() {
 
 // ***** ready functions *****
 async function main() {
+    await deleteProducts();
     await deleteCategories();
     await deleteProductTypes();
     await deleteProductAttributes();
-    logger.info('*** Categories, Prod Types, Prod Attributes deletion complete!👍🏽 ***');
+    logger.info('*** Products, Categories, Prod Types, Prod Attributes deletion complete!👍🏽 ***');
 }
 
 
