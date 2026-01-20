@@ -5,10 +5,14 @@ import { Configuration } from "@kibocommerce/rest-sdk";
 import { ProductAttributesApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/ProductAttributesApi";
 import { ProductTypesApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/ProductTypesApi";
 import { CategoriesApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/CategoriesApi";
+import { ProductsApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/ProductsApi";
 
 import productAttributesData from "./data/productAttributes.json";
 import productTypesData from "./data/productTypes.json";
 import productCategoriesData from "./data/productCategories.json";
+import productsData from "./data/products.json";
+
+const pageSize = 200;
 
 // Initialize Pino logger with multiple transports
 const transport = pino.transport({
@@ -60,6 +64,7 @@ const configuration = new Configuration({
 const productAttributes = productAttributesData;
 const productTypes = productTypesData;
 const productCategories = productCategoriesData;
+const products = productsData;
 
 // create product attributes
 async function createProductAttributes() {
@@ -218,16 +223,64 @@ async function createCategories() {
 }
 
 // create products
+async function createProducts() {
+  const productClient = new ProductsApi(configuration);
+  const productTypeClient = new ProductTypesApi(configuration);
 
+  logger.info("Starting products creation...");
+
+  try {
+  // get product types from Kibo
+  const productTypeResponse = await productTypeClient.getProductTypes({
+    pageSize,
+    startIndex: 0
+  });
+  const productTypes = productTypeResponse.items || [];
+
+    for (const productData of products) {
+      // Use limiter to rate-limit API calls
+      await limiter.schedule(async () => {
+        try {
+
+          // update productTypeIds from Kibo upload
+          const prodTypeName = productData.properties.find(pt => pt.attributeFQN === "Tenant~prod_type_name")?.values[0].value;
+          const prodTypeId = productTypes.find(pt => pt.name === prodTypeName)?.id;
+          productData.productTypeId = prodTypeId || 1;
+
+          const createdProduct = await productClient.addProduct({
+            catalogAdminsProduct: productData,
+          });
+
+          logger.info({
+            productCode: createdProduct.productCode,
+            productName: createdProduct.content?.productName,
+          }, "Created product");
+        } catch (error) {
+          logger.error({
+            productCode: productData.productCode,
+            productName: productData.content?.productName,
+            error: error instanceof Error ? error.message : String(error),
+          }, "Error creating product");
+        }
+      });
+    }
+    logger.info("All products created successfully");
+  } catch (error) {
+    logger.error({
+      error: error instanceof Error ? error.message : String(error),
+    }, "Error in createProducts");
+  }
+}
 
 
 
 
 // ***** ready functions *****
 async function main() {
-    await createProductAttributes();
-    await createProductTypes();
-    await createCategories();
+    // await createProductAttributes();
+    // await createProductTypes();
+    // await createCategories();
+    await createProducts();
     logger.info('*** Products load process complete!👍🏽 ***');
 }
 

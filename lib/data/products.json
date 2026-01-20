@@ -1,0 +1,1286 @@
+[
+  {
+    "productCode": "36045",
+    "productUsage": "Standard",
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "Curaplex CPR Mask w/O2 Port & Hard Case",
+      "productFullDescription": "The Curaplex® CPR Mask is a cost-effective option for performing CPR. The mask seals to the face, and a one-way valve protects the rescuer from accidental exposure. The mask also includes a supplemental O2 port. The Curaplex CPR Mask is designed for a trained rescuer and first responder. It provides superior protection and durability. The mask is a barrier separating the rescuer from the patient. The mask is collapsible, easy to use, and portable. The cuff comes inflated and gives a quick and efficient seal. An O2 port allows for the delivery of supplemental emergency oxygen. The mask is not made with natural rubber latex. ***Please note:  This device is intended for single use only.",
+      "productShortDescription": "The Curaplex® CPR Mask is a cost-effective option for performing CPR. The mask seals to the face, and a one-way valve protects the rescuer from accidental exposure. The mask also includes a supplemental O2 port."
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 9.49
+    },
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": true
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "Curaplex",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "Curaplex"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "mask",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "mask"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  },
+  {
+    "productCode": "2442-BVM1500",
+    "productUsage": "Standard",
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "Curaplex BVM Manual Resuscitator with Universal Connector",
+      "productFullDescription": "The Curaplex BVM Manual Resuscitator with Universal Connector is designed for adult, single-patient use. Each kit includes 7ft O2 tubing and a face mask that is proportionately sized to the resuscitation bag to help ensure a secure fit. The pliable bag body provides a reassuring feel of the patient's lung compliance, while the port swivel allows easy movement around the patient. These bags were designed to be clinician-friendly with a drawstring package that clearly denotes size and specifications and IFU on the backside. With accurate pressure delivery to reduce gastric insufflation and being latex-free, the Curaplex BVM Manual Resuscitator is a must-have for professionals seeking a reliable resuscitator with a universal connector.",
+      "productShortDescription": "The Curaplex BVM Manual Resuscitator with Universal Connector is designed for adult, single-patient use. Each kit includes 7ft O2 tubing and a face mask that is proportionately sized to the resuscitation bag to help ensure a secure fit."
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 15.99
+    },
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": true
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "Curaplex",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "Curaplex"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "mask",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "mask"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  },
+  {
+    "productCode": "540212000",
+    "productUsage": "Standard",
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "AMBU Bag SPUR II Infant Resuscitator w/Infant Mask & Oxygen Reservoir",
+      "productFullDescription": "The 'Ambu Bag' is the most widely asked for Bag Valve Mask (BVM) resuscitator on the market, and we have them at the right price. Our Ambu SPUR II® resuscitator is for single patient use (meaning it's disposable). Made from an SEBS polymer instead of PVC. Not made with natural rubber latex. Includes manometer port on the mask.",
+      "productShortDescription": "The 'Ambu Bag' is the most widely asked for Bag Valve Mask (BVM) resuscitator on the market, and we have them at the right price."
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 14.08
+    },
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": true
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "AMBU",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "AMBU"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~resources",
+        "values": [
+          {
+            "value": "https://www.aedsuperstore.com/assets/images/pdf",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "https://www.aedsuperstore.com/assets/images/pdf"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "mask",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "mask"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  },
+  {
+    "productCode": "CSPHG5-N",
+    "productUsage": "Configurable",
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "Cardiac Science Powerheart G5 AED",
+      "productFullDescription": "Whether you are an experienced rescuer or a first-time responder, the Powerheart G5 automated external defibrillator (AED) provides a powerful combination of features that help rescuers provide sudden cardiac arrest (SCA) victims with swift, effective, and life-saving therapy.",
+      "productShortDescription": "Customizes the shock to deliver the appropriate energy needed for each patient"
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 2157
+    },
+    "options": [
+      {
+        "attributeFQN": "Tenant~aed_type",
+        "isProductImageGroupSelector": false,
+        "values": [
+          {
+            "value": "Fully-Automatic AED",
+            "attributeVocabularyValueDetail": {
+              "value": "Fully-Automatic AED",
+              "content": {
+                "localeCode": "en-US",
+                "stringValue": "Fully-Automatic AED"
+              }
+            }
+          },
+          {
+            "value": "Semi-Automatic AED",
+            "attributeVocabularyValueDetail": {
+              "value": "Semi-Automatic AED",
+              "content": {
+                "localeCode": "en-US",
+                "stringValue": "Semi-Automatic AED"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": true
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "Cardiac Science",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "Cardiac Science"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~resources",
+        "values": [
+          {
+            "value": "https://www.aed.com/media/mageplaza/",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "https://www.aed.com/media/mageplaza/"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "aed",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "aed"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  },
+  {
+    "productCode": "DCF-100",
+    "productUsage": "Configurable",
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "Defibtech Lifeline and Lifeline AUTO AED",
+      "productFullDescription": "Defibtech Lifeline and Lifeline Auto AEDs are designed for ease of use in medical emergencies. Both the semi-automatic Lifeline AED and the fully-automatic Lifeline Auto AED provide users with an easy-to-use defibrillator during sudden cardiac arrest events. Defibtech Lifeline AEDs are easy to use, have long battery lives, and are excellent defibrillators for first responders, home emergencies, small business owners, government entities and even corporations.",
+      "productShortDescription": "Defibtech Lifeline and Lifeline Auto AEDs are designed for ease of use in medical emergencies. Both the semi-automatic Lifeline AED and the fully-automatic Lifeline Auto AED provide users with an easy-to-use defibrillator during sudden cardiac arrest events."
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 1523
+    },
+    "options": [
+      {
+        "attributeFQN": "Tenant~aed_type",
+        "isProductImageGroupSelector": false,
+        "values": [
+          {
+            "value": "Fully-Automatic AED",
+            "attributeVocabularyValueDetail": {
+              "value": "Fully-Automatic AED",
+              "content": {
+                "localeCode": "en-US",
+                "stringValue": "Fully-Automatic AED"
+              }
+            }
+          },
+          {
+            "value": "Semi-Automatic AED",
+            "attributeVocabularyValueDetail": {
+              "value": "Semi-Automatic AED",
+              "content": {
+                "localeCode": "en-US",
+                "stringValue": "Semi-Automatic AED"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": true
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "Defibtech",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "Defibtech"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~resources",
+        "values": [
+          {
+            "value": "https://www.heartsmart.com/pdf/",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "https://www.heartsmart.com/pdf/"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "aed",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "aed"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  },
+  {
+    "productCode": "M5066A-C02",
+    "productUsage": "Configurable",
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "Philips HeartStart OnSite AED",
+      "productFullDescription": "The Philips HeartStart OnSite AED is a device made for all rescuers, even those with little or no training with an automated external defibrillator. This device is FDA-approved for home use and is one of the few AED devices that does not need a physician prescription. This device features SMART Analysis technology that can automatically detect an abnormal heart rhythm. If the shock button is pressed, the SMART Analysis technology will determine if the shock is needed, reducing the concern about shocking someone unnecessarily. With an 8-year warranty on the device and daily self-checks, the Philips HeartStart OnSite AED is the easiest AED unit to start your emergency preparedness journey with!",
+      "productShortDescription": "The Philips HeartStart OnSite AED is a device made for all rescuers, even those with little or no training with an automated external defibrillator. This device is FDA-approved for home use and is one of the few AED devices that does not need a physician prescription."
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 1529
+    },
+    "options": [
+      {
+        "attributeFQN": "Tenant~carry_case_option",
+        "isProductImageGroupSelector": false,
+        "values": [
+          {
+            "value": "Carry Sleeve",
+            "attributeVocabularyValueDetail": {
+              "value": "Carry Sleeve",
+              "content": {
+                "localeCode": "en-US",
+                "stringValue": "Carry Sleeve"
+              }
+            }
+          },
+          {
+            "value": "Semi-Rigid Case",
+            "attributeVocabularyValueDetail": {
+              "value": "Semi-Rigid Case",
+              "content": {
+                "localeCode": "en-US",
+                "stringValue": "Semi-Rigid Case"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": true
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "Phillips",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "Phillips"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~resources",
+        "values": [
+          {
+            "value": "https://www.aedsuperstore.com/pdf",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "https://www.aedsuperstore.com/pdf"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "aed",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "aed"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  },
+  {
+    "productCode": "XBTAED001A",
+    "productUsage": "Standard",
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "Cardiac Science Powerheart AED G5 Intellisense Battery",
+      "productFullDescription": "The IntelliSense™ Long-Life Lithium (LiSO2) Battery for Powerheart® AED G5 by Cardiac Science comes with a four-year performance guarantee. Internal Intellisense battery circuitry works with Cardiac Science's patented Rescue Ready technology to relay information about the battery's performance, capacity, and other data points to your Powerheart AED.",
+      "productShortDescription": "The IntelliSense™ Long-Life Lithium (LiSO2) Battery for Powerheart® AED G5 by Cardiac Science"
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 495
+    },
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": true
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "Cardiac Science",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "Cardiac Science"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~resources",
+        "values": [
+          {
+            "value": "https://www.aedsuperstore.com/",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "https://www.aedsuperstore.com/"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "battery",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "battery"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  },
+  {
+    "productCode": "M5070A",
+    "productUsage": "Standard",
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "Philips M5070A",
+      "productFullDescription": "Philips M5070A Battery Specifications - Made from lithium, Non-rechargeable, Part number: M5070A, Free shipping on online orders over $99+, 30-day money-back guarantee, 4-year life in stand-by mode, Capability to provide up to a 200+ shock capacity in most cases, Alternate part number: 989803121381",
+      "productShortDescription": "Philips M5070A Battery"
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 205
+    },
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": true
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "Phillips",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "Phillips"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~resources",
+        "values": [
+          {
+            "value": "https://www.aedsuperstore.com/philips-heartstart-frx.html",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "https://www.aedsuperstore.com/philips-heartstart-frx.html"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "battery",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "battery"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  },
+  {
+    "productCode": "DCF-200",
+    "productUsage": "Standard",
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "Defibtech Lifeline or Lifeline AUTO AED Standard Battery Pack",
+      "productFullDescription": "The Defibtech Lifeline and Lifeline AUTO AED replacement batteries are long-lasting due to their double-battery power. This battery contains a replaceable 9-volt battery (DAC-410) that powers the unit's self-checks, leaving the battery pack available for rescue. Do you need a high-use battery pack for longer shock time? AEDSuperstore carries both options. When purchased, all Defibtech Lifeline and Lifeline AUTO AED Replacement Batteries have a 9-volt battery.",
+      "productShortDescription": "The Defibtech Lifeline and Lifeline AUTO AED replacement batteries are long-lasting due to their double-battery power. This battery contains a replaceable 9-volt battery (DAC-410) that powers the unit's self-checks, leaving the battery pack available for rescue."
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 235.97
+    },
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": true
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "Defibtech",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "Defibtech"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~resources",
+        "values": [
+          {
+            "value": "https://www.aedsuperstore.com/defibtech-lifeline-aed.html",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "https://www.aedsuperstore.com/defibtech-lifeline-aed.html"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "battery",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "battery"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  },
+  {
+    "productCode": "M5076A",
+    "productUsage": "Standard",
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "Philips HeartStart OnSite AED Slim Carrying Case",
+      "productFullDescription": "The Philips HeartStart Slim AED Carrying Case ships standard with the purchase of a Philips HeartStart OnSite AED. The slim carrying case features a small, clear window so you can check the AED indicator without having to take it out of the carrying case. Note: The replacement carrying case had just enough room for the Philips HeartStart OnSite AED only (no extra accessories). Dimensions: 10.5\" x 6.5\" x 3.5\"",
+      "productShortDescription": "The Philips HeartStart Slim AED Carrying Case ships standard with the purchase of a Philips HeartStart OnSite AED."
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 129
+    },
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": true
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "Philips",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "Philips"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "case",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "case"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  },
+  {
+    "productCode": "DAC-2100",
+    "productUsage": "Standard",
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "Defibtech Lifeline View AED Carrying Case",
+      "productFullDescription": "The Defibtech Lifeline View Carrying Case can hold the Lifeline View AED, and extra set of pads, and additional accessories. The durable case is made of ballistic nylon, and has a clear front to allow you to easily see the screen and status indicator.",
+      "productShortDescription": "The Defibtech Lifeline View Carrying Case can hold the Lifeline View AED, and extra set of pads, and additional accessories."
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 112.02
+    },
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": true
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "Defibtech",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "Defibtech"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "case",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "case"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  },
+  {
+    "productCode": "PAD-BAG-01",
+    "productUsage": "Standard",
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "HeartSine Samaritan PAD Carrying Case",
+      "productFullDescription": "The HeartSine Samaritan PAD Carrying Case protects your AED from outside damage. It has the room to store the Samaritan AED, along with a CPR prep kit, additional adult or pediatric pak, data cable, operator's manual, and quick instruction card.",
+      "productShortDescription": "The HeartSine Samaritan PAD Carrying Case protects your AED from outside damage."
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 75
+    },
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": true
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "HeartSine",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "HeartSine"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "case",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "case"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  },
+  {
+    "productCode": "ARCFACPRAEDOL",
+    "productUsage": "Standard",
+    "fulfillmentTypesSupported": ["Digital"],
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "Adult, Child, Infant CPR/AED/First Aid Online Training",
+      "productFullDescription": "This fully-online course covers CPR, AEDs and First Aid for emergencies with adults, children, or infants. During the 2.5 hour course developed by the American Red Cross you can expect to learn how to identify breathing, cardiac, and first aid emergencies and respond appropriately until professional help arrives. ",
+      "productShortDescription": "This fully-online course covers CPR, AEDs and First Aid for emergencies with adults, children, or infants."
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 35
+    },
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": false
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "American Red Cross",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "American Red Cross"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~language",
+        "values": [
+          {
+            "value": "English",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "English"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~class_type",
+        "values": [
+          {
+            "value": "Online only",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "Online only"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~course_length",
+        "values": [
+          {
+            "value": "2 Hours 45 Minutes",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "2 Hours 45 Minutes"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "training",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "training"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  },
+  {
+    "productCode": "15-1422",
+    "productUsage": "Standard",
+    "fulfillmentTypesSupported": ["Digital"],
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "AHA Opioid Education for Healthcare Providers (eLearning Course)",
+      "productFullDescription": "AHA Opioid Education for Healthcare Providers (eLearning Course). This is a self-directed, eLearning course that teaches all levels of clinical healthcare providers how to provide immediate treatment and care for opioid overdose victims. The course educates participants in the pathophysiology of opioid overdose such as special considerations on how to care for overdose patients, including naloxone administration, recognizing the need for high-quality CPR, and use of a defibrillator as indicated.",
+      "productShortDescription": "AHA Opioid Education for Healthcare Providers (self-directed eLearning Course)."
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 20
+    },
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": false
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "American Red Cross",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "American Red Cross"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~language",
+        "values": [
+          {
+            "value": "English",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "English"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~class_type",
+        "values": [
+          {
+            "value": "Online only",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "Online only"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~course_length",
+        "values": [
+          {
+            "value": "1 Hours 30 Minutes",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "1 Hours 30 Minutes"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "training",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "training"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  },
+  {
+    "productCode": "25-1147",
+    "productUsage": "Standard",
+    "fulfillmentTypesSupported": ["Digital"],
+    "masterCatalogId": 1,
+    "productTypeId": 1,
+    "content": {
+      "localeCode": "en-US",
+      "productName": "AHA 2025 Heartsaver First Aid CPR AED Course Videos on USB Drive",
+      "productFullDescription": "Heartsaver First Aid CPR AED Course Videos on USB Drive: The AHA 2025 Heartsaver® First Aid CPR AED Course Videos on USB Drive provide instructors with a complete video library for teaching Heartsaver First Aid, CPR AED, and blended-learning courses. Fully updated to the 2025 AHA Guidelines for CPR & ECC, this USB drive contains the same content as the DVD set and digital videos, requiring no internet connection. Instructors can easily select the course version via an on-screen menu, and the USB is licensed for use by a single instructor, making it a convenient and reliable teaching resource.",
+      "productShortDescription": "Heartsaver First Aid CPR AED Course Videos on USB Drive: The AHA 2025 Heartsaver® First Aid CPR AED Course Videos on USB Drive provide instructors with a complete video library for teaching Heartsaver First Aid, CPR AED, and blended-learning courses."
+    },
+    "price": {
+      "isoCurrencyCode": "USD",
+      "price": 215
+    },
+    "properties": [
+      {
+        "attributeFQN": "Tenant~is_returnable",
+        "values": [
+          {
+            "value": false
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~manufacturer",
+        "values": [
+          {
+            "value": "American Red Cross",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "American Red Cross"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~language",
+        "values": [
+          {
+            "value": "English",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "English"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~class_type",
+        "values": [
+          {
+            "value": "Online only",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "Online only"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~course_length",
+        "values": [
+          {
+            "value": "3 Hours 30 Minutes",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "3 Hours 30 Minutes"
+            }
+          }
+        ]
+      },
+      {
+        "attributeFQN": "Tenant~prod_type_name",
+        "values": [
+          {
+            "value": "training",
+            "content": {
+              "localeCode": "en-US",
+              "stringValue": "training"
+            }
+          }
+        ]
+      }
+    ],
+    "isTaxable": true,
+    "packageHeight": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWidth": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageLength": {
+      "unit": "in",
+      "value": 1.0
+    },
+    "packageWeight": {
+      "unit": "lbs",
+      "value": 1.0
+    }
+  }
+]

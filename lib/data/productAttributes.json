@@ -494,5 +494,24 @@
         "allowFilteringAndSortingInStorefront": true,
         "indexValueWithCase": false
     }
+  },
+  {
+    "adminName": "prod_type_name",
+    "namespace": "Tenant",
+    "attributeCode": "prod_type_name",
+    "attributeFQN": "tenant~prod_type_name",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
   }
 ]
