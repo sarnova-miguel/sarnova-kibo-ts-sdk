@@ -23,6 +23,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 - [Kibo TypeScript SDK - Documentation](https://docs.kibocommerce.com/pages/typescript-sdk)
 - [Kido TypeScript SDK - Github](https://github.com/KiboSoftware/typescript-rest-sdk)
 - [Kibo API Documentation](https://docs.kibocommerce.com/api-overviews/getting-started)
+- [ts-node](https://www.npmjs.com/package/ts-node)
 
 ---
 
