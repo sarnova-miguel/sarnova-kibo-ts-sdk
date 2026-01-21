@@ -6,15 +6,15 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 
 ## 📋 Table of Contents
 
-- [Quick Links](#quick-links)
-- [Getting Started](#getting-started)
+- [Quick Links](#-quick-links)
+- [Getting Started](#-getting-started)
   - [Configure Environment Variables](#configure-environment-variables)
   - [Install Dependencies](#install-dependencies)
-- [Logs](#logs)
-- [Scripts Overview](#scripts-overview)
-  - [1. 🆕 `newSandboxSetup.ts`](#1-🆕-newsandboxsetupts)
-  - [2. ➕ `newSandboxProducts.ts`](#2-➕-newsandboxproductsts)
-  - [3. ❌ `deleteProdsCatsTypesAttributes.ts`](#3-❌-deleteprodscatstypesattributests)
+- [Logs](#-logs)
+- [Scripts Overview](#️-scripts-overview)
+  - [1. 🆕 `newSandboxSetup.ts`](#1--newsandboxsetupts)
+  - [2. ➕ `newSandboxProducts.ts`](#2--newsandboxproductsts)
+  - [3. ❌ `deleteProdsCatsTypesAttributes.ts`](#3--deleteprodscatstypesattributests)
 
 ---
 
