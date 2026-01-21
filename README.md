@@ -4,6 +4,28 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 
 ---
 
+## 📋 Table of Contents
+
+- [Quick Links](#quick-links)
+- [Getting Started](#getting-started)
+  - [Configure Environment Variables](#configure-environment-variables)
+  - [Install Dependencies](#install-dependencies)
+- [Logs](#logs)
+- [Scripts Overview](#scripts-overview)
+  - [1. 🆕 `newSandboxSetup.ts`](#1-🆕-newsandboxsetupts)
+  - [2. ➕ `newSandboxProducts.ts`](#2-➕-newsandboxproductsts)
+  - [3. ❌ `deleteProdsCatsTypesAttributes.ts`](#3-❌-deleteprodscatstypesattributests)
+
+---
+
+## 🌎 Quick Links
+
+- [Kibo TypeScript SDK - Documentation](https://docs.kibocommerce.com/pages/typescript-sdk)
+- [Kido TypeScript SDK - Github](https://github.com/KiboSoftware/typescript-rest-sdk)
+- [Kibo API Documentation](https://docs.kibocommerce.com/api-overviews/getting-started)
+
+---
+
 ## 🚀 Getting Started
 
 **IMPORTANT:** Before running any scripts, you must configure your environment variables in a `.env` file at the root of the project.
@@ -64,7 +86,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 
 ## 📜 Logs
 
-All scripts generate detailed logs in the `logs/` directory:
+[Pino](https://getpino.io/#/) utilized for logging.  All scripts generate detailed logs in the terminal and in the `logs/` directory:
 - `add-sandbox-products.log` - Product creation logs
 - `delete-sandbox-products.log` - Deletion operation logs
 
