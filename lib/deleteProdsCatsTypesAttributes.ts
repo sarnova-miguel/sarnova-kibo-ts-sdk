@@ -56,18 +56,35 @@ const configuration = new Configuration({
   apiEnv: process.env.API_ENV || "",
 });
 
-// delete products
+// delete products from master catalog
 async function deleteProducts() {
-  const productClient = new ProductsApi(configuration);
+  const masterCatalogId = process.env.MASTER_CATALOG || "1";
 
-  logger.info("Starting products deletion...");
+  // Create a configuration specifically for master catalog operations
+  // Setting 'catalog' and 'siteId' to undefined ensures those headers are not sent,
+  // so API calls will operate at the master catalog level without site/child catalog context
+  const masterCatalogConfiguration = new Configuration({
+    tenantId: process.env.TENANT_ID || "",
+    siteId: undefined, // No site context for master catalog operations
+    catalog: undefined, // No child catalog context
+    masterCatalog: masterCatalogId,
+    sharedSecret: process.env.SHARED_SECRET || "",
+    clientId: process.env.CLIENT_ID || "",
+    pciHost: process.env.PCI_HOST || "",
+    authHost: process.env.AUTH_HOST || "",
+    apiEnv: process.env.API_ENV || "",
+  });
+
+  const productClient = new ProductsApi(masterCatalogConfiguration);
+
+  logger.info({ masterCatalogId }, "Starting master catalog products deletion...");
 
   try {
     let totalDeleted = 0;
     let hasMoreProducts = true;
 
     while (hasMoreProducts) {
-      // Get products in batches
+      // Get products from master catalog in batches
       const productsResponse = await productClient.getProducts({
         pageSize,
         startIndex: 0, // Always get from the beginning since we're deleting
@@ -78,11 +95,12 @@ async function deleteProducts() {
 
       logger.info({
         count: productsCount,
-        totalDeleted
-      }, "Found products in this batch");
+        totalDeleted,
+        masterCatalogId
+      }, "Found products in master catalog batch");
 
       if (productsCount === 0) {
-        logger.info("No more products found to delete");
+        logger.info("No more products found in master catalog to delete");
         hasMoreProducts = false;
         break;
       }
@@ -98,28 +116,32 @@ async function deleteProducts() {
         // Use limiter to rate-limit API calls
         await limiter.schedule(async () => {
           try {
+            // deleteProduct removes the product from the master catalog entirely
             await productClient.deleteProduct({
               productCode: product.productCode!,
             });
             logger.info({
               productCode: product.productCode,
               productName: product.content?.productName,
-            }, "Deleted product");
+              masterCatalogId
+            }, "Deleted product from master catalog");
             totalDeleted++;
           } catch (error) {
             logger.error({
               productCode: product.productCode,
               productName: product.content?.productName,
+              masterCatalogId,
               error: error instanceof Error ? error.message : String(error),
-            }, "Error deleting product");
+            }, "Error deleting product from master catalog");
           }
         });
       }
 
       logger.info({
         batchDeleted: productsCount,
-        totalDeleted
-      }, "Completed batch deletion");
+        totalDeleted,
+        masterCatalogId
+      }, "Completed master catalog batch deletion");
 
       // If we got fewer products than the page size, we're done
       if (productsCount < pageSize) {
@@ -127,9 +149,10 @@ async function deleteProducts() {
       }
     }
 
-    logger.info({ totalDeleted }, "All products deleted successfully");
+    logger.info({ totalDeleted, masterCatalogId }, "All master catalog products deleted successfully");
   } catch (error) {
     logger.error({
+      masterCatalogId,
       error: error instanceof Error ? error.message : String(error),
     }, "Error in deleteProducts");
   }
