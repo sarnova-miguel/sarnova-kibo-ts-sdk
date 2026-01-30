@@ -1,5 +1,43 @@
 [
   {
+    "adminName": "country_of_origin",
+    "namespace": "Tenant",
+    "attributeCode": "country_of_origin",
+    "attributeFQN": "tenant~country_of_origin",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "brand",
+    "namespace": "Tenant",
+    "attributeCode": "brand",
+    "attributeFQN": "tenant~brand",
+    "inputType": "TextBox",
+    "valueType": "AdminEntered",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
     "adminName": "image",
     "namespace": "Tenant",
     "attributeCode": "image",
@@ -152,6 +190,63 @@
     }
   },
   {
+    "adminName": "is_regulated",
+    "namespace": "Tenant",
+    "attributeCode": "is_regulated",
+    "attributeFQN": "tenant~is_regulated",
+    "inputType": "YesNo",
+    "valueType": "AdminEntered",
+    "dataType": "Bool",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "is_refrigerated",
+    "namespace": "Tenant",
+    "attributeCode": "is_refrigerated",
+    "attributeFQN": "tenant~is_refrigerated",
+    "inputType": "YesNo",
+    "valueType": "AdminEntered",
+    "dataType": "Bool",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "is_hazardous",
+    "namespace": "Tenant",
+    "attributeCode": "is_hazardous",
+    "attributeFQN": "tenant~is_hazardous",
+    "inputType": "YesNo",
+    "valueType": "AdminEntered",
+    "dataType": "Bool",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
     "adminName": "is_returnable",
     "namespace": "Tenant",
     "attributeCode": "is_returnable",
@@ -223,6 +318,45 @@
         "searchableInStorefront": false,
         "searchableInAdmin": false,
         "searchDisplayValue": false,
+        "allowFilteringAndSortingInStorefront": true,
+        "indexValueWithCase": false
+    }
+  },
+  {
+    "adminName": "battery_type",
+    "namespace": "Tenant",
+    "attributeCode": "battery_type",
+    "attributeFQN": "tenant~battery_type",
+    "inputType": "List",
+    "valueType": "Predefined",
+    "dataType": "String",
+    "isOption": false,
+    "isExtra": false,
+    "isProperty": true,
+    "vocabularyValues": [
+          {
+              "value": "Lithium",
+              "mappedGenericValues": [],
+              "content": {
+                  "localeCode": "en-US",
+                  "stringValue": "Lithium"
+              },
+              "displayOrder": 1
+          },
+          {
+              "value": "Alkaline",
+              "mappedGenericValues": [],
+              "content": {
+                  "localeCode": "en-US",
+                  "stringValue": "Alkaline"
+              },
+              "displayOrder": 2
+          }
+      ],
+    "searchSettings": {
+        "searchableInStorefront": true,
+        "searchableInAdmin": true,
+        "searchDisplayValue": true,
         "allowFilteringAndSortingInStorefront": true,
         "indexValueWithCase": false
     }
