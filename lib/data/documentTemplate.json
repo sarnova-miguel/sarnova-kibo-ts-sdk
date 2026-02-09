@@ -1,0 +1,18 @@
+{
+    "name": "shipping-messages",
+    "documentTypeFQN": "shippingBanner@Tenant",
+    "listFQN": "shippingBanner@Tenant",
+    "publishState": "active",
+    "properties": {
+        "id": "shipping-msgs-2026",
+        "title": "Base rotation of shipping messages",
+        "isActive": true,
+        "priority": 1,
+        "messages": [
+            "{\"text\": \"Free Shipping on Orders over $99+\",\"redirectUrl\": \"/add-some-url-here\"}",
+            "{\"text\": \"Get $200 OFF purchase of $1,500\",\"redirectUrl\": \"/some-url-here\"}",
+            "{\"text\": \"Free Shipping for ALL NEW CUSTOMERS!\",\"redirectUrl\": \"/another-url-here\"}",
+            "{\"text\": \"Buy 2, Get 1 Free! - Today only!\",\"redirectUrl\": \"/somewhere-url-here\"}"
+        ]
+    }
+}

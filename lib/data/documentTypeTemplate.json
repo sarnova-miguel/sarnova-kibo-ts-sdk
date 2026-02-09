@@ -1,0 +1,62 @@
+{
+    "name": "shippingBanner",
+    "namespace": "Tenant",
+    "documentTypeFQN": "shippingBanner@Tenant",
+    "properties": [
+        {
+            "name": "id",
+            "isRequired": true,
+            "isMultiValued": false,
+            "propertyType": {
+                "name": "string",
+                "namespace": "mozu",
+                "propertyTypeFQN": "string@mozu",
+                "dataType": "string"
+            }
+        },
+        {
+            "name": "title",
+            "isRequired": true,
+            "isMultiValued": false,
+            "propertyType": {
+                "name": "string",
+                "namespace": "mozu",
+                "propertyTypeFQN": "string@mozu",
+                "dataType": "string"
+            }
+        },
+        {
+            "name": "isActive",
+            "isRequired": true,
+            "isMultiValued": false,
+            "propertyType": {
+                "name": "boolean",
+                "namespace": "mozu",
+                "propertyTypeFQN": "boolean@mozu",
+                "dataType": "boolean"
+            }
+        },
+        {
+            "name": "priority",
+            "isRequired": false,
+            "isMultiValued": false,
+            "propertyType": {
+                "name": "int",
+                "namespace": "mozu",
+                "propertyTypeFQN": "int@mozu",
+                "dataType": "int"
+            }
+        },
+        {
+            "name": "messages",
+            "isRequired": true,
+            "isMultiValued": true,
+            "propertyType": {
+                "name": "string",
+                "namespace": "mozu",
+                "propertyTypeFQN": "string@mozu",
+                "dataType": "string"
+            }
+        }
+    ]
+}

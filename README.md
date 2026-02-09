@@ -15,6 +15,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
   - [1. 🆕 `newSandboxSetup.ts`](#1--newsandboxsetupts)
   - [2. ➕ `newSandboxProducts.ts`](#2--newsandboxproductsts)
   - [3. ❌ `deleteProdsCatsTypesAttributes.ts`](#3--deleteprodscatstypesattributests)
+  - [4. 📋 `createDocTypeListDocs.ts`](#4--createdoctypelistdocsts)
 
 ---
 
@@ -81,6 +82,11 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 5. **Clean Up (if needed)**
    ```bash
    ts-node .\lib\deleteProdsCatsTypesAttributes.ts
+   ```
+
+6. **Create Document Type, List, and Docs**
+   ```bash
+   ts-node .\lib\createDocTypeListDocs.ts
    ```
 
 ---
@@ -206,3 +212,28 @@ ts-node .\lib\deleteProdsCatsTypesAttributes.ts
 
 ---
 
+### 4. 📋 `createDocTypeListDocs.ts`
+
+**Purpose:** Create a document type, document list, and document for the sandbox environment. Use the template data files in the `data` folder to customize your data.
+
+**Location:** `lib/createDocTypeListDocs.ts`
+
+**What it does:**
+- Creates a document type from `data/documentTypeTemplate.json`
+- Creates a document list from `data/documentListTemplate.json`
+- Creates a document from `data/documentTemplate.json`
+
+**Key Features:**
+- Rate limiting (500ms between API calls) for API throttling
+- Structured logging to both console and `logs/createDocTypeListDocs.log`
+- Document List is scoped to the site specified in the .env file.  Update the scopeId in the `data/documentListTemplate.json` file before running the script.
+
+**Important Note:**  You may have to comment out CATALOG in the env file before running this script. 
+
+**Usage:**
+To run the script, use the following command:
+```bash
+ts-node .\lib\createDocTypeListDocs.ts
+```
+
+---

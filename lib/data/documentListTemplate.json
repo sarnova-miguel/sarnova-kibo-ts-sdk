@@ -1,0 +1,81 @@
+{
+    "name": "shippingBanner",
+    "namespace": "Tenant",
+    "documentTypes": [
+        "shippingBanner@Tenant"
+    ],
+    "supportsPublishing": true,
+    "enablePublishing": true,
+    "supportsActiveDateRanges": true,
+    "enableActiveDateRanges": true,
+    "usages": [
+        "entitymanager",
+        "sitebuilder"
+    ],
+    "views": [
+        {
+            "name": "default",
+            "isVisibleInStorefront": true,
+            "usages": [
+                "entitymanager",
+                "sitebuilder"
+            ],
+            "fields": [
+                {
+                    "name": "id",
+                    "target": "properties.id"
+                },
+                {
+                    "name": "title",
+                    "target": "properties.title"
+                },
+                {
+                    "name": "isActive",
+                    "target": "properties.isActive"
+                },
+                {
+                    "name": "priority",
+                    "target": "properties.priority"
+                },
+                {
+                    "name": "messages",
+                    "target": "properties.messages"
+                }
+            ]
+        },
+        {
+            "name": "active-banners",
+            "isVisibleInStorefront": true,
+            "filter": "properties.isActive eq true",
+            "includeInactiveMode": "active",
+            "usages": [
+                "entitymanager",
+                "sitebuilder"
+            ],
+            "fields": [
+                {
+                    "name": "id",
+                    "target": "properties.id"
+                },
+                {
+                    "name": "title",
+                    "target": "properties.title"
+                },
+                {
+                    "name": "isActive",
+                    "target": "properties.isActive"
+                },
+                {
+                    "name": "priority",
+                    "target": "properties.priority"
+                },
+                {
+                    "name": "messages",
+                    "target": "properties.messages"
+                }
+            ]
+        }
+    ],
+    "scopeId": 1001015,
+    "scopeType": "Site"
+}
