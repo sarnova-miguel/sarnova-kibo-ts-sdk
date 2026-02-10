@@ -221,7 +221,7 @@ ts-node .\lib\deleteProdsCatsTypesAttributes.ts
 **What it does:**
 - Creates a document type from `data/documentTypeTemplate.json`
 - Creates a document list from `data/documentListTemplate.json`
-- Creates a document from `data/documentTemplate.json`
+- Creates a document from `data/documentTemplate.json` and publishes it
 
 **Key Features:**
 - Rate limiting (500ms between API calls) for API throttling
