@@ -16,7 +16,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
   - [2. ➕ `newSandboxProducts.ts`](#2--newsandboxproductsts)
   - [3. ❌ `deleteProdsCatsTypesAttributes.ts`](#3--deleteprodscatstypesattributests)
   - [4. 📋 `createDocTypeListDocs.ts`](#4--createdoctypelistdocsts)
-  - [5. 🧑‍🤝‍🧑 `copyPasteDocs.ts`](#5-copypastdocsts)
+  - [5. 🧑‍🤝‍🧑 `copyPasteDocs.ts`](#5--copypastedocsts)
 
 ---
 
