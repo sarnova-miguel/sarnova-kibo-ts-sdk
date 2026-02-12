@@ -16,7 +16,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
   - [2. ➕ `newSandboxProducts.ts`](#2--newsandboxproductsts)
   - [3. ❌ `deleteProdsCatsTypesAttributes.ts`](#3--deleteprodscatstypesattributests)
   - [4. 📋 `createDocTypeListDocs.ts`](#4--createdoctypelistdocsts)
-  - [5. 🧑‍🤝‍🧑 `copyPasteDocs.ts`](#5--copypastedocsts)
+  - [5. 📄 `copyPasteDocs.ts`](#5--copypastedocsts)
 
 ---
 
@@ -244,7 +244,7 @@ ts-node .\lib\createDocTypeListDocs.ts
 
 ---
 
-### 5. 🧑‍🤝‍🧑 `copyPasteDocs.ts`
+### 5. 📄 `copyPasteDocs.ts`
 
 **Purpose:** Copy documents from one Kibo environment to another. This is useful for migrating documents between sandbox, staging, and production environments.
 
