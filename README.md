@@ -246,7 +246,7 @@ ts-node .\lib\createDocTypeListDocs.ts
 
 ### 5. 📄 `copyPasteDocs.ts`
 
-**Purpose:** Copy documents from one Kibo environment to another. This is useful for migrating documents between sandbox, staging, and production environments.
+**Purpose:** Copy documents from one Kibo environment to another. This is useful for migrating documents between sandbox environments.
 
 **Location:** `lib/copyPasteDocs.ts`
 
