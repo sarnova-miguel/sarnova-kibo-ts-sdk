@@ -8,8 +8,8 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 
 - [Quick Links](#-quick-links)
 - [Getting Started](#-getting-started)
-  - [Configure Environment Variables](#configure-environment-variables)
-  - [Install Dependencies](#install-dependencies)
+  - Configure Environment Variables
+  - Install Dependencies
 - [Logs](#-logs)
 - [Scripts Overview](#️-scripts-overview)
   - [1. 🆕 `newSandboxSetup.ts`](#1--newsandboxsetupts)
