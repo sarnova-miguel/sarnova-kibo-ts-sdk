@@ -53,7 +53,6 @@ dotenv.config();
 const configuration = new Configuration({
   tenantId: process.env.TENANT_ID || "",
   siteId: process.env.SITE_ID || "",
-  catalog: process.env.CATALOG || "",
   masterCatalog: process.env.MASTER_CATALOG || "",
   sharedSecret: process.env.SHARED_SECRET || "",
   clientId: process.env.CLIENT_ID || "",
