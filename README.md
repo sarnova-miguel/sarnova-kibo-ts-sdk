@@ -16,6 +16,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
   - [2. ➕ `newSandboxProducts.ts`](#2--newsandboxproductsts)
   - [3. ❌ `deleteProdsCatsTypesAttributes.ts`](#3--deleteprodscatstypesattributests)
   - [4. 📋 `createDocTypeListDocs.ts`](#4--createdoctypelistdocsts)
+  - [5. 🧑‍🤝‍🧑 `copyPasteDocs.ts`](#5--copypastdocsts)
 
 ---
 
@@ -89,6 +90,11 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
    ts-node .\lib\createDocTypeListDocs.ts
    ```
 
+7. **Copy Documents Between Environments**
+   ```bash
+   ts-node .\lib\copyPasteDocs.ts
+   ```
+
 ---
 
 ## 📜 Logs
@@ -96,6 +102,8 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 [Pino](https://getpino.io/#/) utilized for logging.  All scripts generate detailed logs in the terminal and in the `logs/` directory:
 - `add-sandbox-products.log` - Product creation logs
 - `delete-sandbox-products.log` - Deletion operation logs
+- `document-type-list-creation.log` - Document type, list, and document creation logs
+- `copy-paste-documents.log` - Document copy/paste operation logs
 
 Logs include timestamps, operation status, entity details, and error messages for troubleshooting.
 
@@ -233,5 +241,56 @@ To run the script, use the following command:
 ```bash
 ts-node .\lib\createDocTypeListDocs.ts
 ```
+
+---
+
+### 5. 🧑‍🤝‍🧑`copyPasteDocs.ts`
+
+**Purpose:** Copy documents from one Kibo environment to another. This is useful for migrating documents between sandbox, staging, and production environments.
+
+**Location:** `lib/copyPasteDocs.ts`
+
+**Note:** This script requires additional configuration. 
+- Your current environment variables will be used as the source environment variables.
+- Update the .env file to add the destination tenant ID, site ID, and document list name to your current environment variables.
+ ```env
+   # Destination Tenant Configuration
+   DEST_TENANT_ID=your_destination_tenant_id
+   DEST_SITE_ID=your_destination_site_id
+   DOCUMENT_LIST_NAME=your_document_list_name  # e.g. shippingBanner@Tenant 
+```
+
+**What it does:**
+- Fetches all documents from a document list in the source environment (with pagination support)
+- Creates each document in the destination environment
+- Tracks success/failure counts for each document
+- Continues processing even if individual documents fail
+
+**Key Features:**
+- Rate limiting (500ms between API calls) to avoid API throttling
+- Structured logging to both console and `logs/copy-paste-documents.log`
+- Pagination support for large document lists (200 documents per page)
+- Error handling that allows the process to continue even if individual documents fail
+- Detailed progress tracking with success/failure counts
+
+**Prerequisites:**
+⚠️ **IMPORTANT:** Before running this script, ensure the following:
+1. The document type must already exist in the destination environment
+2. The document list must already exist in the destination environment
+3. The document type and document list in the destination environment must **exactly match** the source environment (same FQN, namespace, and schema)
+4. You have configured destination environment variables in your `.env` file
+
+**Usage:**
+To run the script, use the following command:
+```bash
+ts-node .\lib\copyPasteDocs.ts
+```
+
+**Logging:**
+All operations are logged with detailed information including:
+- Number of documents fetched from source
+- Progress for each document being copied
+- Success/failure status for each document
+- Final summary with total documents, success count, and failure count
 
 ---
