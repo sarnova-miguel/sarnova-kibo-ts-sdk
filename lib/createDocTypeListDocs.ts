@@ -7,17 +7,13 @@ import { DocumentTypeApi } from "@kibocommerce/rest-sdk/clients/Content/apis/Doc
 import { DocumentListApi } from "@kibocommerce/rest-sdk/clients/Content/apis/DocumentListApi";
 import { DocumentPublishingApi } from "@kibocommerce/rest-sdk/clients/Content/apis/DocumentPublishingApi";
 
-import documentStickyMsgsData from "./data/documentStickyMsgs.json";
 import documentTemplateData from "./data/documentTemplate.json";
 import documentListTemplateData from "./data/documentListTemplate.json";
 import documentTypeTemplateData from "./data/documentTypeTemplate.json";
 
-const documentStickyMsgs = documentStickyMsgsData;
 const documentTemplate = documentTemplateData;
 const documentListTemplate = documentListTemplateData;
 const documentTypeTemplate = documentTypeTemplateData;
-
-const pageSize = 200;
 
 // Initialize Pino logger with multiple transports
 const transport = pino.transport({
