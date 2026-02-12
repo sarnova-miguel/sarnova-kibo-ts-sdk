@@ -183,69 +183,87 @@ async function createDocumentList() {
 
 // create documents
 // This function uses data from data/documentTemplate.json
+// The documentTemplate.json file should contain an array of document objects.
 // Use this data to create sample documents for testing and dev purposes.
 // Or update the data to match your needs.
-async function createDocument() {
+async function createDocuments() {
     logger.info('Starting document creation...');
 
     const documentsClient = new DocumentsApi(configuration);
     const publishingClient = new DocumentPublishingApi(configuration);
 
     try {
-        let documentId: string | undefined;
+        const documentIds: string[] = [];
 
-        // Use limiter to rate-limit API calls for document creation
-        await limiter.schedule(async () => {
-            try {
-                const createdDocument = await documentsClient.createDocument({
-                    documentListName: documentTemplate.listFQN,
-                    document: documentTemplate
-                });
-                documentId = createdDocument.id ?? undefined;
-                logger.info({
-                    documentId: createdDocument.id,
-                    name: createdDocument.name,
-                    documentTypeFQN: createdDocument.documentTypeFQN,
-                    listFQN: createdDocument.listFQN,
-                    publishState: createdDocument.publishState
-                }, 'Created document');
-            } catch (error) {
-                logger.error({
-                    documentName: documentTemplate.name,
-                    listFQN: documentTemplate.listFQN,
-                    error: error instanceof Error ? error.message : String(error),
-                    fullError: error
-                }, 'Error creating document');
-            }
-        });
+        // Iterate through each document template in the array
+        for (const [index, docTemplate] of documentTemplate.entries()) {
+            logger.info({
+                index: index + 1,
+                total: documentTemplate.length,
+                documentName: docTemplate.name
+            }, 'Processing document');
 
-        // Publish the document if it was created successfully
-        if (documentId) {
+            let documentId: string | undefined;
+
+            // Use limiter to rate-limit API calls for document creation
             await limiter.schedule(async () => {
                 try {
-                    await publishingClient.publishDocuments({
-                        requestBody: [documentId!]
+                    const createdDocument = await documentsClient.createDocument({
+                        documentListName: docTemplate.listFQN,
+                        document: docTemplate
                     });
+                    documentId = createdDocument.id ?? undefined;
+                    if (documentId) {
+                        documentIds.push(documentId);
+                    }
                     logger.info({
-                        documentId,
-                        listFQN: documentTemplate.listFQN
-                    }, 'Published document');
+                        documentId: createdDocument.id,
+                        name: createdDocument.name,
+                        documentTypeFQN: createdDocument.documentTypeFQN,
+                        listFQN: createdDocument.listFQN,
+                        publishState: createdDocument.publishState
+                    }, 'Created document');
                 } catch (error) {
                     logger.error({
-                        documentId,
-                        listFQN: documentTemplate.listFQN,
+                        documentName: docTemplate.name,
+                        listFQN: docTemplate.listFQN,
                         error: error instanceof Error ? error.message : String(error),
                         fullError: error
-                    }, 'Error publishing document');
+                    }, 'Error creating document');
                 }
             });
+
+            // Publish the document if it was created successfully
+            if (documentId) {
+                await limiter.schedule(async () => {
+                    try {
+                        await publishingClient.publishDocuments({
+                            requestBody: [documentId!]
+                        });
+                        logger.info({
+                            documentId,
+                            listFQN: docTemplate.listFQN
+                        }, 'Published document');
+                    } catch (error) {
+                        logger.error({
+                            documentId,
+                            listFQN: docTemplate.listFQN,
+                            error: error instanceof Error ? error.message : String(error),
+                            fullError: error
+                        }, 'Error publishing document');
+                    }
+                });
+            }
         }
 
-        logger.info('Document creation and publishing complete');
+        logger.info({
+            totalDocuments: documentTemplate.length,
+            successfullyCreated: documentIds.length
+        }, 'Document creation and publishing complete');
     } catch (error) {
         logger.error({
             error: error instanceof Error ? error.message : String(error)
-        }, 'Error in createDocument');
+        }, 'Error in createDocuments');
     }
 }
 
@@ -253,9 +271,9 @@ async function createDocument() {
 
 // ***** ready functions *****
 async function main() {
-    await createDocumentType();
-    await createDocumentList();
-    await createDocument();
+    // await createDocumentType();
+    // await createDocumentList();
+    await createDocuments();
     logger.info('*** Document type list creation process complete!👍🏽 ***');
 }
 

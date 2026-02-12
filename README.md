@@ -214,21 +214,21 @@ ts-node .\lib\deleteProdsCatsTypesAttributes.ts
 
 ### 4. 📋 `createDocTypeListDocs.ts`
 
-**Purpose:** Create a document type, document list, and document for the sandbox environment. Use the template data files in the `data` folder to customize your data.
+**Purpose:** Create a document type, document list, and documents for the sandbox environment. Use the template data files in the `data` folder to customize your data.
 
 **Location:** `lib/createDocTypeListDocs.ts`
 
 **What it does:**
 - Creates a document type from `data/documentTypeTemplate.json`
 - Creates a document list from `data/documentListTemplate.json`
-- Creates a document from `data/documentTemplate.json` and publishes it
+- Creates documents from `data/documentTemplate.json` and publishes them
 
 **Key Features:**
 - Rate limiting (500ms between API calls) for API throttling
 - Structured logging to both console and `logs/createDocTypeListDocs.log`
 - Document List is scoped to the site specified in the .env file.  Update the scopeId in the `data/documentListTemplate.json` file before running the script.
 
-**Important Note:**  You may have to comment out CATALOG in the env file before running this script. 
+**Important Note:**  You have to comment out CATALOG in the env file before running this script. 
 
 **Usage:**
 To run the script, use the following command:
