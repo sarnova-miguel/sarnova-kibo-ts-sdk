@@ -228,8 +228,6 @@ ts-node .\lib\deleteProdsCatsTypesAttributes.ts
 - Structured logging to both console and `logs/createDocTypeListDocs.log`
 - Document List is scoped to the site specified in the .env file.  Update the scopeId in the `data/documentListTemplate.json` file before running the script.
 
-**Important Note:**  You have to comment out CATALOG in the env file before running this script. 
-
 **Usage:**
 To run the script, use the following command:
 ```bash
