@@ -17,6 +17,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
   - [3. ❌ `deleteProdsCatsTypesAttributes.ts`](#3--deleteprodscatstypesattributests)
   - [4. 📋 `createDocTypeListDocs.ts`](#4--createdoctypelistdocsts)
   - [5. 📄 `copyPasteDocs.ts`](#5--copypastedocsts)
+  - [6. 🛒 `cartToCompletedOrder.ts`](#6--carttocompletedorderts)
 
 ---
 
@@ -95,6 +96,11 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
    ts-node .\lib\copyPasteDocs.ts
    ```
 
+8. **Cart to Completed Order**
+   ```bash
+   ts-node .\lib\cartToCompletedOrder.ts
+   ```
+
 ---
 
 ## 📜 Logs
@@ -104,6 +110,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 - `delete-sandbox-products.log` - Deletion operation logs
 - `document-type-list-creation.log` - Document type, list, and document creation logs
 - `copy-paste-documents.log` - Document copy/paste operation logs
+- `cart-to-completed-order.log` - Cart to completed order process logs
 
 Logs include timestamps, operation status, entity details, and error messages for troubleshooting.
 
@@ -292,5 +299,54 @@ All operations are logged with detailed information including:
 - Progress for each document being copied
 - Success/failure status for each document
 - Final summary with total documents, success count, and failure count
+
+---
+
+### 6. 🛒 `cartToCompletedOrder.ts`
+
+**Purpose:** Create an anonymous shopper cart, add a product, and complete the full order lifecycle (fulfillment, billing, payment, and submission).
+
+**Location:** `lib/cartToCompletedOrder.ts`
+
+**Note:** This script requires additional configuration.
+- Add the sandbox payments endpoint to your `.env` file:
+ ```env
+   # Payments Endpoint
+   SANDBOX_PAYMENTS_ENDPOINT=https://payments-sb.usc1.gcp.kibocommerce.com/payments/commerce/payments/cards/
+```
+
+**What it does:**
+- Creates an anonymous shopper auth ticket
+- Adds a product to the anonymous cart
+- Creates an order from the cart
+- Sets fulfillment info (shipping address and method)
+- Obtains a `paymentServiceCardId` by POSTing card details to the sandbox payments endpoint
+- Sets billing info using the retrieved `paymentServiceCardId`
+- Creates a customer account and associates it with the order
+- Submits the order
+
+**Key Features:**
+- Rate limiting (500ms between API calls) for API throttling
+- Structured logging to both console and `logs/cart-to-completed-order.log`
+- Uses anonymous shopper authentication flow
+- Dynamically retrieves `paymentServiceCardId` from the payments service
+- Full order lifecycle from cart creation to order submission
+
+**Execution Order:**
+1. Create anonymous shopper auth ticket
+2. Add item to cart
+3. Create order from cart
+4. Set fulfillment info (shipping address)
+5. Get available shipping methods and set shipping method
+6. POST to payments endpoint to obtain `paymentServiceCardId`
+7. Set billing info (payment details with retrieved card ID)
+8. Create customer account and assign to order
+9. Submit the order
+
+**Usage:**
+To run the script, use the following command:
+```bash
+ts-node .\lib\cartToCompletedOrder.ts
+```
 
 ---
