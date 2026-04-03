@@ -6,6 +6,7 @@ import {
   CustomerAccountApi,
   StorefrontAuthTicketApi,
   CustomerAccount,
+  CustomerLoginInfo,
 } from "@kibocommerce/rest-sdk/clients/Customer";
 import {
   CartApi,
@@ -63,11 +64,12 @@ const configuration = new Configuration({
 
 const paymentsUrl = process.env.SANDBOX_PAYMENTS_ENDPOINT;
 const newUser = {
-  firstName: "Michael",
-  lastNameOrSurname: "Jordan",
-  email: "mj@testing.com",
-  phone: "215-555-1234",
+  firstName: "Dave",
+  lastNameOrSurname: "Chapelle",
+  email: "dc@testing.com",
+  phone: "215-555-4321",
 };
+const sandboxProduct = "DSP_001";
 
 async function main() {
   logger.info("cartToCompletedOrder running...");
@@ -93,7 +95,7 @@ async function main() {
     // if anonymous user token, cart will not be assigned an id until an item is added
 
     const addedItemToCart = await CartClient.addItemToCart(
-      { cartItem: { product: { productCode: "med-glove" }, quantity: 1 } },
+      { cartItem: { product: { productCode: sandboxProduct }, quantity: 1 } },
       { headers },
     );
     logger.info({ addedItemToCart }, `addedItemToCart`);
@@ -234,36 +236,54 @@ async function main() {
         // not necessary if using a user auth token, the response for that token will include account id
         const customerAccount: CustomerAccount = {
           emailAddress: newUser.email,
+          firstName: newUser.firstName,
+          lastName: newUser.lastNameOrSurname,
+          userName: newUser.email,
         };
 
+        // Step 1: Create the account
         const createdCustomerAccount = await CustomerAccountClient.addAccount(
           { customerAccount },
           { headers },
         );
         const customerAccountId = createdCustomerAccount.id;
+        logger.info({ customerAccountId }, "Created customer account");
+
+        // Step 2: Add login credentials to convert guest to registered shopper account
+        if (customerAccountId) {
+          const customerLoginInfo: CustomerLoginInfo = {
+            emailAddress: newUser.email,
+            username: newUser.email,
+            password: "password123",
+          };
+
+          await CustomerAccountClient.addLoginToExistingCustomer(
+              { accountId: customerAccountId, customerLoginInfo },
+            );
+          logger.info(
+            { customerAccountId },
+            "Added login credentials — account is now a registered shopper",
+          );
+        }
 
         if (customerAccountId) {
           const currentOrder = await OrderClient.getOrder(
-            { orderId },
-            { headers },
+            { orderId }
           );
           currentOrder.customerAccountId = customerAccountId;
 
           await OrderClient.updateOrder(
-            { orderId, order: currentOrder },
-            { headers },
+            { orderId, order: currentOrder }
           );
 
           const availableActions = await OrderClient.getAvailableActions(
-            { orderId },
-            { headers },
+            { orderId }
           );
           logger.info({ availableActions }, "available actions");
 
           if (availableActions.includes("SubmitOrder")) {
             await OrderClient.performOrderAction(
-              { orderId, orderAction: { actionName: "SubmitOrder" } },
-              { headers },
+              { orderId, orderAction: { actionName: "SubmitOrder" } }
             );
             logger.info("Submitted Order!");
           }
@@ -271,7 +291,7 @@ async function main() {
       }
     }
   } catch (error) {
-    logger.error("Error with cartToCompletedOrder");
+    logger.error({error}, "Error with cartToCompletedOrder");
   }
 }
 
