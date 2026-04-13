@@ -347,7 +347,14 @@ async function deleteProductAttributes() {
     "sales-rank-long-term",
     "sales-rank-medium-term",
     "sales-rank-short-term",
-    "product-upsell"
+    "product-upsell",
+    // Subscription attributes
+    "subscription-mode",
+    "subscription-frequency",
+    "subscription-trial-days",
+    "subscription-trial-productCode",
+    "subscription-trial-variantCode",
+    "split-extras-in-subscriptions",
   ];
 
   logger.info("Starting product attributes deletion...");
