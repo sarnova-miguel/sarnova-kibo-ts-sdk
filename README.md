@@ -18,7 +18,8 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
   - [4. 📋 `createDocTypeListDocs.ts`](#4--createdoctypelistdocsts)
   - [5. 📄 `copyPasteDocs.ts`](#5--copypastedocsts)
   - [6. 🛒 `cartToCompletedOrder.ts`](#6--carttocompletedorderts)
-  - [7. 🔄 `addSubscriptionAttributes.ts`](#7--addsubscriptionattributests)
+  - [7. 🛒 `cartToCheckoutToOrder.ts`](#7--carttocheckouttoorderts)
+  - [8. �🔄 `addSubscriptionAttributes.ts`](#8--addsubscriptionattributests)
 
 ---
 
@@ -102,7 +103,12 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
    ts-node .\lib\cartToCompletedOrder.ts
    ```
 
-9. **Add Subscription Attributes**
+9. **Cart to Checkout to Order**
+   ```bash
+   ts-node .\lib\cartToCheckoutToOrder.ts
+   ```
+
+10. **Add Subscription Attributes**
    ```bash
    ts-node .\lib\addSubscriptionAttributes.ts
    ```
@@ -117,6 +123,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 - `document-type-list-creation.log` - Document type, list, and document creation logs
 - `copy-paste-documents.log` - Document copy/paste operation logs
 - `cart-to-completed-order.log` - Cart to completed order process logs
+- `cart-to-checkout-to-order.log` - Cart to checkout to order process logs
 - `add-subscription-attributes.log` - Subscription attribute creation logs
 
 Logs include timestamps, operation status, entity details, and error messages for troubleshooting.
@@ -358,7 +365,57 @@ ts-node .\lib\cartToCompletedOrder.ts
 
 ---
 
-### 7. 🔄 `addSubscriptionAttributes.ts`
+### 7. 🛒 `cartToCheckoutToOrder.ts`
+
+**Purpose:** Log in an existing user, add a product to their cart, create a checkout, and complete the full order lifecycle using the Checkout API flow (destination, shipping, billing, payment, and submission).
+
+**Location:** `lib/cartToCheckoutToOrder.ts`
+
+**Note:** This script requires additional configuration.
+- Add the sandbox payments endpoint to your `.env` file:
+ ```env
+   # Payments Endpoint
+   SANDBOX_PAYMENTS_ENDPOINT=https://payments-sb.usc1.gcp.kibocommerce.com/payments/commerce/payments/cards/
+```
+
+**What it does:**
+- Logs in an existing user with `StorefrontAuthTicketApi`
+- Gets or creates the user's cart and adds a product by cart ID
+- Creates a checkout from the cart using the Checkout API
+- Adds a destination (shipping address) to the checkout
+- Assigns checkout items to the destination
+- Gets available shipping methods and sets the shipping method
+- Obtains a `paymentServiceCardId` by POSTing card details to the sandbox payments endpoint
+- Creates a payment action on the checkout with billing info
+- Submits the checkout to create a completed order
+
+**Key Features:**
+- Rate limiting (500ms between API calls) for API throttling
+- Structured logging to both console and `logs/cart-to-checkout-to-order.log`
+- Uses authenticated user flow (as opposed to anonymous shopper in `cartToCompletedOrder.ts`)
+- Uses Checkout API with destination-based fulfillment
+- Dynamically retrieves `paymentServiceCardId` from the payments service
+
+**Execution Order:**
+1. Log in existing user and obtain auth token
+2. Get or create user cart and add item by cart ID
+3. Create checkout from cart
+4. Add destination (shipping address) to checkout
+5. Assign items to the destination
+6. Get available shipping methods and set shipping method
+7. POST to payments endpoint to obtain `paymentServiceCardId`
+8. Create payment action with billing info
+9. Submit the checkout
+
+**Usage:**
+To run the script, use the following command:
+```bash
+ts-node .\lib\cartToCheckoutToOrder.ts
+```
+
+---
+
+### 8. 🔄 `addSubscriptionAttributes.ts`
 
 **Purpose:** Create subscription-related product attributes in the Kibo catalog
 
