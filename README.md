@@ -18,6 +18,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
   - [4. 📋 `createDocTypeListDocs.ts`](#4--createdoctypelistdocsts)
   - [5. 📄 `copyPasteDocs.ts`](#5--copypastedocsts)
   - [6. 🛒 `cartToCompletedOrder.ts`](#6--carttocompletedorderts)
+  - [7. 🔄 `addSubscriptionAttributes.ts`](#7--addsubscriptionattributests)
 
 ---
 
@@ -101,6 +102,11 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
    ts-node .\lib\cartToCompletedOrder.ts
    ```
 
+9. **Add Subscription Attributes**
+   ```bash
+   ts-node .\lib\addSubscriptionAttributes.ts
+   ```
+
 ---
 
 ## 📜 Logs
@@ -111,6 +117,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 - `document-type-list-creation.log` - Document type, list, and document creation logs
 - `copy-paste-documents.log` - Document copy/paste operation logs
 - `cart-to-completed-order.log` - Cart to completed order process logs
+- `add-subscription-attributes.log` - Subscription attribute creation logs
 
 Logs include timestamps, operation status, entity details, and error messages for troubleshooting.
 
@@ -347,6 +354,35 @@ All operations are logged with detailed information including:
 To run the script, use the following command:
 ```bash
 ts-node .\lib\cartToCompletedOrder.ts
+```
+
+---
+
+### 7. 🔄 `addSubscriptionAttributes.ts`
+
+**Purpose:** Create subscription-related product attributes in the Kibo catalog
+
+**Location:** `lib/addSubscriptionAttributes.ts`
+
+**What it does:**
+- Creates six subscription-related system product attributes:
+  - **Subscription Mode** – Defines if a product is subscription-only or subscription + one-time purchase (values: `SO`, `SAOT`)
+  - **Subscription Frequency** – Available subscription frequencies for customers (15 days through 12 months)
+  - **Trial Days** – Number of trial days for a subscription (1–365)
+  - **Trial Product Code** – Trial product code
+  - **Trial Product Variation Code** – Trial product variation code
+  - **Split Extras In Subscriptions** – Whether to split extras in subscriptions (Yes/No)
+
+**Key Features:**
+- Rate limiting (200ms between API calls) for API throttling
+- Structured logging to both console and `logs/add-subscription-attributes.log`
+- Skips attributes that already exist (handles 409 conflict responses)
+- All attributes use the `system` namespace
+
+**Usage:**
+To run the script, use the following command:
+```bash
+ts-node .\lib\addSubscriptionAttributes.ts
 ```
 
 ---
