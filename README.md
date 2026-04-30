@@ -501,27 +501,30 @@ ts-node .\lib\addSubscriptionAttributes.ts
 
 ### 9. 🔑 `userLogin.ts`
 
-**Purpose:** Create a new customer account, add login credentials, and authenticate the user via the Kibo storefront auth ticket API.
+**Purpose:** Create a new customer account, add login credentials, and authenticate the user via the Kibo storefront auth ticket API. If the account already exists, skip account creation and log in directly.
 
 **Location:** `lib/userLogin.ts`
 
 **What it does:**
 
-- Creates a new customer account using `CustomerAccountApi`
-- Adds login credentials (email/password) to the account, converting it to a registered shopper
-- Logs in the newly created user via `StorefrontAuthTicketApi` and obtains a JWT auth token
+- Checks if a customer account already exists for the given email using `CustomerAccountApi.getAccounts()` with an email filter
+- If the account **does not exist**: creates a new account and adds login credentials (email/password), converting it to a registered shopper
+- If the account **already exists**: skips account creation and proceeds directly to login
+- Logs in the user via `StorefrontAuthTicketApi` and obtains a JWT auth token
 
 **Key Features:**
 
 - Structured logging to both console and `logs/user-login.log`
-- Uses `CustomerAccountApi.addAccount()` to create the account
-- Uses `CustomerAccountApi.addLoginToExistingCustomer()` to set login credentials
+- Skips account creation if the customer already exists (idempotent)
+- Uses `CustomerAccountApi.getAccounts()` to check for existing accounts by email
+- Uses `CustomerAccountApi.addAccount()` to create the account (only if needed)
+- Uses `CustomerAccountApi.addLoginToExistingCustomer()` to set login credentials (only if needed)
 - Uses `StorefrontAuthTicketApi.createUserAuthTicket()` to authenticate and retrieve a JWT token
 
 **Execution Order:**
 
-1. Create a new customer account
-2. Add login credentials (password) to the account
+1. Check if a customer account already exists for the email
+2. If not found, create a new customer account and add login credentials (password)
 3. Log in the user and obtain a JWT auth token
 
 **Usage:**
