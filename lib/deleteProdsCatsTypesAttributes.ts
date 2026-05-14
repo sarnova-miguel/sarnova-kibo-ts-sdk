@@ -34,12 +34,12 @@ const logger = pino(
   {
     level: process.env.LOG_LEVEL || "info",
   },
-  transport
+  transport,
 );
 
 const limiter = new Bottleneck({
   maxConcurrent: 1,
-  minTime: 500
+  minTime: 500,
 });
 
 dotenv.config();
@@ -77,7 +77,10 @@ async function deleteProducts() {
 
   const productClient = new ProductsApi(masterCatalogConfiguration);
 
-  logger.info({ masterCatalogId }, "Starting master catalog products deletion...");
+  logger.info(
+    { masterCatalogId },
+    "Starting master catalog products deletion...",
+  );
 
   try {
     let totalDeleted = 0;
@@ -93,11 +96,14 @@ async function deleteProducts() {
       const products = productsResponse.items || [];
       const productsCount = products.length;
 
-      logger.info({
-        count: productsCount,
-        totalDeleted,
-        masterCatalogId
-      }, "Found products in master catalog batch");
+      logger.info(
+        {
+          count: productsCount,
+          totalDeleted,
+          masterCatalogId,
+        },
+        "Found products in master catalog batch",
+      );
 
       if (productsCount === 0) {
         logger.info("No more products found in master catalog to delete");
@@ -107,9 +113,12 @@ async function deleteProducts() {
 
       for (const product of products) {
         if (!product.productCode) {
-          logger.warn({
-            productName: product.content?.productName
-          }, "Product has no productCode, skipping");
+          logger.warn(
+            {
+              productName: product.content?.productName,
+            },
+            "Product has no productCode, skipping",
+          );
           continue;
         }
 
@@ -120,28 +129,37 @@ async function deleteProducts() {
             await productClient.deleteProduct({
               productCode: product.productCode!,
             });
-            logger.info({
-              productCode: product.productCode,
-              productName: product.content?.productName,
-              masterCatalogId
-            }, "Deleted product from master catalog");
+            logger.info(
+              {
+                productCode: product.productCode,
+                productName: product.content?.productName,
+                masterCatalogId,
+              },
+              "Deleted product from master catalog",
+            );
             totalDeleted++;
           } catch (error) {
-            logger.error({
-              productCode: product.productCode,
-              productName: product.content?.productName,
-              masterCatalogId,
-              error: error instanceof Error ? error.message : String(error),
-            }, "Error deleting product from master catalog");
+            logger.error(
+              {
+                productCode: product.productCode,
+                productName: product.content?.productName,
+                masterCatalogId,
+                error: error instanceof Error ? error.message : String(error),
+              },
+              "Error deleting product from master catalog",
+            );
           }
         });
       }
 
-      logger.info({
-        batchDeleted: productsCount,
-        totalDeleted,
-        masterCatalogId
-      }, "Completed master catalog batch deletion");
+      logger.info(
+        {
+          batchDeleted: productsCount,
+          totalDeleted,
+          masterCatalogId,
+        },
+        "Completed master catalog batch deletion",
+      );
 
       // If we got fewer products than the page size, we're done
       if (productsCount < pageSize) {
@@ -149,12 +167,18 @@ async function deleteProducts() {
       }
     }
 
-    logger.info({ totalDeleted, masterCatalogId }, "All master catalog products deleted successfully");
+    logger.info(
+      { totalDeleted, masterCatalogId },
+      "All master catalog products deleted successfully",
+    );
   } catch (error) {
-    logger.error({
-      masterCatalogId,
-      error: error instanceof Error ? error.message : String(error),
-    }, "Error in deleteProducts");
+    logger.error(
+      {
+        masterCatalogId,
+        error: error instanceof Error ? error.message : String(error),
+      },
+      "Error in deleteProducts",
+    );
   }
 }
 
@@ -178,10 +202,13 @@ async function deleteCategories() {
       const categories = categoriesResponse.items || [];
       const categoriesCount = categories.length;
 
-      logger.info({
-        count: categoriesCount,
-        totalDeleted
-      }, "Found categories in this batch");
+      logger.info(
+        {
+          count: categoriesCount,
+          totalDeleted,
+        },
+        "Found categories in this batch",
+      );
 
       if (categoriesCount === 0) {
         logger.info("No more categories found to delete");
@@ -195,7 +222,10 @@ async function deleteCategories() {
 
       for (const category of reversedCategories) {
         if (!category.id) {
-          logger.warn({ categoryName: category.content?.name }, "Category has no ID, skipping");
+          logger.warn(
+            { categoryName: category.content?.name },
+            "Category has no ID, skipping",
+          );
           continue;
         }
 
@@ -206,27 +236,36 @@ async function deleteCategories() {
               categoryId: category.id!,
               cascadeDelete: true, // Delete child categories if any
             });
-            logger.info({
-              categoryId: category.id,
-              categoryName: category.content?.name,
-              categoryCode: category.categoryCode,
-            }, "Deleted category");
+            logger.info(
+              {
+                categoryId: category.id,
+                categoryName: category.content?.name,
+                categoryCode: category.categoryCode,
+              },
+              "Deleted category",
+            );
             totalDeleted++;
           } catch (error) {
-            logger.error({
-              categoryId: category.id,
-              categoryName: category.content?.name,
-              categoryCode: category.categoryCode,
-              error: error instanceof Error ? error.message : String(error),
-            }, "Error deleting category");
+            logger.error(
+              {
+                categoryId: category.id,
+                categoryName: category.content?.name,
+                categoryCode: category.categoryCode,
+                error: error instanceof Error ? error.message : String(error),
+              },
+              "Error deleting category",
+            );
           }
         });
       }
 
-      logger.info({
-        batchDeleted: categoriesCount,
-        totalDeleted
-      }, "Completed batch deletion");
+      logger.info(
+        {
+          batchDeleted: categoriesCount,
+          totalDeleted,
+        },
+        "Completed batch deletion",
+      );
 
       // If we got fewer categories than the page size, we're done
       if (categoriesCount < pageSize) {
@@ -236,9 +275,12 @@ async function deleteCategories() {
 
     logger.info({ totalDeleted }, "All categories deleted successfully");
   } catch (error) {
-    logger.error({
-      error: error instanceof Error ? error.message : String(error),
-    }, "Error in deleteCategories");
+    logger.error(
+      {
+        error: error instanceof Error ? error.message : String(error),
+      },
+      "Error in deleteCategories",
+    );
   }
 }
 
@@ -262,10 +304,13 @@ async function deleteProductTypes() {
       const productTypes = productTypesResponse.items || [];
       const productTypesCount = productTypes.length;
 
-      logger.info({
-        count: productTypesCount,
-        totalDeleted
-      }, "Found product types in this batch");
+      logger.info(
+        {
+          count: productTypesCount,
+          totalDeleted,
+        },
+        "Found product types in this batch",
+      );
 
       if (productTypesCount === 0) {
         logger.info("No more product types found to delete");
@@ -275,16 +320,25 @@ async function deleteProductTypes() {
 
       for (const productType of productTypes) {
         if (!productType.id) {
-          logger.warn({ productTypeName: productType.name }, "Product type has no ID, skipping");
+          logger.warn(
+            { productTypeName: productType.name },
+            "Product type has no ID, skipping",
+          );
           continue;
         }
 
         // Skip the Base product type
-        if (productType.name === "Base" || productType.name?.toLowerCase() === "base") {
-          logger.info({
-            productTypeId: productType.id,
-            productTypeName: productType.name
-          }, "Skipping Base product type");
+        if (
+          productType.name === "Base" ||
+          productType.name?.toLowerCase() === "base"
+        ) {
+          logger.info(
+            {
+              productTypeId: productType.id,
+              productTypeName: productType.name,
+            },
+            "Skipping Base product type",
+          );
           continue;
         }
 
@@ -294,25 +348,34 @@ async function deleteProductTypes() {
             await productTypeClient.deleteProductType({
               productTypeId: productType.id!,
             });
-            logger.info({
-              productTypeId: productType.id,
-              productTypeName: productType.name,
-            }, "Deleted product type");
+            logger.info(
+              {
+                productTypeId: productType.id,
+                productTypeName: productType.name,
+              },
+              "Deleted product type",
+            );
             totalDeleted++;
           } catch (error) {
-            logger.error({
-              productTypeId: productType.id,
-              productTypeName: productType.name,
-              error: error instanceof Error ? error.message : String(error),
-            }, "Error deleting product type");
+            logger.error(
+              {
+                productTypeId: productType.id,
+                productTypeName: productType.name,
+                error: error instanceof Error ? error.message : String(error),
+              },
+              "Error deleting product type",
+            );
           }
         });
       }
 
-      logger.info({
-        batchDeleted: productTypesCount,
-        totalDeleted
-      }, "Completed batch deletion");
+      logger.info(
+        {
+          batchDeleted: productTypesCount,
+          totalDeleted,
+        },
+        "Completed batch deletion",
+      );
 
       // If we got fewer product types than the page size, we're done
       if (productTypesCount < pageSize) {
@@ -322,9 +385,12 @@ async function deleteProductTypes() {
 
     logger.info({ totalDeleted }, "All product types deleted successfully");
   } catch (error) {
-    logger.error({
-      error: error instanceof Error ? error.message : String(error),
-    }, "Error in deleteProductTypes");
+    logger.error(
+      {
+        error: error instanceof Error ? error.message : String(error),
+      },
+      "Error in deleteProductTypes",
+    );
   }
 }
 
@@ -348,6 +414,8 @@ async function deleteProductAttributes() {
     "sales-rank-medium-term",
     "sales-rank-short-term",
     "product-upsell",
+    "future-inventory-enabled",
+    "reserve-inventory-in-cart",
     // Subscription attributes
     "subscription-mode",
     "subscription-frequency",
@@ -374,11 +442,14 @@ async function deleteProductAttributes() {
       const attributes = attributesResponse.items || [];
       const attributesCount = attributes.length;
 
-      logger.info({
-        count: attributesCount,
-        totalDeleted,
-        totalSkipped
-      }, "Found product attributes in this batch");
+      logger.info(
+        {
+          count: attributesCount,
+          totalDeleted,
+          totalSkipped,
+        },
+        "Found product attributes in this batch",
+      );
 
       if (attributesCount === 0) {
         logger.info("No more product attributes found to delete");
@@ -388,20 +459,29 @@ async function deleteProductAttributes() {
 
       for (const attribute of attributes) {
         if (!attribute.attributeFQN) {
-          logger.warn({
-            attributeCode: attribute.attributeCode,
-            adminName: attribute.adminName
-          }, "Product attribute has no attributeFQN, skipping");
+          logger.warn(
+            {
+              attributeCode: attribute.attributeCode,
+              adminName: attribute.adminName,
+            },
+            "Product attribute has no attributeFQN, skipping",
+          );
           continue;
         }
 
         // Skip system attributes
-        if (attribute.attributeCode && systemAttributeCodes.includes(attribute.attributeCode)) {
-          logger.info({
-            attributeFQN: attribute.attributeFQN,
-            attributeCode: attribute.attributeCode,
-            adminName: attribute.adminName
-          }, "Skipping system attribute");
+        if (
+          attribute.attributeCode &&
+          systemAttributeCodes.includes(attribute.attributeCode)
+        ) {
+          logger.info(
+            {
+              attributeFQN: attribute.attributeFQN,
+              attributeCode: attribute.attributeCode,
+              adminName: attribute.adminName,
+            },
+            "Skipping system attribute",
+          );
           totalSkipped++;
           continue;
         }
@@ -412,28 +492,37 @@ async function deleteProductAttributes() {
             await productAttributeClient.deleteAttribute({
               attributeFQN: attribute.attributeFQN!,
             });
-            logger.info({
-              attributeFQN: attribute.attributeFQN,
-              attributeCode: attribute.attributeCode,
-              adminName: attribute.adminName,
-            }, "Deleted product attribute");
+            logger.info(
+              {
+                attributeFQN: attribute.attributeFQN,
+                attributeCode: attribute.attributeCode,
+                adminName: attribute.adminName,
+              },
+              "Deleted product attribute",
+            );
             totalDeleted++;
           } catch (error) {
-            logger.error({
-              attributeFQN: attribute.attributeFQN,
-              attributeCode: attribute.attributeCode,
-              adminName: attribute.adminName,
-              error: error instanceof Error ? error.message : String(error),
-            }, "Error deleting product attribute");
+            logger.error(
+              {
+                attributeFQN: attribute.attributeFQN,
+                attributeCode: attribute.attributeCode,
+                adminName: attribute.adminName,
+                error: error instanceof Error ? error.message : String(error),
+              },
+              "Error deleting product attribute",
+            );
           }
         });
       }
 
-      logger.info({
-        batchDeleted: attributesCount,
-        totalDeleted,
-        totalSkipped
-      }, "Completed batch deletion");
+      logger.info(
+        {
+          batchDeleted: attributesCount,
+          totalDeleted,
+          totalSkipped,
+        },
+        "Completed batch deletion",
+      );
 
       // If we got fewer attributes than the page size, we're done
       if (attributesCount < pageSize) {
@@ -441,28 +530,32 @@ async function deleteProductAttributes() {
       }
     }
 
-    logger.info({
-      totalDeleted,
-      totalSkipped
-    }, "All product attributes deleted successfully");
+    logger.info(
+      {
+        totalDeleted,
+        totalSkipped,
+      },
+      "All product attributes deleted successfully",
+    );
   } catch (error) {
-    logger.error({
-      error: error instanceof Error ? error.message : String(error),
-    }, "Error in deleteProductAttributes");
+    logger.error(
+      {
+        error: error instanceof Error ? error.message : String(error),
+      },
+      "Error in deleteProductAttributes",
+    );
   }
 }
 
-
-
-
 // ***** ready functions *****
 async function main() {
-    await deleteProducts();
-    await deleteCategories();
-    await deleteProductTypes();
-    await deleteProductAttributes();
-    logger.info('*** Products, Categories, Prod Types, Prod Attributes deletion complete!👍🏽 ***');
+  await deleteProducts();
+  await deleteCategories();
+  await deleteProductTypes();
+  await deleteProductAttributes();
+  logger.info(
+    "*** Products, Categories, Prod Types, Prod Attributes deletion complete!👍🏽 ***",
+  );
 }
-
 
 main();
