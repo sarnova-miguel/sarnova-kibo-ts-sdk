@@ -79,7 +79,7 @@ async function deleteProducts() {
 
   logger.info(
     { masterCatalogId },
-    "Starting master catalog products deletion...",
+    `Starting master catalog products deletion for Tenant: ${process.env.TENANT_ID}`,
   );
 
   try {
