@@ -96,6 +96,18 @@ function unflattenObject(row: Record<string, string>): Record<string, any> {
   return result;
 }
 
+// Convert a value to an array: handles actual arrays, numeric-keyed objects from unflattenObject, or returns empty array
+function toArray(value: any): any[] {
+  if (Array.isArray(value)) return value;
+  if (value && typeof value === "object") {
+    const keys = Object.keys(value);
+    if (keys.length > 0 && keys.every((k) => /^[0-9]+$/.test(k))) {
+      return keys.sort((a, b) => Number(a) - Number(b)).map((k) => value[k]);
+    }
+  }
+  return [];
+}
+
 // Parse a CSV string value back to its original type
 function parseValue(value: string): any {
   if (value === "") return undefined;
@@ -364,12 +376,22 @@ async function importProducts() {
           )?.id;
           productData.productTypeId = prodTypeId || 1;
 
-          // Remap old category IDs to new category IDs in productInCatalogs
-          if (Array.isArray(productData.productInCatalogs)) {
-            for (const catalog of productData.productInCatalogs) {
+          // Remap old category IDs to newly created category IDs
+          const catalogs = toArray(productData.productInCatalogs);
+          if (catalogs.length > 0) {
+            productData.productInCatalogs = catalogs;
+            for (const catalog of catalogs) {
+              // Only set category IDs for catalogId 1
+              if (Number(catalog.catalogId) !== 1) {
+                delete catalog.primaryProductCategory;
+                delete catalog.productCategories;
+                continue;
+              }
               // Remap productCategories
-              if (Array.isArray(catalog.productCategories)) {
-                for (const pc of catalog.productCategories) {
+              const categories = toArray(catalog.productCategories);
+              if (categories.length > 0) {
+                catalog.productCategories = categories;
+                for (const pc of categories) {
                   const oldCatId = Number(pc.categoryId);
                   const catCode = oldCatIdToCodeMap.get(oldCatId);
                   if (catCode) {
@@ -418,7 +440,7 @@ async function importProducts() {
         }
       });
     }
-    logger.info("All products imported successfully");
+    logger.info("DONE importing products!");
   } catch (error) {
     logger.error(
       { error: error instanceof Error ? error.message : String(error) },
