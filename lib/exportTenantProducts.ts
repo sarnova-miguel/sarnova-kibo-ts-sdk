@@ -8,6 +8,7 @@ import { ProductAttributesApi } from "@kibocommerce/rest-sdk/clients/CatalogAdmi
 import { ProductTypesApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/ProductTypesApi";
 import { CategoriesApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/CategoriesApi";
 import { ProductsApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/ProductsApi";
+import { TenantsApi } from "@kibocommerce/rest-sdk/clients/Tenant/apis/TenantsApi";
 
 const pageSize = 200;
 
@@ -165,18 +166,61 @@ async function exportProductAttributes() {
   }
 }
 
-// Export categories
+// Export categories from every catalog in the tenant.
+// Each catalog (master + children) has its own category ID space, and product
+// entries in productInCatalogs reference IDs from their own catalog, so all
+// catalogs' categories must be exported for the import to remap correctly.
 async function exportCategories() {
-  const client = new CategoriesApi(configuration);
-  logger.info("Fetching categories...");
+  const tenantsClient = new TenantsApi(configuration);
+  logger.info("Fetching categories from all catalogs in tenant...");
 
   try {
-    const items = await fetchAllPages((startIndex) =>
-      client.getCategories({ pageSize, startIndex }),
+    const tenant = await tenantsClient.getTenant({
+      tenantId: Number(process.env.TENANT_ID),
+    });
+
+    // Map each unique catalogId to a siteId that can be used to authenticate calls
+    const catalogIdToSiteIdMap = new Map<number, number>();
+    for (const site of tenant.sites || []) {
+      if (
+        site.catalogId != null &&
+        site.id != null &&
+        !catalogIdToSiteIdMap.has(site.catalogId)
+      ) {
+        catalogIdToSiteIdMap.set(site.catalogId, site.id);
+      }
+    }
+    logger.info(
+      { catalogSiteMap: Object.fromEntries(catalogIdToSiteIdMap) },
+      "Built catalogId -> siteId map from tenant",
     );
 
-    writeCsv("categories.csv", items);
-    logger.info({ count: items.length }, "Categories export complete");
+    const allCategories: Record<string, any>[] = [];
+    for (const [catalogId, siteId] of catalogIdToSiteIdMap) {
+      const catalogConfig = new Configuration({
+        tenantId: process.env.TENANT_ID || "",
+        siteId: String(siteId),
+        catalog: String(catalogId),
+        masterCatalog: process.env.MASTER_CATALOG || "",
+        sharedSecret: process.env.SHARED_SECRET || "",
+        clientId: process.env.CLIENT_ID || "",
+        pciHost: process.env.PCI_HOST || "",
+        authHost: process.env.AUTH_HOST || "",
+        apiEnv: process.env.API_ENV || "",
+      });
+      const client = new CategoriesApi(catalogConfig);
+      const items = await fetchAllPages((startIndex) =>
+        client.getCategories({ pageSize, startIndex }),
+      );
+      logger.info(
+        { catalogId, count: items.length },
+        "Fetched categories for catalog",
+      );
+      allCategories.push(...(items as Record<string, any>[]));
+    }
+
+    writeCsv("categories.csv", allCategories);
+    logger.info({ count: allCategories.length }, "Categories export complete");
   } catch (error) {
     logger.error(
       { error: error instanceof Error ? error.message : String(error) },

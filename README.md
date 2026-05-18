@@ -243,10 +243,10 @@ All operations are logged with detailed information including success/failure st
 
 **What it does:**
 
-- Deletes all products
-- Deletes all categories (with cascade delete for children)
+- Deletes all products from the master catalog
+- Deletes all categories from **every child catalog** discovered via the tenant's sites (with cascade delete for children)
 - Deletes all product types (except "Base" type)
-- Deletes all product attributes (except system attributes)
+- Deletes all product attributes (except system and subscription attributes)
 
 **Key Features:**
 
@@ -255,6 +255,9 @@ All operations are logged with detailed information including success/failure st
 - Structured logging to both console and `logs/delete-sandbox-products.log`
 - Protects system-critical attributes and the "Base" product type
 - Cascade deletion for categories to handle parent-child relationships
+- Product deletion runs against the master catalog using a dedicated `Configuration` with `siteId` and `catalog` set to `undefined`, so the call operates at the master catalog level rather than a single child catalog
+- Category deletion iterates every child catalog: a `catalogId -> siteId` map is built from `TenantsApi.getTenant()` and a per-catalog `Configuration` is created so each `CategoriesApi` call is scoped to the correct catalog/site
+- Categories within each catalog are deleted in reverse order (children first, then parents) with `cascadeDelete: true`
 
 **Protected System Attributes:**
 
@@ -270,11 +273,14 @@ All operations are logged with detailed information including success/failure st
 - `substitute-variants`
 - `sales-rank-*`
 - `product-upsell`
+- `future-inventory-enabled`
+- `reserve-inventory-in-cart`
+- Subscription attributes (`subscription-mode`, `subscription-frequency`, `subscription-trial-days`, `subscription-trial-productCode`, `subscription-trial-variantCode`, `split-extras-in-subscriptions`)
 
 **Execution Order:**
 
-1. Products (must be deleted first)
-2. Categories
+1. Products (master catalog, must be deleted first)
+2. Categories (per child catalog, via tenant sites lookup)
 3. Product Types
 4. Product Attributes
 
@@ -602,33 +608,41 @@ ts-node .\lib\exportTenantProducts.ts
 - Reads exported CSV files from the `exports/` directory
 - Imports product attributes from `exports/productAttributes.csv`
 - Imports product types from `exports/productTypes.csv` (skips the "Base" type)
-- Imports categories from `exports/categories.csv` (top-level first, then children)
-- Imports products from `exports/products.csv` with automatic product type and category ID remapping
+- Builds a `catalogId -> siteId` map from `TenantsApi.getTenant()` so category creation can be scoped per child catalog
+- Imports categories from `exports/categories.csv` **per catalog** (top-level first, then children) using a `Configuration` scoped to each catalog/site
+- Imports products from `exports/products.csv` with automatic product type and per-catalog category ID remapping
 
 **Key Features:**
 
 - Rate limiting (500ms between API calls) via Bottleneck for API throttling
-- Unflattens dot-notation CSV columns back into nested objects
-- Parses JSON strings in CSV cells back into arrays
-- Automatically remaps old product type IDs and category IDs to newly created IDs in the destination tenant 🔥
-- Handles parent-child category relationships across tenants
+- Unflattens dot-notation CSV columns back into nested objects (`unflattenObject`)
+- Parses JSON strings in CSV cells back into arrays/objects (`parseValue`)
+- Normalizes numeric-keyed objects from `unflattenObject` back into real arrays via the `toArray` helper before iterating `productInCatalogs` / `productCategories`
+- Per-catalog category creation: each catalog has its own `categoryCode` namespace, so `importCategories` returns a `Map<catalogId, Map<categoryCode, newCategoryId>>` and creates categories with a per-catalog `CategoriesApi` client 🔥
+- Automatically remaps old product type IDs (via name lookup) and category IDs to newly created IDs in the destination tenant 🔥
+- Remaps both `productCategories` entries and `primaryProductCategory` inside every `productInCatalogs` entry, using the category map for that entry's `catalogId` 🔥
+- Emits a structured `RemapReport` per product/catalog pair listing every `remapped` and `skipped` category ID (with reason) for full traceability
+- Aborts the entire import cleanly when the destination tenant already contains a category with the same `categoryCode`: `createCategoriesForCatalog` throws a `CategoryAlreadyExistsError`, which `main()` catches and logs with the offending `catalogId` and `categoryCode` so stale data can be cleaned up before retrying
+- Handles parent-child category relationships across tenants (parent lookup by name within each catalog) 🔥
 - Skips system-critical items (e.g., "Base" product type)
 - Structured logging to both console and `logs/import-tenant-products.log`
 
 **Prerequisites:**
 ⚠️ **IMPORTANT:** Before running the export/import workflow across tenants, ensure the following:
 
-1. The **source and destination tenants must have matching site configurations** (same numbers of sites)
+1. The **source and destination tenants must have matching site configurations** (same numbers of sites, same order of sites)
 2. The **source and destination tenants must have matching catalog configurations** (same number of catalogs, catalog structure, and catalog IDs)
-3. Run `exportTenantProducts.ts` on the source tenant **before** running `importTenantProducts.ts` on the destination tenant
-4. Update your `.env` file to point to the **destination tenant** before running the import script
+3. The destination tenant must have **no leftover categories** in any child catalog — categories are not inherited from the master catalog and each catalog has its own `categoryCode` namespace, so duplicate codes will abort the import. Run `deleteProdsCatsTypesAttributes.ts` on the destination tenant first if needed.
+4. Run `exportTenantProducts.ts` on the source tenant **before** running `importTenantProducts.ts` on the destination tenant
+5. Update your `.env` file to point to the **destination tenant** before running the import script
 
 **Execution Order:**
 
 1. Product Attributes
-2. Product Types
-3. Categories (top-level first, then children)
-4. Products (with product type and category ID remapping)
+2. Product Types (skips "Base")
+3. Build `catalogId -> siteId` map from the destination tenant
+4. Categories — per catalog, top-level first, then children (aborts on duplicate `categoryCode`)
+5. Products — with product type ID remapping and per-catalog category ID remapping for every `productInCatalogs` entry
 
 **Usage:**
 To run the script, use the following command:
