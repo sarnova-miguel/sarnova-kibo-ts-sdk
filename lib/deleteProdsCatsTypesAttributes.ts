@@ -6,6 +6,7 @@ import { ProductAttributesApi } from "@kibocommerce/rest-sdk/clients/CatalogAdmi
 import { ProductTypesApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/ProductTypesApi";
 import { CategoriesApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/CategoriesApi";
 import { ProductsApi } from "@kibocommerce/rest-sdk/clients/CatalogAdministration/apis/ProductsApi";
+import { TenantsApi } from "@kibocommerce/rest-sdk/clients/Tenant/apis/TenantsApi";
 
 const pageSize = 200;
 
@@ -182,98 +183,162 @@ async function deleteProducts() {
   }
 }
 
-// delete categories
+// delete categories from every child catalog discovered via the tenant's sites
 async function deleteCategories() {
-  const categoryClient = new CategoriesApi(configuration);
+  const tenantsClient = new TenantsApi(configuration);
 
   logger.info("Starting categories deletion...");
 
   try {
-    let totalDeleted = 0;
-    let hasMoreCategories = true;
+    const tenant = await tenantsClient.getTenant({
+      tenantId: Number(process.env.TENANT_ID),
+    });
 
-    while (hasMoreCategories) {
-      // Get categories in batches
-      const categoriesResponse = await categoryClient.getCategories({
-        pageSize,
-        startIndex: 0, // Always get from the beginning since we're deleting
-      });
-
-      const categories = categoriesResponse.items || [];
-      const categoriesCount = categories.length;
-
-      logger.info(
-        {
-          count: categoriesCount,
-          totalDeleted,
-        },
-        "Found categories in this batch",
-      );
-
-      if (categoriesCount === 0) {
-        logger.info("No more categories found to delete");
-        hasMoreCategories = false;
-        break;
-      }
-
-      // Delete categories in reverse order (children first, then parents)
-      // This ensures we don't have orphaned categories
-      const reversedCategories = [...categories].reverse();
-
-      for (const category of reversedCategories) {
-        if (!category.id) {
-          logger.warn(
-            { categoryName: category.content?.name },
-            "Category has no ID, skipping",
-          );
-          continue;
-        }
-
-        // Use limiter to rate-limit API calls
-        await limiter.schedule(async () => {
-          try {
-            await categoryClient.deleteCategoryById({
-              categoryId: category.id!,
-              cascadeDelete: true, // Delete child categories if any
-            });
-            logger.info(
-              {
-                categoryId: category.id,
-                categoryName: category.content?.name,
-                categoryCode: category.categoryCode,
-              },
-              "Deleted category",
-            );
-            totalDeleted++;
-          } catch (error) {
-            logger.error(
-              {
-                categoryId: category.id,
-                categoryName: category.content?.name,
-                categoryCode: category.categoryCode,
-                error: error instanceof Error ? error.message : String(error),
-              },
-              "Error deleting category",
-            );
-          }
-        });
-      }
-
-      logger.info(
-        {
-          batchDeleted: categoriesCount,
-          totalDeleted,
-        },
-        "Completed batch deletion",
-      );
-
-      // If we got fewer categories than the page size, we're done
-      if (categoriesCount < pageSize) {
-        hasMoreCategories = false;
+    // Map each unique catalogId to a siteId that can be used to authenticate calls
+    const catalogIdToSiteIdMap = new Map<number, number>();
+    for (const site of tenant.sites || []) {
+      if (
+        site.catalogId != null &&
+        site.id != null &&
+        !catalogIdToSiteIdMap.has(site.catalogId)
+      ) {
+        catalogIdToSiteIdMap.set(site.catalogId, site.id);
       }
     }
+    logger.info(
+      { catalogSiteMap: Object.fromEntries(catalogIdToSiteIdMap) },
+      "Built catalogId -> siteId map from tenant",
+    );
 
-    logger.info({ totalDeleted }, "All categories deleted successfully");
+    let totalDeleted = 0;
+
+    for (const [catalogId, siteId] of catalogIdToSiteIdMap) {
+      const catalogConfig = new Configuration({
+        tenantId: process.env.TENANT_ID || "",
+        siteId: String(siteId),
+        catalog: String(catalogId),
+        masterCatalog: process.env.MASTER_CATALOG || "",
+        sharedSecret: process.env.SHARED_SECRET || "",
+        clientId: process.env.CLIENT_ID || "",
+        pciHost: process.env.PCI_HOST || "",
+        authHost: process.env.AUTH_HOST || "",
+        apiEnv: process.env.API_ENV || "",
+      });
+      const categoryClient = new CategoriesApi(catalogConfig);
+
+      logger.info(
+        { catalogId, siteId },
+        "Starting categories deletion for catalog",
+      );
+
+      let catalogDeleted = 0;
+      let hasMoreCategories = true;
+
+      while (hasMoreCategories) {
+        // Get categories in batches
+        const categoriesResponse = await categoryClient.getCategories({
+          pageSize,
+          startIndex: 0, // Always get from the beginning since we're deleting
+        });
+
+        const categories = categoriesResponse.items || [];
+        const categoriesCount = categories.length;
+
+        logger.info(
+          {
+            catalogId,
+            siteId,
+            count: categoriesCount,
+            catalogDeleted,
+            totalDeleted,
+          },
+          "Found categories in this batch",
+        );
+
+        if (categoriesCount === 0) {
+          logger.info(
+            { catalogId, siteId },
+            "No more categories found to delete in catalog",
+          );
+          hasMoreCategories = false;
+          break;
+        }
+
+        // Delete categories in reverse order (children first, then parents)
+        // This ensures we don't have orphaned categories
+        const reversedCategories = [...categories].reverse();
+
+        for (const category of reversedCategories) {
+          if (!category.id) {
+            logger.warn(
+              { catalogId, siteId, categoryName: category.content?.name },
+              "Category has no ID, skipping",
+            );
+            continue;
+          }
+
+          // Use limiter to rate-limit API calls
+          await limiter.schedule(async () => {
+            try {
+              await categoryClient.deleteCategoryById({
+                categoryId: category.id!,
+                cascadeDelete: true, // Delete child categories if any
+              });
+              logger.info(
+                {
+                  catalogId,
+                  siteId,
+                  categoryId: category.id,
+                  categoryName: category.content?.name,
+                  categoryCode: category.categoryCode,
+                },
+                "Deleted category",
+              );
+              catalogDeleted++;
+              totalDeleted++;
+            } catch (error) {
+              logger.error(
+                {
+                  catalogId,
+                  siteId,
+                  categoryId: category.id,
+                  categoryName: category.content?.name,
+                  categoryCode: category.categoryCode,
+                  error: error instanceof Error ? error.message : String(error),
+                },
+                "Error deleting category",
+              );
+            }
+          });
+        }
+
+        logger.info(
+          {
+            catalogId,
+            siteId,
+            batchDeleted: categoriesCount,
+            catalogDeleted,
+            totalDeleted,
+          },
+          "Completed batch deletion",
+        );
+
+        // If we got fewer categories than the page size, we're done
+        if (categoriesCount < pageSize) {
+          hasMoreCategories = false;
+        }
+      }
+
+      logger.info(
+        { catalogId, siteId, catalogDeleted },
+        "Completed categories deletion for catalog",
+      );
+    }
+
+    logger.info(
+      { totalDeleted },
+      "All categories deleted successfully across child catalogs",
+    );
   } catch (error) {
     logger.error(
       {
