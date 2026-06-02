@@ -12,6 +12,7 @@
   "type": "commonjs",
   "dependencies": {
     "@kibocommerce/rest-sdk": "^2.2530.1",
+    "@webiny/sdk": "^6.3.0",
     "bottleneck": "^2.19.5",
     "csv": "^6.5.1",
     "dotenv": "^17.2.3",

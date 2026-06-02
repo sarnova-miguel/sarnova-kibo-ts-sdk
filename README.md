@@ -25,6 +25,9 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
   - [11. 📥 `importTenantProducts.ts`](#11--importtenantproductsts)
   - [12. 🎛️ `exportTenantProductVariations.ts`](#12-️-exporttenantproductvariationsts)
   - [13. 🔁 `importTenantProductVariations.ts`](#13--importtenantproductvariationsts)
+  - [14. 🗂️ `listWebinyFiles.ts`](#14-️-listwebinyfilests)
+  - [15. 📚 `listWebinyCmsEntries.ts`](#15--listwebinycmsentriests)
+  - [16. 📄 `listWebinyCmsEntry.ts`](#16--listwebinycmsentryts)
 
 ---
 
@@ -34,6 +37,9 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 - [Kido TypeScript SDK - Github](https://github.com/KiboSoftware/typescript-rest-sdk)
 - [Kibo API Documentation](https://docs.kibocommerce.com/api-overviews/getting-started)
 - [ts-node](https://www.npmjs.com/package/ts-node)
+- [Webiny Headless CMS - GraphQL API Overview](https://www.webiny.com/docs/headless-cms/graphql-api-overview)
+- [Webiny Headless CMS - Using the Webiny SDK](https://www.webiny.com/docs/headless-cms/using-webiny-sdk)
+- [Webiny File Manager SDK Reference](https://www.webiny.com/docs/reference/sdk/file-manager)
 
 ---
 
@@ -79,83 +85,15 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
    npm install
    ```
 
-3. **Set Up New Sandbox**
+3. **Run a Script**
+
+   Use `ts-node` to execute any script in the `lib/` directory. For example:
 
    ```bash
    ts-node .\lib\newSandboxSetup.ts
    ```
 
-4. **Load Product Data**
-
-   ```bash
-   ts-node .\lib\newSandboxProducts.ts
-   ```
-
-5. **Clean Up (if needed)**
-
-   ```bash
-   ts-node .\lib\deleteProdsCatsTypesAttributes.ts
-   ```
-
-6. **Create Document Type, List, and Docs**
-
-   ```bash
-   ts-node .\lib\createDocTypeListDocs.ts
-   ```
-
-7. **Copy Documents Between Environments**
-
-   ```bash
-   ts-node .\lib\copyPasteDocs.ts
-   ```
-
-8. **Cart to Completed Order**
-
-   ```bash
-   ts-node .\lib\cartToCompletedOrder.ts
-   ```
-
-9. **Cart to Checkout to Order**
-
-   ```bash
-   ts-node .\lib\cartToCheckoutToOrder.ts
-   ```
-
-10. **Add Subscription Attributes**
-
-```bash
-ts-node .\lib\addSubscriptionAttributes.ts
-```
-
-11. **Create User Account and Login**
-
-```bash
-ts-node .\lib\userLogin.ts
-```
-
-12. **Export Tenant Products**
-
-```bash
-ts-node .\lib\exportTenantProducts.ts
-```
-
-13. **Import Tenant Products**
-
-```bash
-ts-node .\lib\importTenantProducts.ts
-```
-
-14. **Export Tenant Product Variations**
-
-```bash
-ts-node .\lib\exportTenantProductVariations.ts
-```
-
-15. **Import Tenant Product Variations**
-
-```bash
-ts-node .\lib\importTenantProductVariations.ts
-```
+   See [Scripts Overview](#️-scripts-overview) for the full list of available scripts and their usage.
 
 ---
 
@@ -175,6 +113,9 @@ ts-node .\lib\importTenantProductVariations.ts
 - `import-tenant-products.log` - Tenant product data import logs
 - `export-tenant-product-variations.log` - Tenant product variation export logs
 - `import-tenant-product-variations.log` - Tenant product variation import logs
+- `list-webiny-files.log` - Webiny File Manager file listing logs
+- `list-webiny-cms-entries.log` - Webiny CMS entries listing logs
+- `list-webiny-cms-entry.log` - Webiny CMS single entry retrieval logs
 
 Logs include timestamps, operation status, entity details, and error messages for troubleshooting.
 
@@ -761,3 +702,150 @@ ts-node .\lib\importTenantProductVariations.ts
 **Output:** `exports/variationCodeMigration.csv` with columns `productCode, variationProductCode, destVariationKey, optionTuple, status, error`, where `status` is one of `migrated`, `already_set`, `conflict_existing_code`, `not_found_in_destination`, `error`.
 
 ---
+
+### 14. 🗂️ `listWebinyFiles.ts`
+
+**Purpose:** List every file in a Webiny CMS File Manager via the Webiny SDK and log each file's metadata using Pino.
+
+**Location:** `lib/listWebinyFiles.ts`
+
+**Note:** This script uses a different SDK than the rest of the project (Webiny instead of Kibo). Before running, install the Webiny SDK and add the Webiny-specific variables to your `.env` file.
+
+```bash
+npm install @webiny/sdk
+```
+
+```env
+  # Webiny File Manager Configuration
+  WEBINY_API_URL=https://your-webiny-instance.example.com/graphql
+  WEBINY_API_TOKEN=your_webiny_api_token
+  WEBINY_TENANT=root  # Optional, defaults to "root"
+```
+
+**What it does:**
+
+- Initializes the Webiny SDK with the `endpoint`, `token`, and `tenant` from environment variables
+- Calls `sdk.fileManager.listFiles()` with the requested fields (`id`, `name`, `key`, `type`, `size`, `src`, `createdOn`, `tags`, `location.folderId`)
+- Pages through every file using cursor-based pagination (`meta.cursor` + `meta.hasMoreItems`)
+- Logs each file's metadata to the console and to `logs/list-webiny-files.log`
+
+**Key Features:**
+
+- Cursor pagination (100 items per page) until `meta.hasMoreItems` is `false`
+- Result-pattern error handling via `result.isFail()` / `result.error.message`
+- Structured logging of every file (id, name, key, type, size, src, createdOn, tags, folderId) to both console and `logs/list-webiny-files.log`
+
+**API Notes:**
+
+- The Webiny SDK initialization options (`endpoint`, `token`, `tenant`) are documented in the [Webiny SDK Overview](https://www.webiny.com/docs/reference/sdk/overview).
+- `listFiles()` requires a `fields` array specifying which file fields to return — see the [File Manager SDK Reference](https://www.webiny.com/docs/reference/sdk/file-manager).
+- The API token must be created in **Settings → Access Management → API Keys** in the Webiny Admin and granted at least read permission on the File Manager. See the [GraphQL API Overview](https://www.webiny.com/docs/headless-cms/graphql-api-overview) for details on tokens and tenant scoping.
+
+**Usage:**
+To run the script, use the following command:
+
+```bash
+ts-node .\lib\listWebinyFiles.ts
+```
+
+**Output:** All file metadata is logged to the console and persisted to `logs/list-webiny-files.log`.
+
+---
+
+### 15. 📚 `listWebinyCmsEntries.ts`
+
+**Purpose:** List every entry of a Webiny Headless CMS content model via the Webiny SDK and log each entry's metadata using Pino.
+
+**Location:** `lib/listWebinyCmsEntries.ts`
+
+**Note:** This script uses the Webiny SDK. Before running, install the Webiny SDK (if not already installed) and add the Webiny-specific variables to your `.env` file.
+
+```bash
+npm install @webiny/sdk
+```
+
+```env
+  # Webiny CMS Configuration
+  WEBINY_API_URL=https://your-webiny-instance.example.com/graphql
+  WEBINY_API_TOKEN=your_webiny_api_token
+  WEBINY_TENANT=root  # Optional, defaults to "root"
+```
+
+**What it does:**
+
+- Initializes the Webiny SDK with the `endpoint`, `token`, and `tenant` from environment variables
+- Calls `sdk.cms.listEntries()` for the configured `modelId` with the requested top-level fields (`id`, `entryId`, `createdOn`, `savedOn`)
+- Pages through every entry using cursor-based pagination (`meta.cursor` + `meta.hasMoreItems`)
+- Logs each entry's metadata to the console and to `logs/list-webiny-cms-entries.log`
+
+**Key Features:**
+
+- Cursor pagination (100 items per page) until `meta.hasMoreItems` is `false`
+- Configurable `modelId` (defaults to `aedCollection`) and `entryFields` array at the top of the script
+- Result-pattern error handling via `result.isFail()` / `result.error.message`
+- Structured logging of every entry (id, entryId, status, version, title, createdOn, savedOn) to both console and `logs/list-webiny-cms-entries.log`
+
+**API Notes:**
+
+- The Webiny SDK initialization options (`endpoint`, `token`, `tenant`) are documented in the [Webiny SDK Overview](https://www.webiny.com/docs/reference/sdk/overview).
+- `listEntries()` requires a `modelId` and a `fields` array specifying which entry fields to return — nested `values.*` fields can be requested when the model schema is known.
+- The API token must be created in **Settings → Access Management → API Keys** in the Webiny Admin and granted at least read permission on the target content model. See the [GraphQL API Overview](https://www.webiny.com/docs/headless-cms/graphql-api-overview) for details on tokens and tenant scoping.
+
+**Usage:**
+To run the script, use the following command (update `modelId` in the script first if needed):
+
+```bash
+ts-node .\lib\listWebinyCmsEntries.ts
+```
+
+**Output:** All entry metadata is logged to the console and persisted to `logs/list-webiny-cms-entries.log`.
+
+---
+
+### 16. 📄 `listWebinyCmsEntry.ts`
+
+**Purpose:** Fetch a single Webiny Headless CMS entry by `entryId` for a given content model via the Webiny SDK and log its metadata using Pino.
+
+**Location:** `lib/listWebinyCmsEntry.ts`
+
+**Note:** This script uses the Webiny SDK. Before running, install the Webiny SDK (if not already installed) and add the Webiny-specific variables to your `.env` file.
+
+```bash
+npm install @webiny/sdk
+```
+
+```env
+  # Webiny CMS Configuration
+  WEBINY_API_URL=https://your-webiny-instance.example.com/graphql
+  WEBINY_API_TOKEN=your_webiny_api_token
+  WEBINY_TENANT=root          # Optional, defaults to "root"
+  WEBINY_ENTRY_ID=your_entry_id  # Optional, overrides the default entryId in the script
+```
+
+**What it does:**
+
+- Initializes the Webiny SDK with the `endpoint`, `token`, and `tenant` from environment variables
+- Calls `sdk.cms.getEntry()` for the configured `modelId` and `entryId` with the requested fields (`id`, `entryId`, `createdOn`, `savedOn`, `values.contentId`, `values.siteId`)
+- Logs the entry's metadata to the console and to `logs/list-webiny-cms-entry.log`
+
+**Key Features:**
+
+- Configurable `modelId` (defaults to `aedCollection`) and `entryFields` array at the top of the script
+- `entryId` can be overridden via the `WEBINY_ENTRY_ID` environment variable
+- Result-pattern error handling via `result.isFail()` / `result.error.message`
+- Structured logging of the entry (id, entryId, status, version, title, createdOn, savedOn) to both console and `logs/list-webiny-cms-entry.log`
+
+**API Notes:**
+
+- The Webiny SDK initialization options (`endpoint`, `token`, `tenant`) are documented in the [Webiny SDK Overview](https://www.webiny.com/docs/reference/sdk/overview).
+- `getEntry()` requires a `modelId`, a `where` filter (e.g. `{ entryId }`), and a `fields` array specifying which entry fields to return — nested `values.*` fields can be requested when the model schema is known.
+- The API token must be created in **Settings → Access Management → API Keys** in the Webiny Admin and granted at least read permission on the target content model. See the [GraphQL API Overview](https://www.webiny.com/docs/headless-cms/graphql-api-overview) for details on tokens and tenant scoping.
+
+**Usage:**
+To run the script, use the following command (set `WEBINY_ENTRY_ID` or update the default `entryId` in the script first):
+
+```bash
+ts-node .\lib\listWebinyCmsEntry.ts
+```
+
+**Output:** Entry metadata is logged to the console and persisted to `logs/list-webiny-cms-entry.log`.
