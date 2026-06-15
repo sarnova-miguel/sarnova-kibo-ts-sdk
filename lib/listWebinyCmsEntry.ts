@@ -53,19 +53,20 @@ if (!endpoint || !token) {
 const sdk = new Webiny({ endpoint, token, tenant });
 
 // Model ID of the content model the entry belongs to
-const modelId = "aedCollection";
+const modelId = "galoSiteContentModel";
 
 // Specific entry to fetch (override via WEBINY_ENTRY_ID env var or CLI arg)
-const entryId = process.env.WEBINY_ENTRY_ID || "69d3e044c4d8710002cd1eec";
+const entryId = process.env.WEBINY_ENTRY_ID || "6a2aec556305cd0002543422";
 
 // Top-level entry fields requested for the model
 const entryFields = [
   "id",
   "entryId",
   "createdOn",
-  "savedOn",
   "values.contentId",
-  "values.siteId",
+  "values.title",
+  "wbyAco_location.folderId",
+  // "savedOn",
   // "meta.status",
   // "meta.modelId",
   // "meta.version",

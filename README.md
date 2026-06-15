@@ -28,6 +28,10 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
   - [14. 🗂️ `listWebinyFiles.ts`](#14-️-listwebinyfilests)
   - [15. 📚 `listWebinyCmsEntries.ts`](#15--listwebinycmsentriests)
   - [16. 📄 `listWebinyCmsEntry.ts`](#16--listwebinycmsentryts)
+  - [17. 📚 `listWebinyCmsEntryGraphQLManageAPI.ts`](#17--listwebinycmsentrygraphqlmanageapits)
+  - [18. 🗂️ `getWebinyCmsFolder.ts`](#18-️-getwebinycmsfolderts)
+  - [19. ➕ `createWebinyCmsFolder.ts`](#19--createwebinycmsfolderts)
+  - [20. 🧨 `deleteAllWebinyContent.ts`](#20--deleteallwebinycontentts)
 
 ---
 
@@ -116,6 +120,10 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 - `list-webiny-files.log` - Webiny File Manager file listing logs
 - `list-webiny-cms-entries.log` - Webiny CMS entries listing logs
 - `list-webiny-cms-entry.log` - Webiny CMS single entry retrieval logs
+- `list-webiny-cms-entry-graphql-manage-api.log` - Webiny CMS entry listing via raw Manage API GraphQL logs
+- `get-webiny-cms-folder.log` - Webiny ACO folder retrieval logs
+- `create-webiny-cms-folder.log` - Webiny ACO folder creation logs
+- `delete-all-webiny-content.log` - Webiny tenant-wide content wipe logs
 
 Logs include timestamps, operation status, entity details, and error messages for troubleshooting.
 
@@ -740,6 +748,10 @@ npm install @webiny/sdk
 - The Webiny SDK initialization options (`endpoint`, `token`, `tenant`) are documented in the [Webiny SDK Overview](https://www.webiny.com/docs/reference/sdk/overview).
 - `listFiles()` requires a `fields` array specifying which file fields to return — see the [File Manager SDK Reference](https://www.webiny.com/docs/reference/sdk/file-manager).
 - The API token must be created in **Settings → Access Management → API Keys** in the Webiny Admin and granted at least read permission on the File Manager. See the [GraphQL API Overview](https://www.webiny.com/docs/headless-cms/graphql-api-overview) for details on tokens and tenant scoping.
+- **Folder type:** the `location.folderId` on each file references an ACO folder whose `type` is **`FmFile`** (the literal string registered by `FoldersFeature.register(child, { type: "FmFile" })` in `@webiny/app-file-manager`). This is distinct from CMS entry folders, which use `cms:<modelId>` — see [`createWebinyCmsFolder.ts`](#19--createwebinycmsfolderts).
+- **Supported file types:** the File Manager is MIME-type agnostic and accepts **any file type**. The MIME type stored on each file is whatever the uploader provided (validated up to 255 characters per [RFC 6838](https://datatracker.ietf.org/doc/html/rfc6838)); when no MIME type is detected, Webiny falls back to `application/octet-stream` (the same fallback used by Amazon S3). Out of the box, only the following categories have a built-in renderer in the Admin UI — every other type is stored normally but rendered with a default icon unless a custom [`FileManagerFileTypePlugin`](https://www.webiny.com/docs/5.x/file-manager/extending/create-a-file-type-plugin) is registered:
+  - **Images** — `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, and any other `image/*` MIME type (rendered with an inline thumbnail preview)
+  - **All other types** (e.g. `video/mp4`, `video/quicktime`, `video/*`, `audio/*`, `application/pdf`, `application/zip`, `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` and similar Office MIME types, `text/*`, `application/json`, `application/octet-stream`) — accepted and stored, rendered with the default fallback icon unless a custom file type plugin or [custom file preview](https://www.webiny.com/docs/5.x/file-manager/extending/customize-file-preview) is registered for them
 
 **Usage:**
 To run the script, use the following command:
@@ -849,3 +861,220 @@ ts-node .\lib\listWebinyCmsEntry.ts
 ```
 
 **Output:** Entry metadata is logged to the console and persisted to `logs/list-webiny-cms-entry.log`.
+
+---
+
+### 17. 📚 `listWebinyCmsEntryGraphQLManageAPI.ts`
+
+**Purpose:** List every entry of a Webiny Headless CMS content model by issuing a raw GraphQL query against the Webiny Manage API (no SDK) and log each entry's metadata using Pino.
+
+**Location:** `lib/listWebinyCmsEntryGraphQLManageAPI.ts`
+
+**Note:** This script calls the Webiny **Manage API** directly via `fetch` — it does not use the Webiny SDK. The Manage API endpoint is typically `https://YOUR_DOMAIN/cms/manage/{locale_code}` (see the [GraphQL API Overview](https://www.webiny.com/docs/headless-cms/graphql-api-overview#manage-api)). Add the Webiny-specific variables to your `.env` file before running.
+
+```env
+  # Webiny CMS Manage API Configuration
+  WEBINY_MANAGE_API_URL=https://your-webiny-instance.example.com/cms/manage/en-US
+  WEBINY_API_TOKEN=your_webiny_api_token
+  WEBINY_TENANT=root  # Optional, defaults to "root"
+```
+
+**What it does:**
+
+- POSTs a GraphQL query to the Manage API endpoint with the `Authorization: Bearer` and `x-tenant` headers
+- Executes the per-model list query (e.g. `listGaloSiteContentModels`) derived from the model's plural API name
+- Requests `id`, `entryId`, `createdOn`, `savedOn`, selected `values.*` fields, `live.version`, `wbyAco_location.folderId`, and `meta` (`version`, `status`, `title`, `modelId`)
+- Logs each returned entry to the console and to `logs/list-webiny-cms-entry-graphql-manage-api.log`
+
+**Key Features:**
+
+- Pure `fetch` + raw GraphQL — no `@webiny/sdk` dependency required
+- Configurable `listQueryName` at the top of the script (Webiny derives this from the model's plural API name, e.g. `listPromoBanners` for the "Promo Banner" model)
+- Surfaces both HTTP errors and GraphQL `errors` / per-payload `error` blocks distinctly
+- Structured logging of every entry (id, entryId, status, version, title, folderId, createdOn, savedOn) to both console and `logs/list-webiny-cms-entry-graphql-manage-api.log`
+
+**API Notes:**
+
+- The Manage API exposes per-model typed queries and mutations; the list query name follows the pattern `list<PluralApiName>`. See the [GraphQL API Overview](https://www.webiny.com/docs/headless-cms/graphql-api-overview).
+- The API token must be created in **Settings → Access Management → API Keys** in the Webiny Admin and granted at least read permission on the target content model.
+
+**Usage:**
+To run the script, use the following command (update `listQueryName` in the script first to match your model's plural API name):
+
+```bash
+ts-node .\lib\listWebinyCmsEntryGraphQLManageAPI.ts
+```
+
+**Output:** All entry metadata is logged to the console and persisted to `logs/list-webiny-cms-entry-graphql-manage-api.log`.
+
+---
+
+### 18. 🗂️ `getWebinyCmsFolder.ts`
+
+**Purpose:** Fetch a single Webiny ACO (Advanced Content Organization) folder by `id` via the Webiny Main GraphQL API and log its metadata using Pino.
+
+**Location:** `lib/getWebinyCmsFolder.ts`
+
+**Note:** This script calls the Webiny **Main GraphQL API** directly via `fetch` (the ACO schema — `Query.aco.getFolder` — is exposed on the Main API at `/graphql`, **not** on the Manage API at `/cms/manage/...`). Add the Webiny-specific variables to your `.env` file before running.
+
+```env
+  # Webiny Main API + ACO Folder Configuration
+  WEBINY_API_URL=https://your-webiny-instance.example.com/graphql
+  WEBINY_API_TOKEN=your_webiny_api_token
+  WEBINY_TENANT=root          # Optional, defaults to "root"
+  WEBINY_FOLDER_ID=your_folder_id
+```
+
+**What it does:**
+
+- Normalizes `WEBINY_API_URL` to ensure it targets the `/graphql` path on the Main API
+- POSTs the `aco.getFolder(id: $id)` query to the Main API endpoint with the `Authorization: Bearer` and `x-tenant` headers
+- Requests `id`, `title`, `slug`, `type`, and `parentId`
+- Logs the returned folder to the console and to `logs/get-webiny-cms-folder.log`
+
+**Key Features:**
+
+- Pure `fetch` + raw GraphQL — no `@webiny/sdk` dependency required
+- Endpoint normalization that appends `/graphql` when the configured URL is missing a path
+- `folderId` is configurable via the `WEBINY_FOLDER_ID` environment variable
+- Surfaces both HTTP errors and GraphQL `errors` / per-payload `error` blocks distinctly
+- Structured logging of the folder (id, title, slug, type, parentId) to both console and `logs/get-webiny-cms-folder.log`
+
+**API Notes:**
+
+- The ACO schema lives on the Webiny Main API (`/graphql`), not on the Headless CMS Manage API (`/cms/manage/...`). Calling `aco.getFolder` against the Manage API will return `Cannot query field "aco" on type "Query"`.
+- Folder `type` is namespaced by the owning application:
+  - **CMS entry folders** — `cms:<modelId>` (e.g. `cms:fiftyFiftyContentBlockCollection`), one namespace per Headless CMS model.
+  - **File Manager folders** — `FmFile` (the literal string registered by `@webiny/app-file-manager` via `FoldersFeature.register(child, { type: "FmFile" })`); the same value is used by `aco.listFolders(where: { type: "FmFile" })` to enumerate folders shown in the File Manager UI.
+- The API token must be created in **Settings → Access Management → API Keys** in the Webiny Admin and granted at least read permission on the Content (ACO) area.
+
+**Usage:**
+To run the script, use the following command (set `WEBINY_FOLDER_ID` or update the default in the script first):
+
+```bash
+ts-node .\lib\getWebinyCmsFolder.ts
+```
+
+**Output:** Folder metadata is logged to the console and persisted to `logs/get-webiny-cms-folder.log`.
+
+---
+
+### 19. ➕ `createWebinyCmsFolder.ts`
+
+**Purpose:** Create a new Webiny ACO folder for a Headless CMS content model via the Webiny Main GraphQL API and log the created folder's metadata using Pino.
+
+**Location:** `lib/createWebinyCmsFolder.ts`
+
+**Note:** This script calls the Webiny **Main GraphQL API** directly via `fetch` (the ACO `createFolder` mutation is exposed on the Main API at `/graphql`, **not** on the Manage API). Add the Webiny-specific variables to your `.env` file before running.
+
+```env
+  # Webiny Main API + ACO Folder Configuration
+  WEBINY_API_URL=https://your-webiny-instance.example.com/graphql
+  WEBINY_API_TOKEN=your_webiny_api_token
+  WEBINY_TENANT=root                                    # Optional, defaults to "root"
+  WEBINY_CMS_MODEL_ID=fiftyFiftyContentBlockCollection  # Headless CMS modelId the folder belongs to
+  WEBINY_FOLDER_TITLE=New Test Folder                   # Optional, defaults shown
+  WEBINY_FOLDER_SLUG=new-test-folder                    # Optional, defaults shown
+  WEBINY_FOLDER_PARENT_ID=                              # Optional parent folder ID; null for top-level
+```
+
+**What it does:**
+
+- Normalizes `WEBINY_API_URL` to ensure it targets the `/graphql` path on the Main API
+- Builds the folder `type` as `cms:<WEBINY_CMS_MODEL_ID>` (the convention Webiny uses for CMS entry folders)
+- POSTs the `aco.createFolder(data: $data)` mutation to the Main API endpoint with the `Authorization: Bearer` and `x-tenant` headers
+- Requests `id`, `title`, `slug`, `type`, `parentId`, `createdOn`, and `createdBy` on the created folder
+- Logs the created folder to the console and to `logs/create-webiny-cms-folder.log`
+
+**Key Features:**
+
+- Pure `fetch` + raw GraphQL — no `@webiny/sdk` dependency required
+- Endpoint normalization that appends `/graphql` when the configured URL is missing a path (avoids the `404 "Unable to resolve the request!"` response from a non-GraphQL path)
+- All folder fields (`title`, `slug`, `modelId`, `parentId`) are overridable via environment variables
+- Surfaces both HTTP errors and GraphQL `errors` / per-payload `error` blocks distinctly
+- Structured logging of the created folder (id, title, slug, type, parentId, createdOn, createdBy) to both console and `logs/create-webiny-cms-folder.log`
+
+**API Notes:**
+
+- The ACO schema lives on the Webiny Main API (`/graphql`), not on the Headless CMS Manage API (`/cms/manage/...`).
+- This script always builds the folder `type` as `cms:<modelId>` (CMS entry folders) — otherwise the folder won't show up under that model in the Webiny Admin. Folders shown in the **File Manager** use a different `type`, the literal string **`FmFile`** (registered by `@webiny/app-file-manager` via `FoldersFeature.register(child, { type: "FmFile" })`); to create a File Manager folder instead, send `type: "FmFile"` (and omit the `cms:` prefix) when calling `aco.createFolder`.
+- The API token must be created in **Settings → Access Management → API Keys** in the Webiny Admin and granted at least write permission on the Content (ACO) area.
+
+**Usage:**
+To run the script, use the following command (set `WEBINY_CMS_MODEL_ID` and optionally `WEBINY_FOLDER_TITLE` / `WEBINY_FOLDER_SLUG` / `WEBINY_FOLDER_PARENT_ID` first):
+
+```bash
+ts-node .\lib\createWebinyCmsFolder.ts
+```
+
+**Output:** Created folder metadata is logged to the console and persisted to `logs/create-webiny-cms-folder.log`.
+
+---
+
+**⚠️ WARNING:** The script below permanently deletes **all** Webiny content (entries, folders, content models, and content model groups) for the target tenant. Use with extreme caution! ⚠️
+
+### 20. 🧨 `deleteAllWebinyContent.ts`
+
+**Purpose:** Wipe a Webiny tenant by deleting every entry of every content model, every CMS ACO folder, every content model, and every content model group, in the order required by Webiny's referential integrity.
+
+**Location:** `lib/deleteAllWebinyContent.ts`
+
+**Note:** This script calls both the Webiny **Manage API** (entries, content models, content model groups) and the **Main GraphQL API** (ACO folders) directly via `fetch`. Both endpoints share the same `Authorization: Bearer` and `x-tenant` headers. Add the Webiny-specific variables to your `.env` file before running.
+
+```env
+  # Webiny Configuration (both APIs derived from WEBINY_API_URL when WEBINY_MANAGE_API_URL is not set)
+  WEBINY_API_URL=https://your-webiny-instance.example.com/graphql
+  WEBINY_MANAGE_API_URL=https://your-webiny-instance.example.com/cms/manage/en-US  # Optional
+  WEBINY_API_TOKEN=your_webiny_api_token
+  WEBINY_LOCALE=en-US  # Optional, defaults to "en-US"
+  TENANT_ID=root       # Falls back to WEBINY_TENANT, then "root"
+```
+
+Then, in your shell (**not** in `.env`), set the destructive-operation safety guard:
+
+```bash
+$env:WEBINY_CONFIRM_DELETE_ALL="yes"   # PowerShell
+# export WEBINY_CONFIRM_DELETE_ALL=yes # bash/zsh
+```
+
+**What it does:**
+
+- Discovers all content models once via `listContentModels` on the Manage API
+- **Phase 1 — Entries (Manage API):** For each model, calls `list<PluralApiName>` to get revision IDs, then `delete<SingularApiName>(revision: $r)` per entry
+- **Phase 2 — Folders (Main API):** For each model, calls `aco.listFolders(where: { type: "cms:<modelId>" })`, orders folders so leaves are deleted before parents, then calls `aco.deleteFolder(id: $id)` per folder
+- **Phase 3 — Content Models (Manage API):** Calls `deleteContentModel(modelId: $id)` for each non-plugin model; plugin models are logged and skipped
+- **Phase 4 — Content Model Groups (Manage API):** Calls `listContentModelGroups` then `deleteContentModelGroup(id: $id)` for each non-plugin group
+
+**Key Features:**
+
+- Pure `fetch` + raw GraphQL — no `@webiny/sdk` dependency required
+- Hard safety guard: refuses to run unless `WEBINY_CONFIRM_DELETE_ALL=yes` is set in the **shell** (not `.env`)
+- Auto-derives the Manage API endpoint from `WEBINY_API_URL` + `WEBINY_LOCALE` when `WEBINY_MANAGE_API_URL` is not set
+- Skips plugin-registered content models and groups (these cannot be deleted at runtime)
+- Orders folder deletions leaves-first so Webiny does not reject parents that still contain children
+- Per-phase error isolation: a failure inside one phase is logged but does not abort the remaining phases
+- Structured logging of every list, delete, and skip to both console and `logs/delete-all-webiny-content.log`
+
+**API Notes:**
+
+- The Manage API exposes per-model typed queries (`list<PluralApiName>`) and mutations (`delete<SingularApiName>`), plus `listContentModels` / `deleteContentModel` and `listContentModelGroups` / `deleteContentModelGroup`. See the [GraphQL API Overview](https://www.webiny.com/docs/headless-cms/graphql-api-overview).
+- The ACO `listFolders` / `deleteFolder` operations live on the Main API (`/graphql`), not on the Manage API.
+- Webiny refuses to delete a folder that still contains child folders or entries, and refuses to delete a content model group that still contains models — this script orders the four phases (entries → folders → models → groups) to satisfy those constraints.
+- The API token must be created in **Settings → Access Management → API Keys** in the Webiny Admin and granted write permission on both the Headless CMS and the Content (ACO) areas.
+
+**Execution Order:**
+
+1. Discover content models (`listContentModels`)
+2. Phase 1 — delete all entries of every model
+3. Phase 2 — delete all ACO folders for every `cms:<modelId>` type (leaves first)
+4. Phase 3 — delete every non-plugin content model
+5. Phase 4 — delete every non-plugin content model group
+
+**Usage:**
+To run the script, use the following command **after** setting `WEBINY_CONFIRM_DELETE_ALL=yes` in your shell:
+
+```bash
+ts-node .\lib\deleteAllWebinyContent.ts
+```
+
+**Output:** Per-phase progress, deleted IDs, and skipped plugin items are logged to the console and persisted to `logs/delete-all-webiny-content.log`.

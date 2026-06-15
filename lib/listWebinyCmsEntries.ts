@@ -55,14 +55,21 @@ if (!endpoint || !token) {
 const sdk = new Webiny({ endpoint, token, tenant });
 
 // Model ID of the content model whose entries should be listed
-const modelId = "aedCollection";
+// const modelId = "aedCollection";
+const modelId = "showcaseDocument";
 
 // Top-level entry fields requested for the model
 const entryFields = [
   "id",
   "entryId",
   "createdOn",
-  "savedOn",
+  "values.contentId",
+  // "values.title",
+  // "location.folderId",
+  // "values.layout.section",
+  // "values.layout.isActive",
+  // "values.cards.title",
+  // "savedOn",
   // "meta.status",
   // "meta.modelId",
   // "meta.version",
