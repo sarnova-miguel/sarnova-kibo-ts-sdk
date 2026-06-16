@@ -1084,13 +1084,7 @@ ts-node .\lib\moveEntryToFolder.ts
   WEBINY_API_TOKEN=your_webiny_api_token
   WEBINY_LOCALE=en-US  # Optional, defaults to "en-US"
   TENANT_ID=root       # Falls back to WEBINY_TENANT, then "root"
-```
-
-Then, in your shell (**not** in `.env`), set the destructive-operation safety guard:
-
-```bash
-$env:WEBINY_CONFIRM_DELETE_ALL="yes"   # PowerShell
-# export WEBINY_CONFIRM_DELETE_ALL=yes # bash/zsh
+  WEBINY_CONFIRM_DELETE_ALL=yes          # Safety guard; Required to allow deletion
 ```
 
 **What it does:**
