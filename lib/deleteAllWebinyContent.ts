@@ -42,8 +42,20 @@ const token = process.env.WEBINY_API_TOKEN || "";
 const tenant = process.env.TENANT_ID || process.env.WEBINY_TENANT || "root";
 
 // Destructive-operation safety guard. Set WEBINY_CONFIRM_DELETE_ALL="yes" in
-// the shell (not .env) to allow the script to run.
+// the .env to allow the script to run.
 const confirmed = process.env.WEBINY_CONFIRM_DELETE_ALL === "yes";
+
+// Models excluded from every phase. These are Webiny system/plugin models that
+// either cannot be deleted at runtime or whose entries must not be touched by
+// a tenant wipe.
+const SKIPPED_MODELS = new Set<string>([
+  "backgroundTaskSettings",
+  "webhook",
+  "webhookDelivery",
+  "webhookSettings",
+  "wbyLanguage",
+  "wbyTenant",
+]);
 
 if (!mainEndpoint || !manageEndpoint || !token) {
   logger.error(
@@ -92,6 +104,61 @@ async function gql<T>(
   return json.data;
 }
 
+// ── Retry helper ────────────────────────────────────────────────────────────
+// Wraps an individual step (one GraphQL call) with bounded exponential
+// backoff. Permanent errors (schema validation, non-retryable HTTP 4xx) are
+// detected and re-thrown immediately so we don't waste attempts on, e.g.,
+// singleton models that don't expose a `list*` query.
+function isRetryable(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  if (
+    /Cannot query field|Unknown argument|Syntax Error|Variable .* is not defined|is not defined by type/i.test(
+      msg,
+    )
+  ) {
+    return false;
+  }
+  const httpMatch = msg.match(/^HTTP (\d{3})/);
+  if (httpMatch) {
+    const status = Number(httpMatch[1]);
+    if (status >= 400 && status < 500 && status !== 408 && status !== 429) {
+      return false;
+    }
+  }
+  return true;
+}
+
+async function withRetry<T>(
+  label: string,
+  fn: () => Promise<T>,
+  opts: { attempts?: number; baseDelayMs?: number } = {},
+): Promise<T> {
+  const attempts = opts.attempts ?? 3;
+  const baseDelay = opts.baseDelayMs ?? 500;
+  let lastErr: unknown;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      if (attempt === attempts || !isRetryable(err)) break;
+      const delayMs = baseDelay * 2 ** (attempt - 1);
+      logger.warn(
+        {
+          label,
+          attempt,
+          attempts,
+          delayMs,
+          error: err instanceof Error ? err.message : String(err),
+        },
+        "step failed; retrying",
+      );
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+  }
+  throw lastErr;
+}
+
 interface ContentModel {
   modelId: string;
   singularApiName: string;
@@ -113,10 +180,15 @@ type EntryDeleteResp = Record<
 // ids, then `delete<SingularApiName>(revision: $r)` per entry.
 async function deleteAllEntries(models: ContentModel[]): Promise<void> {
   logger.info({ endpoint: manageEndpoint }, "Phase 1: deleting entries");
-  try {
-    for (const m of models) {
+  logger.info(
+    "entry delete failed - Tried to get value from a failed Result. messages come from inside Webiny's server-side delete resolver, after the entry has already been removed from storage. Confirm deletion in UI",
+  );
+  for (const m of models) {
+    try {
       const listQ = `query { list${m.pluralApiName} { data { id } error { message } } }`;
-      const lr = await gql<EntryListResp>(manageEndpoint, listQ);
+      const lr = await withRetry(`list${m.pluralApiName}`, () =>
+        gql<EntryListResp>(manageEndpoint, listQ),
+      );
       const list = lr[`list${m.pluralApiName}`];
       if (list?.error) {
         logger.warn(
@@ -131,24 +203,40 @@ async function deleteAllEntries(models: ContentModel[]): Promise<void> {
         "deleting entries for model",
       );
       for (const e of entries) {
-        const mut = `mutation D($r: ID!) { delete${m.singularApiName}(revision: $r) { data error { message } } }`;
-        const dr = await gql<EntryDeleteResp>(manageEndpoint, mut, { r: e.id });
-        const p = dr[`delete${m.singularApiName}`];
-        if (p?.error)
-          logger.warn(
-            { model: m.modelId, id: e.id, error: p.error },
-            "entry delete failed",
+        try {
+          const mut = `mutation D($r: ID!) { delete${m.singularApiName}(revision: $r) { data error { message } } }`;
+          const dr = await withRetry(`delete${m.singularApiName}`, () =>
+            gql<EntryDeleteResp>(manageEndpoint, mut, { r: e.id }),
           );
-        else logger.info({ model: m.modelId, id: e.id }, "entry deleted");
+          const p = dr[`delete${m.singularApiName}`];
+          if (p?.error)
+            logger.warn(
+              { model: m.modelId, id: e.id, error: p.error },
+              "entry delete failed",
+            );
+          else logger.info({ model: m.modelId, id: e.id }, "entry deleted");
+        } catch (err) {
+          logger.warn(
+            {
+              model: m.modelId,
+              id: e.id,
+              error: err instanceof Error ? err.message : String(err),
+            },
+            "entry delete threw; continuing",
+          );
+        }
       }
+    } catch (err) {
+      logger.warn(
+        {
+          model: m.modelId,
+          error: err instanceof Error ? err.message : String(err),
+        },
+        "model entry processing failed; skipping model",
+      );
     }
-    logger.info("Phase 1 complete");
-  } catch (err) {
-    logger.error(
-      { error: err instanceof Error ? err.message : String(err) },
-      "Phase 1 failed",
-    );
   }
+  logger.info("Phase 1 complete");
 }
 
 // ── Phase 2: delete every CMS ACO folder (Main API) ─────────────────────────
@@ -174,11 +262,13 @@ type FolderDeleteResp = {
 
 async function deleteAllFolders(models: ContentModel[]): Promise<void> {
   logger.info({ endpoint: mainEndpoint }, "Phase 2: deleting folders");
-  try {
-    for (const m of models) {
-      const type = `cms:${m.modelId}`;
+  for (const m of models) {
+    const type = `cms:${m.modelId}`;
+    try {
       const listQ = `query L($t: String!) { aco { listFolders(where: { type: $t }) { data { id parentId } error { message } } } }`;
-      const lr = await gql<FolderListResp>(mainEndpoint, listQ, { t: type });
+      const lr = await withRetry(`listFolders:${type}`, () =>
+        gql<FolderListResp>(mainEndpoint, listQ, { t: type }),
+      );
       const folders = lr.aco.listFolders.data ?? [];
       const parents = new Set(
         folders.map((f) => f.parentId).filter((p): p is string => !!p),
@@ -191,23 +281,39 @@ async function deleteAllFolders(models: ContentModel[]): Promise<void> {
         "deleting folders for model",
       );
       for (const f of ordered) {
-        const mut = `mutation D($id: ID!) { aco { deleteFolder(id: $id) { data error { message } } } }`;
-        const dr = await gql<FolderDeleteResp>(mainEndpoint, mut, { id: f.id });
-        if (dr.aco.deleteFolder.error)
-          logger.warn(
-            { id: f.id, type, error: dr.aco.deleteFolder.error },
-            "folder delete failed",
+        try {
+          const mut = `mutation D($id: ID!) { aco { deleteFolder(id: $id) { data error { message } } } }`;
+          const dr = await withRetry(`deleteFolder:${f.id}`, () =>
+            gql<FolderDeleteResp>(mainEndpoint, mut, { id: f.id }),
           );
-        else logger.info({ id: f.id, type }, "folder deleted");
+          if (dr.aco.deleteFolder.error)
+            logger.warn(
+              { id: f.id, type, error: dr.aco.deleteFolder.error },
+              "folder delete failed",
+            );
+          else logger.info({ id: f.id, type }, "folder deleted");
+        } catch (err) {
+          logger.warn(
+            {
+              id: f.id,
+              type,
+              error: err instanceof Error ? err.message : String(err),
+            },
+            "folder delete threw; continuing",
+          );
+        }
       }
+    } catch (err) {
+      logger.warn(
+        {
+          type,
+          error: err instanceof Error ? err.message : String(err),
+        },
+        "folder processing failed; skipping model",
+      );
     }
-    logger.info("Phase 2 complete");
-  } catch (err) {
-    logger.error(
-      { error: err instanceof Error ? err.message : String(err) },
-      "Phase 2 failed",
-    );
   }
+  logger.info("Phase 2 complete");
 }
 
 // ── Phase 3: delete every content model (Manage API) ────────────────────────
@@ -225,33 +331,36 @@ async function deleteAllContentModels(models: ContentModel[]): Promise<void> {
     { endpoint: manageEndpoint, count: models.length },
     "Phase 3: deleting content models",
   );
-  try {
-    for (const m of models) {
-      if (m.plugin) {
-        logger.warn(
-          { modelId: m.modelId },
-          "plugin model; cannot delete at runtime",
-        );
-        continue;
-      }
+  for (const m of models) {
+    if (m.plugin) {
+      logger.warn(
+        { modelId: m.modelId },
+        "plugin model; cannot delete at runtime",
+      );
+      continue;
+    }
+    try {
       const mut = `mutation D($id: ID!) { deleteContentModel(modelId: $id) { data error { message } } }`;
-      const dr = await gql<ModelDeleteResp>(manageEndpoint, mut, {
-        id: m.modelId,
-      });
+      const dr = await withRetry(`deleteContentModel:${m.modelId}`, () =>
+        gql<ModelDeleteResp>(manageEndpoint, mut, { id: m.modelId }),
+      );
       if (dr.deleteContentModel.error)
         logger.warn(
           { modelId: m.modelId, error: dr.deleteContentModel.error },
           "model delete failed",
         );
       else logger.info({ modelId: m.modelId }, "model deleted");
+    } catch (err) {
+      logger.warn(
+        {
+          modelId: m.modelId,
+          error: err instanceof Error ? err.message : String(err),
+        },
+        "model delete threw; continuing",
+      );
     }
-    logger.info("Phase 3 complete");
-  } catch (err) {
-    logger.error(
-      { error: err instanceof Error ? err.message : String(err) },
-      "Phase 3 failed",
-    );
   }
+  logger.info("Phase 3 complete");
 }
 
 // ── Phase 4: delete every content model group (Manage API) ──────────────────
@@ -275,35 +384,51 @@ async function deleteAllContentModelGroups(): Promise<void> {
     { endpoint: manageEndpoint },
     "Phase 4: deleting content model groups",
   );
+  let groups: { id: string; name: string; plugin?: boolean }[] = [];
   try {
     const listQ = `query { listContentModelGroups { data { id name plugin } error { message } } }`;
-    const lr = await gql<GroupListResp>(manageEndpoint, listQ);
-    const groups = lr.listContentModelGroups.data ?? [];
+    const lr = await withRetry("listContentModelGroups", () =>
+      gql<GroupListResp>(manageEndpoint, listQ),
+    );
+    groups = lr.listContentModelGroups.data ?? [];
     logger.info({ count: groups.length }, "groups discovered");
-    for (const g of groups) {
-      if (g.plugin) {
-        logger.warn(
-          { id: g.id, name: g.name },
-          "plugin group; cannot delete at runtime",
-        );
-        continue;
-      }
+  } catch (err) {
+    logger.error(
+      { error: err instanceof Error ? err.message : String(err) },
+      "Phase 4 list failed",
+    );
+    return;
+  }
+  for (const g of groups) {
+    if (g.plugin) {
+      logger.warn(
+        { id: g.id, name: g.name },
+        "plugin group; cannot delete at runtime",
+      );
+      continue;
+    }
+    try {
       const mut = `mutation D($id: ID!) { deleteContentModelGroup(id: $id) { data error { message } } }`;
-      const dr = await gql<GroupDeleteResp>(manageEndpoint, mut, { id: g.id });
+      const dr = await withRetry(`deleteContentModelGroup:${g.id}`, () =>
+        gql<GroupDeleteResp>(manageEndpoint, mut, { id: g.id }),
+      );
       if (dr.deleteContentModelGroup.error)
         logger.warn(
           { id: g.id, error: dr.deleteContentModelGroup.error },
           "group delete failed",
         );
       else logger.info({ id: g.id, name: g.name }, "group deleted");
+    } catch (err) {
+      logger.warn(
+        {
+          id: g.id,
+          error: err instanceof Error ? err.message : String(err),
+        },
+        "group delete threw; continuing",
+      );
     }
-    logger.info("Phase 4 complete");
-  } catch (err) {
-    logger.error(
-      { error: err instanceof Error ? err.message : String(err) },
-      "Phase 4 failed",
-    );
   }
+  logger.info("Phase 4 complete");
 }
 
 // ── Orchestrator ────────────────────────────────────────────────────────────
@@ -323,9 +448,20 @@ async function main() {
     "Starting tenant wipe",
   );
   const listQ = `query { listContentModels { data { modelId singularApiName pluralApiName plugin } error { message } } }`;
-  const lr = await gql<ModelListResp>(manageEndpoint, listQ);
-  const models = lr.listContentModels.data ?? [];
-  logger.info({ count: models.length }, "Discovered content models");
+  const lr = await withRetry("listContentModels", () =>
+    gql<ModelListResp>(manageEndpoint, listQ),
+  );
+  const discovered = lr.listContentModels.data ?? [];
+  const skipped = discovered.filter((m) => SKIPPED_MODELS.has(m.modelId));
+  const models = discovered.filter((m) => !SKIPPED_MODELS.has(m.modelId));
+  logger.info(
+    {
+      discovered: discovered.length,
+      skipped: skipped.map((m) => m.modelId),
+      processing: models.length,
+    },
+    "Discovered content models",
+  );
 
   await deleteAllEntries(models);
   await deleteAllFolders(models);

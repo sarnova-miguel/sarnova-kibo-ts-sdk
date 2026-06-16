@@ -1101,15 +1101,18 @@ ts-node .\lib\moveEntryToFolder.ts
 - Hard safety guard: refuses to run unless `WEBINY_CONFIRM_DELETE_ALL=yes` is set in the **shell** (not `.env`)
 - Auto-derives the Manage API endpoint from `WEBINY_API_URL` + `WEBINY_LOCALE` when `WEBINY_MANAGE_API_URL` is not set
 - Skips plugin-registered content models and groups (these cannot be deleted at runtime)
+- Skips a hard-coded `SKIPPED_MODELS` set of Webiny system/plugin models (`backgroundTaskSettings`, `webhook`, `webhookDelivery`, `webhookSettings`, `wbyLanguage`, `wbyTenant`) once at discovery time, so no phase queries, lists, or deletes them
 - Orders folder deletions leaves-first so Webiny does not reject parents that still contain children
-- Per-phase error isolation: a failure inside one phase is logged but does not abort the remaining phases
-- Structured logging of every list, delete, and skip to both console and `logs/delete-all-webiny-content.log`
+- Per-iteration error isolation: every per-model, per-folder, per-entry, and per-group step has its own `try/catch`, so one failing item is logged and skipped without aborting the rest of its phase
+- Per-step retry with bounded exponential backoff (default 3 attempts, 500 ms / 1000 ms delays) around every GraphQL call; permanent errors (GraphQL schema/validation errors, non-transient HTTP 4xx other than 408 / 429) are detected via `isRetryable(...)` and re-thrown immediately so singleton models and similar permanent failures don't waste attempts
+- Structured logging of every discovery, list, delete, skip, retry, and per-item warning to both console and `logs/delete-all-webiny-content.log`
 
 **API Notes:**
 
 - The Manage API exposes per-model typed queries (`list<PluralApiName>`) and mutations (`delete<SingularApiName>`), plus `listContentModels` / `deleteContentModel` and `listContentModelGroups` / `deleteContentModelGroup`. See the [GraphQL API Overview](https://www.webiny.com/docs/headless-cms/graphql-api-overview).
 - The ACO `listFolders` / `deleteFolder` operations live on the Main API (`/graphql`), not on the Manage API.
 - Webiny refuses to delete a folder that still contains child folders or entries, and refuses to delete a content model group that still contains models — this script orders the four phases (entries → folders → models → groups) to satisfy those constraints.
+- Some `delete<Singular>` mutations return `error: { message: "Tried to get value from a failed Result." }` even though the entry has been removed from storage. This is a known Webiny artifact: a post-delete bookkeeping step (e.g. re-projecting the new "latest" revision, ES sync, or ACO/lifecycle hooks) calls `.value` on an internal `Result` that ended in `fail` and the message is surfaced in the GraphQL payload after the destructive write has already been committed. The warning is informational — Phase 3 / Phase 4 still succeed because the entries are actually gone. Confirm in the Webiny UI if in doubt.
 - The API token must be created in **Settings → Access Management → API Keys** in the Webiny Admin and granted write permission on both the Headless CMS and the Content (ACO) areas.
 
 **Execution Order:**
