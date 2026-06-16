@@ -31,7 +31,8 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
   - [17. 📚 `listWebinyCmsEntryGraphQLManageAPI.ts`](#17--listwebinycmsentrygraphqlmanageapits)
   - [18. 🗂️ `getWebinyCmsFolder.ts`](#18-️-getwebinycmsfolderts)
   - [19. ➕ `createWebinyCmsFolder.ts`](#19--createwebinycmsfolderts)
-  - [20. 🧨 `deleteAllWebinyContent.ts`](#20--deleteallwebinycontentts)
+  - [20. 🚚 `moveEntryToFolder.ts`](#20--moveentrytofolderts)
+  - [21. 🧨 `deleteAllWebinyContent.ts`](#21--deleteallwebinycontentts)
 
 ---
 
@@ -123,6 +124,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 - `list-webiny-cms-entry-graphql-manage-api.log` - Webiny CMS entry listing via raw Manage API GraphQL logs
 - `get-webiny-cms-folder.log` - Webiny ACO folder retrieval logs
 - `create-webiny-cms-folder.log` - Webiny ACO folder creation logs
+- `move-entry-to-folder.log` - Webiny CMS entry folder move logs
 - `delete-all-webiny-content.log` - Webiny tenant-wide content wipe logs
 
 Logs include timestamps, operation status, entity details, and error messages for troubleshooting.
@@ -1011,9 +1013,63 @@ ts-node .\lib\createWebinyCmsFolder.ts
 
 ---
 
-**⚠️ WARNING:** The script below permanently deletes **all** Webiny content (entries, folders, content models, and content model groups) for the target tenant. Use with extreme caution! ⚠️
+### 20. 🚚 `moveEntryToFolder.ts`
 
-### 20. 🧨 `deleteAllWebinyContent.ts`
+**Purpose:** Move a single Webiny Headless CMS entry into a different ACO folder (or to the model's root) by issuing the per-model `move<SingularApiName>` mutation against the Webiny Manage API and log the result using Pino.
+
+**Location:** `lib/moveEntryToFolder.ts`
+
+**Note:** This script calls the Webiny **Manage API** directly via `fetch` — it does not use the Webiny SDK. The Manage API endpoint is typically `https://YOUR_DOMAIN/cms/manage/{locale_code}` (see the [GraphQL API Overview](https://www.webiny.com/docs/headless-cms/graphql-api-overview#manage-api)). Add the Webiny-specific variables to your `.env` file before running.
+
+```env
+  # Webiny CMS Manage API Configuration
+  WEBINY_MANAGE_API_URL=https://your-webiny-instance.example.com/cms/manage/en-US
+  WEBINY_API_TOKEN=your_webiny_api_token
+  WEBINY_TENANT=root                                    # Optional, defaults to "root"
+  WEBINY_CMS_MODEL_ID=categoryPageLayout                # Headless CMS modelId the entry belongs to
+  WEBINY_CMS_MODEL_SINGULAR=CategoryPageLayout          # Optional, overrides the PascalCased modelId for the mutation name
+  WEBINY_ENTRY_REVISION=6a28c16821ddf60002aa40ab#0001   # Required revision id in `<entryId>#<version>` format (WEBINY_ENTRY_ID accepted as fallback)
+  WEBINY_TARGET_FOLDER_ID=6a30b39b34ad220002d68652      # Target folder ID; use "ROOT" for the model's root
+```
+
+**What it does:**
+
+- Resolves the Manage API endpoint from `WEBINY_MANAGE_API_URL`, or derives it from `WEBINY_API_URL` by stripping any trailing `/graphql` and appending `/cms/manage`
+- Builds the per-model mutation name as `move<SingularApiName>` (e.g. `moveCategoryPageLayout`), defaulting `singularApiName` to a PascalCased `modelId` and allowing an override via `WEBINY_CMS_MODEL_SINGULAR`
+- POSTs the `move<SingularApiName>(revision: $revision, folderId: $folderId)` mutation to the Manage API endpoint with the `Authorization: Bearer` and `x-tenant` headers
+- Requests `data` and the `error { code, message, data }` block on the move response
+- Logs the moved entry's outcome to the console and to `logs/move-entry-to-folder.log`
+
+**Key Features:**
+
+- Pure `fetch` + raw GraphQL — no `@webiny/sdk` dependency required
+- Auto-derives the Manage API endpoint from `WEBINY_API_URL` when `WEBINY_MANAGE_API_URL` is not set
+- Configurable `modelId`, singular API name, entry revision id, and target folder id via environment variables
+- Warns when `WEBINY_ENTRY_REVISION` does not match the `<entryId>#<version>` shape (the per-model move mutation expects a revision id, not a bare entry id)
+- Surfaces both HTTP errors and GraphQL `errors` / per-payload `error` blocks distinctly
+- Structured logging of the endpoint, tenant, mutation, entry revision, target folder, and final `moved` boolean to both console and `logs/move-entry-to-folder.log`
+
+**API Notes:**
+
+- The Manage API exposes per-model typed mutations; the move mutation name follows the pattern `move<SingularApiName>` and takes `revision: ID!` and `folderId: ID!`. See the [GraphQL API Overview](https://www.webiny.com/docs/headless-cms/graphql-api-overview).
+- The `revision` argument expects the revision id in `<entryId>#<version>` format (e.g. `6a28c16821ddf60002aa40ab#0001`) — a bare entry id will not match.
+- Use the literal string `"ROOT"` as `folderId` to move the entry to the model's root folder.
+- The API token must be created in **Settings → Access Management → API Keys** in the Webiny Admin and granted write permission on the target content model.
+
+**Usage:**
+To run the script, use the following command (set `WEBINY_CMS_MODEL_ID`, `WEBINY_ENTRY_REVISION`, and `WEBINY_TARGET_FOLDER_ID` first):
+
+```bash
+ts-node .\lib\moveEntryToFolder.ts
+```
+
+**Output:** Move result is logged to the console and persisted to `logs/move-entry-to-folder.log`.
+
+---
+
+**⚠️ WARNING:** The script below permanently deletes **all** Webiny content (entries, folders, content models, and content model groups; NOT files/images) for the target tenant. Use with extreme caution! ⚠️
+
+### 21. 🧨 `deleteAllWebinyContent.ts`
 
 **Purpose:** Wipe a Webiny tenant by deleting every entry of every content model, every CMS ACO folder, every content model, and every content model group, in the order required by Webiny's referential integrity.
 
