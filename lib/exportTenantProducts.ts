@@ -229,10 +229,26 @@ async function exportCategories() {
   }
 }
 
-// Export products
+// Export products from the master catalog.
+// Setting 'catalog' and 'siteId' to undefined ensures those headers are not sent,
+// so the call operates at the master catalog level rather than a single child catalog.
 async function exportProducts() {
-  const client = new ProductsApi(configuration);
-  logger.info("Fetching products...");
+  const masterCatalogId = process.env.MASTER_CATALOG || "1";
+
+  const masterCatalogConfiguration = new Configuration({
+    tenantId: process.env.TENANT_ID || "",
+    siteId: undefined,
+    catalog: undefined,
+    masterCatalog: masterCatalogId,
+    sharedSecret: process.env.SHARED_SECRET || "",
+    clientId: process.env.CLIENT_ID || "",
+    pciHost: process.env.PCI_HOST || "",
+    authHost: process.env.AUTH_HOST || "",
+    apiEnv: process.env.API_ENV || "",
+  });
+
+  const client = new ProductsApi(masterCatalogConfiguration);
+  logger.info({ masterCatalogId }, "Fetching products from master catalog...");
 
   try {
     const items = await fetchAllPages((startIndex) =>
@@ -240,10 +256,16 @@ async function exportProducts() {
     );
 
     writeCsv("products.csv", items);
-    logger.info({ count: items.length }, "Products export complete");
+    logger.info(
+      { count: items.length, masterCatalogId },
+      "Products export complete",
+    );
   } catch (error) {
     logger.error(
-      { error: error instanceof Error ? error.message : String(error) },
+      {
+        masterCatalogId,
+        error: error instanceof Error ? error.message : String(error),
+      },
       "Error exporting products",
     );
   }
