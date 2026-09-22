@@ -90,12 +90,24 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
    npm install
    ```
 
+   This installs `ts-node` and `typescript` locally — no global install is
+   required.
+
 3. **Run a Script**
 
-   Use `ts-node` to execute any script in the `lib/` directory. For example:
+   Use `ts-node` to execute any script in the `lib/` directory. `ts-node` is a
+   local dependency, so run it through `npx` (or `pnpm exec`) — a bare `ts-node`
+   command will fail unless you have installed it globally. For example:
 
    ```bash
-   ts-node .\lib\newSandboxSetup.ts
+   npx ts-node .\lib\newSandboxSetup.ts
+   ```
+
+   Equivalent alternatives:
+
+   ```bash
+   pnpm exec ts-node .\lib\newSandboxSetup.ts
+   npm run script -- .\lib\newSandboxSetup.ts
    ```
 
    See [Scripts Overview](#️-scripts-overview) for the full list of available scripts and their usage.
@@ -154,7 +166,7 @@ Logs include timestamps, operation status, entity details, and error messages fo
 To run the script, use the following command:
 
 ```bash
-ts-node .\lib\newSandboxSetup.ts
+npx ts-node .\lib\newSandboxSetup.ts
 ```
 
 **Note:** Some configurations (catalogs, sites, payment gateways) must be done manually through the Kibo admin interface.
@@ -192,7 +204,7 @@ ts-node .\lib\newSandboxSetup.ts
 To run the script, use the following command:
 
 ```bash
-ts-node .\lib\newSandboxProducts.ts
+npx ts-node .\lib\newSandboxProducts.ts
 ```
 
 **Logging:**
@@ -255,7 +267,7 @@ All operations are logged with detailed information including success/failure st
 To run the script, use the following command:
 
 ```bash
-ts-node .\lib\deleteProdsCatsTypesAttributes.ts
+npx ts-node .\lib\deleteProdsCatsTypesAttributes.ts
 ```
 
 ---
@@ -282,7 +294,7 @@ ts-node .\lib\deleteProdsCatsTypesAttributes.ts
 To run the script, use the following command:
 
 ```bash
-ts-node .\lib\createDocTypeListDocs.ts
+npx ts-node .\lib\createDocTypeListDocs.ts
 ```
 
 ---
@@ -332,7 +344,7 @@ ts-node .\lib\createDocTypeListDocs.ts
 To run the script, use the following command:
 
 ```bash
-ts-node .\lib\copyPasteDocs.ts
+npx ts-node .\lib\copyPasteDocs.ts
 ```
 
 **Logging:**
@@ -395,7 +407,7 @@ All operations are logged with detailed information including:
 To run the script, use the following command:
 
 ```bash
-ts-node .\lib\cartToCompletedOrder.ts
+npx ts-node .\lib\cartToCompletedOrder.ts
 ```
 
 ---
@@ -451,7 +463,7 @@ ts-node .\lib\cartToCompletedOrder.ts
 To run the script, use the following command:
 
 ```bash
-ts-node .\lib\cartToCheckoutToOrder.ts
+npx ts-node .\lib\cartToCheckoutToOrder.ts
 ```
 
 ---
@@ -483,7 +495,7 @@ ts-node .\lib\cartToCheckoutToOrder.ts
 To run the script, use the following command:
 
 ```bash
-ts-node .\lib\addSubscriptionAttributes.ts
+npx ts-node .\lib\addSubscriptionAttributes.ts
 ```
 
 ---
@@ -520,7 +532,7 @@ ts-node .\lib\addSubscriptionAttributes.ts
 To run the script, use the following command (be sure to update the `newUser` data before running):
 
 ```bash
-ts-node .\lib\userLogin.ts
+npx ts-node .\lib\userLogin.ts
 ```
 
 ---
@@ -557,7 +569,7 @@ ts-node .\lib\userLogin.ts
 To run the script, use the following command:
 
 ```bash
-ts-node .\lib\exportTenantProducts.ts
+npx ts-node .\lib\exportTenantProducts.ts
 ```
 
 **Output:** CSV files are written to the `exports/` directory at the project root.
@@ -586,6 +598,7 @@ ts-node .\lib\exportTenantProducts.ts
 - Parses JSON strings in CSV cells back into arrays/objects (`parseValue`)
 - Normalizes numeric-keyed objects from `unflattenObject` back into real arrays via the `toArray` helper before iterating `productInCatalogs` / `productCategories`
 - Per-catalog category creation: each catalog has its own `categoryCode` namespace, so `importCategories` returns a `Map<catalogId, Map<categoryCode, newCategoryId>>` and creates categories with a per-catalog `CategoriesApi` client 🔥
+- Normalizes `isOption` on product attributes: the flag is **preserved** for `inputType: "List"` attributes and **forced to `false`** for every other input type (`TextBox`, `TextArea`, `YesNo`), because Kibo rejects option attributes whose `inputType`/`valueType`/`dataType` combination has no matching `AttributeTypeRule`. Each preserved/downgraded attribute is logged, and the run summary reports `isOptionPreserved` / `isOptionForcedFalse` counts 🔥
 - Automatically remaps old product type IDs (via name lookup) and category IDs to newly created IDs in the destination tenant 🔥
 - Remaps both `productCategories` entries and `primaryProductCategory` inside every `productInCatalogs` entry, using the category map for that entry's `catalogId` 🔥
 - Emits a structured `RemapReport` per product/catalog pair listing every `remapped` and `skipped` category ID (with reason) for full traceability
@@ -615,7 +628,7 @@ ts-node .\lib\exportTenantProducts.ts
 To run the script, use the following command:
 
 ```bash
-ts-node .\lib\importTenantProducts.ts
+npx ts-node .\lib\importTenantProducts.ts
 ```
 
 **Input:** Reads CSV files from the `exports/` directory (generated by `exportTenantProducts.ts`).
@@ -654,7 +667,7 @@ ts-node .\lib\importTenantProducts.ts
 To run the script, use the following command:
 
 ```bash
-ts-node .\lib\exportTenantProductVariations.ts
+npx ts-node .\lib\exportTenantProductVariations.ts
 ```
 
 **Output:** `exports/productVariations.csv` with columns `productCode, variationProductCode, attributeFQN, value`.
@@ -704,7 +717,7 @@ ts-node .\lib\exportTenantProductVariations.ts
 To run the script, use the following command:
 
 ```bash
-ts-node .\lib\importTenantProductVariations.ts
+npx ts-node .\lib\importTenantProductVariations.ts
 ```
 
 **Input:** Reads `exports/productVariations.csv` (generated by `exportTenantProductVariations.ts`).
@@ -759,7 +772,7 @@ npm install @webiny/sdk
 To run the script, use the following command:
 
 ```bash
-ts-node .\lib\listWebinyFiles.ts
+npx ts-node .\lib\listWebinyFiles.ts
 ```
 
 **Output:** All file metadata is logged to the console and persisted to `logs/list-webiny-files.log`.
@@ -809,7 +822,7 @@ npm install @webiny/sdk
 To run the script, use the following command (update `modelId` in the script first if needed):
 
 ```bash
-ts-node .\lib\listWebinyCmsEntries.ts
+npx ts-node .\lib\listWebinyCmsEntries.ts
 ```
 
 **Output:** All entry metadata is logged to the console and persisted to `logs/list-webiny-cms-entries.log`.
@@ -859,7 +872,7 @@ npm install @webiny/sdk
 To run the script, use the following command (set `WEBINY_ENTRY_ID` or update the default `entryId` in the script first):
 
 ```bash
-ts-node .\lib\listWebinyCmsEntry.ts
+npx ts-node .\lib\listWebinyCmsEntry.ts
 ```
 
 **Output:** Entry metadata is logged to the console and persisted to `logs/list-webiny-cms-entry.log`.
@@ -904,7 +917,7 @@ ts-node .\lib\listWebinyCmsEntry.ts
 To run the script, use the following command (update `listQueryName` in the script first to match your model's plural API name):
 
 ```bash
-ts-node .\lib\listWebinyCmsEntryGraphQLManageAPI.ts
+npx ts-node .\lib\listWebinyCmsEntryGraphQLManageAPI.ts
 ```
 
 **Output:** All entry metadata is logged to the console and persisted to `logs/list-webiny-cms-entry-graphql-manage-api.log`.
@@ -954,7 +967,7 @@ ts-node .\lib\listWebinyCmsEntryGraphQLManageAPI.ts
 To run the script, use the following command (set `WEBINY_FOLDER_ID` or update the default in the script first):
 
 ```bash
-ts-node .\lib\getWebinyCmsFolder.ts
+npx ts-node .\lib\getWebinyCmsFolder.ts
 ```
 
 **Output:** Folder metadata is logged to the console and persisted to `logs/get-webiny-cms-folder.log`.
@@ -1006,7 +1019,7 @@ ts-node .\lib\getWebinyCmsFolder.ts
 To run the script, use the following command (set `WEBINY_CMS_MODEL_ID` and optionally `WEBINY_FOLDER_TITLE` / `WEBINY_FOLDER_SLUG` / `WEBINY_FOLDER_PARENT_ID` first):
 
 ```bash
-ts-node .\lib\createWebinyCmsFolder.ts
+npx ts-node .\lib\createWebinyCmsFolder.ts
 ```
 
 **Output:** Created folder metadata is logged to the console and persisted to `logs/create-webiny-cms-folder.log`.
@@ -1060,7 +1073,7 @@ ts-node .\lib\createWebinyCmsFolder.ts
 To run the script, use the following command (set `WEBINY_CMS_MODEL_ID`, `WEBINY_ENTRY_REVISION`, and `WEBINY_TARGET_FOLDER_ID` first):
 
 ```bash
-ts-node .\lib\moveEntryToFolder.ts
+npx ts-node .\lib\moveEntryToFolder.ts
 ```
 
 **Output:** Move result is logged to the console and persisted to `logs/move-entry-to-folder.log`.
@@ -1127,7 +1140,7 @@ ts-node .\lib\moveEntryToFolder.ts
 To run the script, use the following command **after** setting `WEBINY_CONFIRM_DELETE_ALL=yes` in your shell:
 
 ```bash
-ts-node .\lib\deleteAllWebinyContent.ts
+npx ts-node .\lib\deleteAllWebinyContent.ts
 ```
 
 **Output:** Per-phase progress, deleted IDs, and skipped plugin items are logged to the console and persisted to `logs/delete-all-webiny-content.log`.

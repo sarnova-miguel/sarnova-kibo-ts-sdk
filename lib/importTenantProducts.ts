@@ -109,6 +109,15 @@ function toArray(value: any): any[] {
   return [];
 }
 
+// Kibo only accepts isOption: true when the attribute's inputType/valueType/dataType
+// combination matches an AttributeTypeRule; in practice only list-driven attributes
+// qualify as options. TextBox, TextArea and YesNo attributes never can.
+const OPTION_INPUT_TYPES = new Set(["List"]);
+
+function canBeOption(attributeData: Record<string, any>): boolean {
+  return OPTION_INPUT_TYPES.has(String(attributeData.inputType));
+}
+
 // Parse a CSV string value back to its original type
 function parseValue(value: string): any {
   if (value === "") return undefined;
@@ -139,12 +148,42 @@ async function importProductAttributes() {
   const items = readCsv("productAttributes.csv");
   logger.info({ count: items.length }, "Importing product attributes...");
 
+  let isOptionForcedFalse = 0;
+  let isOptionPreserved = 0;
+
   try {
     for (const attributeData of items) {
+      // Shallow copy so we don't mutate the shared CSV row. isOption is only kept
+      // when the attribute's inputType can legally be an option (see canBeOption),
+      // otherwise Kibo rejects the create.
+      const payload: Record<string, any> = { ...attributeData };
+      const wasOption = attributeData.isOption === true;
+      const keepOption = wasOption && canBeOption(attributeData);
+      const attributeTypeFields = {
+        attributeCode: attributeData.attributeCode,
+        inputType: attributeData.inputType,
+        valueType: attributeData.valueType,
+        dataType: attributeData.dataType,
+      };
+      if (keepOption) {
+        isOptionPreserved++;
+        logger.info(
+          attributeTypeFields,
+          "Preserving isOption for product attribute",
+        );
+      } else if (wasOption) {
+        isOptionForcedFalse++;
+        logger.warn(
+          attributeTypeFields,
+          "Forcing isOption to false for product attribute",
+        );
+      }
+      payload.isOption = keepOption;
+
       await limiter.schedule(async () => {
         try {
           const created = await client.addAttribute({
-            catalogAdminsAttribute: attributeData,
+            catalogAdminsAttribute: payload,
           });
           logger.info(
             { attributeCode: created.attributeCode },
@@ -153,7 +192,7 @@ async function importProductAttributes() {
         } catch (error) {
           logger.error(
             {
-              attributeCode: attributeData.attributeCode,
+              attributeCode: payload.attributeCode,
               error: error instanceof Error ? error.message : String(error),
             },
             "Error creating product attribute",
@@ -161,7 +200,10 @@ async function importProductAttributes() {
         }
       });
     }
-    logger.info("All product attributes imported successfully");
+    logger.info(
+      { count: items.length, isOptionPreserved, isOptionForcedFalse },
+      "All product attributes imported successfully",
+    );
   } catch (error) {
     logger.error(
       { error: error instanceof Error ? error.message : String(error) },

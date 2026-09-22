@@ -144,7 +144,29 @@ describe("importTenantProducts - happy path", () => {
     resetApiMocks();
 
     setCsv("productAttributes.csv", [
-      { attributeCode: "color", "content.name": "Color" },
+      {
+        attributeCode: "color",
+        "content.name": "Color",
+        inputType: "TextBox",
+        valueType: "AdminEntered",
+        isOption: "false",
+      },
+      // TextBox can never be an option - isOption must be forced to false
+      {
+        attributeCode: "size",
+        "content.name": "Size",
+        inputType: "TextBox",
+        valueType: "AdminEntered",
+        isOption: "true",
+      },
+      // List attributes can be options - isOption must be preserved
+      {
+        attributeCode: "aed_type",
+        "content.name": "AED Type",
+        inputType: "List",
+        valueType: "Predefined",
+        isOption: "true",
+      },
     ]);
     // Base type should be skipped (case-insensitive); Apparel should be created
     setCsv("productTypes.csv", [
@@ -182,7 +204,10 @@ describe("importTenantProducts - happy path", () => {
       },
     ]);
 
-    addAttributeMock.mockResolvedValue({ attributeCode: "color" });
+    addAttributeMock
+      .mockResolvedValueOnce({ attributeCode: "color" })
+      .mockResolvedValueOnce({ attributeCode: "size" })
+      .mockResolvedValueOnce({ attributeCode: "aed_type" });
     addProductTypeMock.mockResolvedValue({ name: "Apparel", id: 999 });
     addCategoryMock
       .mockResolvedValueOnce({
@@ -217,11 +242,32 @@ describe("importTenantProducts - happy path", () => {
   });
 
   it("creates each product attribute from the CSV", () => {
-    expect(addAttributeMock).toHaveBeenCalledTimes(1);
+    expect(addAttributeMock).toHaveBeenCalledTimes(3);
     expect(addAttributeMock).toHaveBeenCalledWith({
       catalogAdminsAttribute: expect.objectContaining({
         attributeCode: "color",
         content: { name: "Color" },
+        isOption: false,
+      }),
+    });
+  });
+
+  it("forces isOption to false on TextBox attributes exported with isOption true", () => {
+    expect(addAttributeMock).toHaveBeenCalledWith({
+      catalogAdminsAttribute: expect.objectContaining({
+        attributeCode: "size",
+        inputType: "TextBox",
+        isOption: false,
+      }),
+    });
+  });
+
+  it("preserves isOption true on List attributes", () => {
+    expect(addAttributeMock).toHaveBeenCalledWith({
+      catalogAdminsAttribute: expect.objectContaining({
+        attributeCode: "aed_type",
+        inputType: "List",
+        isOption: true,
       }),
     });
   });
