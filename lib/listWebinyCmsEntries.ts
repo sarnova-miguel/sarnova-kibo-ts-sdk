@@ -56,7 +56,7 @@ const sdk = new Webiny({ endpoint, token, tenant });
 
 // Model ID of the content model whose entries should be listed
 // const modelId = "aedCollection";
-const modelId = "showcaseDocument";
+const modelId = "brandPageLayout";
 
 // Top-level entry fields requested for the model
 const entryFields = [

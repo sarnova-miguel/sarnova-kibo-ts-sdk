@@ -50,7 +50,7 @@ if (!endpoint || !token) {
 // Name of the list query exposed by the Manage API for the target model.
 // Webiny derives this from the model's plural API name, e.g.
 // `listPromoBanners` for the "Promo Banner" model.
-const listQueryName = "listGaloSiteContentModels";
+const listQueryName = "listBrandPageLayouts";
 
 // GraphQL query string. Includes `meta.status` so the entry's publication
 // status (draft / published / unpublished) is returned.
@@ -63,8 +63,8 @@ const query = `
         createdOn
         savedOn
         values {
-          title
           contentId
+          siteId
         }
         live {
           version
