@@ -1144,3 +1144,63 @@ npx ts-node .\lib\deleteAllWebinyContent.ts
 ```
 
 **Output:** Per-phase progress, deleted IDs, and skipped plugin items are logged to the console and persisted to `logs/delete-all-webiny-content.log`.
+
+---
+
+### 22. 👥 `importB2CAccountsFromCSV.ts`
+
+**Purpose:** Bulk-create B2C shopper accounts in Kibo from a legacy-system CSV, one row per account, including billing/shipping contacts and the legacy account number.
+
+**Location:** `lib/importB2CAccountsFromCSV.ts`
+
+**What it does:**
+
+- Checks if a customer account already exists for each row's email using `CustomerAccountApi.getAccounts()` with an `emailAddress eq` filter, and skips the row if it does
+- Creates the account with `CustomerAccountApi.addAccountAndLogin()`, using the email as `emailAddress`, `userName`, and `externalId`, and the temporary password `TempPa$$word123!`
+- Stores the legacy `fnoAccountNumber` in the `tenant~accountnumber` account attribute and the `is-verified` flag in the `tenant~is-verified` account attribute, by sending both in the same `addAccountAndLogin()` payload (`account.attributes`). Custom attributes persist through Add-Account-And-Login
+- Adds the billing and shipping contacts with `CustomerAccountApi.addAccountContact()`. Contacts are added after the account is created because they don't persist through Add-Account-And-Login
+
+**CSV Columns:**
+
+| Group | Columns |
+|---|---|
+| Account | `fnoAccountNumber`, `is-verified` (boolean), `emailAddress` (required), `firstName`, `lastName`, `companyOrOrganization`, `acceptsMarketing` |
+| Phone | `phone`, `phoneType` (`home`, `mobile`, or `work`; defaults to `mobile`) |
+| Billing (required) | `billingAddress1`, `billingAddress2`, `billingCityOrTown`, `billingStateOrProvince`, `billingPostalOrZipCode`, `billingCountryCode`, `billingIsValidated` |
+| Shipping (optional) | `shippingAddress1` … `shippingCountryCode`, `shippingIsValidated` |
+| Extra shipping (optional) | Same fields with a numbered prefix: `shipping2Address1` … `shipping2IsValidated`, `shipping3…`, and so on |
+
+- Boolean columns (`is-verified`, `acceptsMarketing`, `*IsValidated`) accept `true`, `1`, or `yes`; anything else, including blank or `null`, is `false`
+- If all shipping columns are blank, the billing address is also the primary shipping address
+- A shipping address identical to billing is merged into the billing contact instead of creating a duplicate
+- With multiple shipping addresses, only the first is marked primary
+- See `lib/data/b2c-accounts-sample.csv` for examples
+
+**Key Features:**
+
+- Rate limiting (500ms between API calls via Bottleneck) for API throttling
+- Structured logging to both console and `logs/import-b2c-accounts.log`
+- Skips accounts that already exist (idempotent re-runs)
+- Validates each row (email, required billing/shipping fields) before calling the API
+- Per-row and per-contact error isolation: a failure is logged and the import continues
+- End-of-run summary with `created`, `skipped`, `failed`, and `contactFailed` counts, plus details of each failure
+
+**Prerequisites:**
+
+- The `tenant~accountnumber` and `tenant~is-verified` customer attributes must already exist in Kibo Admin (**System → Schema → Customer Attributes**). If either doesn't, the account create itself is expected to fail
+
+**Execution Order (per row):**
+
+1. Validate the row
+2. Check if an account already exists for the email
+3. Create the account with the temporary password and the `tenant~accountnumber` and `tenant~is-verified` attributes
+4. Add each billing/shipping contact
+
+**Usage:**
+To run the script, use the following command:
+
+```bash
+npx ts-node .\lib\importB2CAccountsFromCSV.ts .\lib\data\b2c-accounts-sample.csv
+```
+
+**Output:** Per-row progress (account ID, account number, contact IDs) and the import summary are logged to the console and persisted to `logs/import-b2c-accounts.log`.

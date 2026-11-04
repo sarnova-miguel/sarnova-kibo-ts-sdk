@@ -1,0 +1,6 @@
+fnoAccountNumber,is-verified,emailAddress,firstName,lastName,companyOrOrganization,acceptsMarketing,phone,phoneType,billingAddress1,billingAddress2,billingCityOrTown,billingStateOrProvince,billingPostalOrZipCode,billingCountryCode,billingIsValidated,shippingAddress1,shippingAddress2,shippingCityOrTown,shippingStateOrProvince,shippingPostalOrZipCode,shippingCountryCode,shippingIsValidated,shipping2Address1,shipping2Address2,shipping2CityOrTown,shipping2StateOrProvince,shipping2PostalOrZipCode,shipping2CountryCode,shipping2IsValidated
+FNO100001,true,jane.doe@fkxample.com,Jane,Doe,,true,2145550101,,100 Main St,,Dallas,TX,75201,US,true,,,,,,,,,,,,,,
+FNO100002,false,john.smith@fkxample.com,John,Smith,,false,4695550102,mobile,200 Elm St,Apt 4B,Plano,TX,75024,US,true,300 Oak Ave,,Frisco,TX,75034,US,false,,,,,,,
+FNO100003,yes,maria.garcia@fkxample.com,Maria,Garcia,Garcia Consulting,yes,9725550103,,400 Pine Rd,,Irving,TX,75038,US,true,500 Cedar Ln,Suite 200,Austin,TX,78701,US,true,600 Birch Blvd,,Houston,TX,77002,US,false
+FNO100004,,alex.chen@fkxample.com,Alex,Chen,,false,8175550104,work,700 Maple Dr,,Fort Worth,TX,76102,US,false,700 Maple Dr,,Fort Worth,TX,76102,US,true,,,,,,,
+FNO100005,null,sam.patel@fkxample.com,Sam,Patel,,false,2145550105,,800 Walnut St,,Dallas,TX,75202,US,true,,,,,,,,,,,,,,
