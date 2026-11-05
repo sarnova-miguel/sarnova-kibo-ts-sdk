@@ -1,9 +1,17 @@
 /**
- * This script imports B2C shopper accounts from a legacy-system CSV into Kibo.
- * For each row it creates the account (Add-Account-And-Login) with the legacy
- * fnoAccountNumber in the tenant~accountnumber account attribute and the is-verified flag
- * in the tenant~is-verified account attribute, then adds the billing and shipping
- * contacts. Rows whose email already exists in Kibo are skipped.
+ * This script imports B2C shopper accounts from a customer CSV into Kibo.
+ *
+ * Expected headers (row 1), one customer per row:
+ *   Tax Exempt, Payment Type, Credit Limit, Overdraft Allowance, Customer Account,
+ *   Customer Name, Billing Address, Primary Contact, Customer email
+ * Optional: Phone, Phone Type
+ *
+ * For each row it creates the account (Add-Account-And-Login) with the Customer Account
+ * in the tenant~accountnumber attribute and externalId, tenant~is-verified = true, and
+ * taxExempt from the Tax Exempt column. It then parses the single-cell Billing Address
+ * ("street, city, state zip") and adds it as the primary Billing + Shipping contact.
+ * Cells containing "N/A" are treated as blank. Rows whose email already exists in Kibo
+ * are skipped.
  *
  * Usage: npx ts-node .\lib\importB2CAccountsFromCSV.ts <path-to-csv>
  */
@@ -28,10 +36,85 @@ const IS_VERIFIED_ATTRIBUTE_FQN = "tenant~is-verified";
 // Every imported shopper gets this temporary password and sets their own via the
 // reset-password flow (see userResetPw.ts). Plain string literal so "$$" stays literal.
 const TEMP_PASSWORD = "TempPa$$word123!";
+const DEFAULT_COUNTRY_CODE = "US";
+
+// CSV header names (after normalization: BOM stripped, whitespace trimmed)
+const COL_TAX_EXEMPT = "Tax Exempt";
+const COL_CUSTOMER_ACCOUNT = "Customer Account";
+const COL_CUSTOMER_NAME = "Customer Name";
+const COL_BILLING_ADDRESS = "Billing Address";
+const COL_PRIMARY_CONTACT = "Primary Contact";
+const COL_EMAIL = "Customer email";
+// Not in the current export yet; used when present
+const COL_PHONE = "Phone";
+const COL_PHONE_TYPE = "Phone Type";
 
 const PHONE_TYPES = ["home", "mobile", "work"] as const;
 type PhoneType = (typeof PHONE_TYPES)[number];
 const DEFAULT_PHONE_TYPE: PhoneType = "mobile";
+
+// Full state / territory name (lowercase) -> 2-letter code
+const US_STATES: Record<string, string> = {
+  alabama: "AL",
+  alaska: "AK",
+  arizona: "AZ",
+  arkansas: "AR",
+  california: "CA",
+  colorado: "CO",
+  connecticut: "CT",
+  delaware: "DE",
+  "district of columbia": "DC",
+  florida: "FL",
+  georgia: "GA",
+  hawaii: "HI",
+  idaho: "ID",
+  illinois: "IL",
+  indiana: "IN",
+  iowa: "IA",
+  kansas: "KS",
+  kentucky: "KY",
+  louisiana: "LA",
+  maine: "ME",
+  maryland: "MD",
+  massachusetts: "MA",
+  michigan: "MI",
+  minnesota: "MN",
+  mississippi: "MS",
+  missouri: "MO",
+  montana: "MT",
+  nebraska: "NE",
+  nevada: "NV",
+  "new hampshire": "NH",
+  "new jersey": "NJ",
+  "new mexico": "NM",
+  "new york": "NY",
+  "north carolina": "NC",
+  "north dakota": "ND",
+  ohio: "OH",
+  oklahoma: "OK",
+  oregon: "OR",
+  pennsylvania: "PA",
+  "rhode island": "RI",
+  "south carolina": "SC",
+  "south dakota": "SD",
+  tennessee: "TN",
+  texas: "TX",
+  utah: "UT",
+  vermont: "VT",
+  virginia: "VA",
+  washington: "WA",
+  "west virginia": "WV",
+  wisconsin: "WI",
+  wyoming: "WY",
+  "puerto rico": "PR",
+  guam: "GU",
+  "u.s. virgin islands": "VI",
+  "us virgin islands": "VI",
+  "virgin islands": "VI",
+  "american samoa": "AS",
+  "northern mariana islands": "MP",
+};
+const US_STATE_CODES = new Set(Object.values(US_STATES));
 
 // Initialize Pino logger with multiple transports
 const transport = pino.transport({
@@ -80,269 +163,253 @@ const configuration = new Configuration({
 
 const customerAccountClient = new CustomerAccountApi(configuration);
 
-// Fixed account columns. Address columns are read by prefix ("billing", "shipping",
-// "shipping2", ...) so extra shipping groups need no code change.
-type AccountCsvRow = {
-  fnoAccountNumber?: string;
-  "is-verified"?: string;
-  emailAddress?: string;
-  firstName?: string;
-  lastName?: string;
-  companyOrOrganization?: string;
-  acceptsMarketing?: string;
-  phone?: string;
-  phoneType?: string;
+type CustomerCsvRow = {
+  [COL_TAX_EXEMPT]?: string;
+  [COL_CUSTOMER_ACCOUNT]?: string;
+  [COL_CUSTOMER_NAME]?: string;
+  [COL_BILLING_ADDRESS]?: string;
+  [COL_PRIMARY_CONTACT]?: string;
+  [COL_EMAIL]?: string;
+  [COL_PHONE]?: string;
+  [COL_PHONE_TYPE]?: string;
   [column: string]: string | undefined;
 };
 
-type CsvAddress = {
-  prefix: string;
+export type ParsedAddress = {
   address1: string;
-  address2: string;
   cityOrTown: string;
   stateOrProvince: string;
   postalOrZipCode: string;
   countryCode: string;
-  isValidated: boolean;
 };
-
-const ADDRESS_FIELDS = [
-  "Address1",
-  "Address2",
-  "CityOrTown",
-  "StateOrProvince",
-  "PostalOrZipCode",
-  "CountryCode",
-] as const;
-const REQUIRED_ADDRESS_FIELDS = [
-  "Address1",
-  "CityOrTown",
-  "PostalOrZipCode",
-  "CountryCode",
-] as const;
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
 function parseBoolean(value: string | undefined): boolean {
-  return ["true", "1", "yes"].includes((value || "").trim().toLowerCase());
+  return ["true", "1", "yes", "y"].includes((value || "").trim().toLowerCase());
 }
 
-// Read the CSV and return one object per row, keyed by header
-function readAccountsCsv(csvFilePath: string): AccountCsvRow[] {
+/**
+ * Clean a raw cell: Unicode dashes become "-", any whitespace run (including
+ * non-breaking / narrow no-break spaces) becomes one space, then trim.
+ * Blank and "N/A" (any case) cells return undefined.
+ */
+export function normalizeCell(value: string | undefined): string | undefined {
+  if (value === undefined || value === null) return undefined;
+  const cleaned = String(value)
+    .replace(/[‐-―−]/g, "-")
+    .replace(/[\s﻿]+/g, " ")
+    .trim();
+  if (!cleaned || /^n\/a$/i.test(cleaned)) return undefined;
+  return cleaned;
+}
+
+// Read the CSV and return one normalized object per row, keyed by header
+function readAccountsCsv(csvFilePath: string): CustomerCsvRow[] {
   const resolvedPath = path.resolve(csvFilePath);
   if (!fs.existsSync(resolvedPath)) {
     throw new Error(`CSV file not found: ${resolvedPath}`);
   }
 
   logger.info({ path: resolvedPath }, "Reading CSV file");
-  const rows: AccountCsvRow[] = parse(fs.readFileSync(resolvedPath, "utf-8"), {
-    columns: true,
-    skip_empty_lines: true,
-    trim: true,
+  const rawRows: Record<string, string>[] = parse(
+    fs.readFileSync(resolvedPath, "utf-8"),
+    {
+      bom: true,
+      columns: (header: string[]) =>
+        header.map((column) => normalizeCell(column) ?? ""),
+      skip_empty_lines: true,
+      trim: true,
+    },
+  );
+
+  const rows: CustomerCsvRow[] = rawRows.map((raw) => {
+    const row: CustomerCsvRow = {};
+    for (const [column, value] of Object.entries(raw)) {
+      row[column] = normalizeCell(value);
+    }
+    return row;
   });
 
   logger.info(
-    { totalRows: rows.length, columns: rows.length ? Object.keys(rows[0]) : [] },
+    { totalRows: rows.length, columns: rawRows.length ? Object.keys(rawRows[0]) : [] },
     "CSV file parsed successfully",
   );
   return rows;
 }
 
-// Shipping prefixes found in the headers, in order: "shipping", "shipping2", "shipping3", ...
-function getShippingPrefixes(row: AccountCsvRow): string[] {
-  return Object.keys(row)
-    .map((column) => column.match(/^shipping(\d*)Address1$/))
-    .filter((match): match is RegExpMatchArray => match !== null)
-    .sort((a, b) => Number(a[1] || 1) - Number(b[1] || 1))
-    .map((match) => `shipping${match[1]}`);
+// 2-letter code or full name (any case) -> 2-letter code; undefined if unknown
+export function normalizeState(value: string): string | undefined {
+  const trimmed = value.trim().replace(/\.$/, "");
+  const upper = trimmed.toUpperCase();
+  if (US_STATE_CODES.has(upper)) return upper;
+  return US_STATES[trimmed.toLowerCase()];
 }
 
-function hasAnyAddressField(row: AccountCsvRow, prefix: string): boolean {
-  return ADDRESS_FIELDS.some((field) => row[`${prefix}${field}`]);
-}
+const ZIP_PATTERN = "\\d{5}(?:-\\d{4})?";
 
-function missingAddressFields(row: AccountCsvRow, prefix: string): string[] {
-  return REQUIRED_ADDRESS_FIELDS.filter((field) => !row[`${prefix}${field}`]).map(
-    (field) => `${prefix}${field}`,
-  );
-}
+/**
+ * Parse a single-cell US address of the form "street, city, state zip".
+ * Street may itself contain commas; everything before the city is kept as address1.
+ * Also accepts "street, city, state, zip". Returns undefined if it can't be parsed.
+ */
+export function parseAddress(raw: string | undefined): ParsedAddress | undefined {
+  if (!raw) return undefined;
+  const parts = raw
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
 
-function readAddress(row: AccountCsvRow, prefix: string): CsvAddress {
+  let stateText: string;
+  let postalOrZipCode: string;
+  const last = parts[parts.length - 1] || "";
+  const zipOnly = last.match(new RegExp(`^(${ZIP_PATTERN})$`));
+  if (zipOnly) {
+    // "..., city, state, zip"
+    parts.pop();
+    stateText = parts.pop() || "";
+    postalOrZipCode = zipOnly[1];
+  } else {
+    // "..., city, state zip"
+    const stateZip = last.match(new RegExp(`^(.+?)\\s+(${ZIP_PATTERN})$`));
+    if (!stateZip) return undefined;
+    parts.pop();
+    stateText = stateZip[1];
+    postalOrZipCode = stateZip[2];
+  }
+
+  const stateOrProvince = normalizeState(stateText);
+  if (!stateOrProvince || parts.length < 2) return undefined;
+
+  const cityOrTown = parts.pop()!;
+  const address1 = parts.join(", ");
+
   return {
-    prefix,
-    address1: row[`${prefix}Address1`] || "",
-    address2: row[`${prefix}Address2`] || "",
-    cityOrTown: row[`${prefix}CityOrTown`] || "",
-    stateOrProvince: row[`${prefix}StateOrProvince`] || "",
-    postalOrZipCode: row[`${prefix}PostalOrZipCode`] || "",
-    countryCode: row[`${prefix}CountryCode`] || "",
-    isValidated: parseBoolean(row[`${prefix}IsValidated`]),
+    address1,
+    cityOrTown,
+    stateOrProvince,
+    postalOrZipCode,
+    countryCode: DEFAULT_COUNTRY_CODE,
   };
 }
 
-// Every non-blank shipping group on the row, in prefix order
-function getShippingAddresses(row: AccountCsvRow): CsvAddress[] {
-  return getShippingPrefixes(row)
-    .filter((prefix) => hasAnyAddressField(row, prefix))
-    .map((prefix) => readAddress(row, prefix));
+// First token is the first name, the rest is the last name
+export function splitFullName(fullName: string | undefined): {
+  firstName?: string;
+  lastName?: string;
+} {
+  const tokens = (fullName || "").trim().split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return {};
+  return {
+    firstName: tokens[0],
+    lastName: tokens.slice(1).join(" ") || undefined,
+  };
 }
 
 // Returns a reason the row can't be imported, or undefined if it's valid
-function validateRow(row: AccountCsvRow): string | undefined {
-  const email = row.emailAddress || "";
+function validateRow(row: CustomerCsvRow): string | undefined {
+  const email = row[COL_EMAIL] || "";
   if (!email || !email.includes("@")) {
-    return "Missing or invalid emailAddress";
+    return `Missing or invalid ${COL_EMAIL}`;
   }
-
-  const missingBilling = missingAddressFields(row, "billing");
-  if (missingBilling.length > 0) {
-    return `Missing billing address fields: ${missingBilling.join(", ")}`;
+  if (!row[COL_CUSTOMER_ACCOUNT]) {
+    return `Missing ${COL_CUSTOMER_ACCOUNT}`;
   }
-
-  for (const prefix of getShippingPrefixes(row)) {
-    if (!hasAnyAddressField(row, prefix)) continue;
-    const missingShipping = missingAddressFields(row, prefix);
-    if (missingShipping.length > 0) {
-      return `Incomplete ${prefix} address, missing: ${missingShipping.join(", ")}`;
-    }
-  }
-
   return undefined;
 }
 
 function buildPhoneNumbers(
-  row: AccountCsvRow,
+  row: CustomerCsvRow,
   rowNumber: number,
 ): CustomerContact["phoneNumbers"] {
-  if (!row.phone) return undefined;
+  const phone = row[COL_PHONE];
+  if (!phone) return undefined;
 
-  const requestedType = (row.phoneType || "").trim().toLowerCase();
+  const requestedType = (row[COL_PHONE_TYPE] || "").trim().toLowerCase();
   let phoneType: PhoneType = DEFAULT_PHONE_TYPE;
   if (PHONE_TYPES.includes(requestedType as PhoneType)) {
     phoneType = requestedType as PhoneType;
   } else if (requestedType) {
     logger.warn(
-      { row: rowNumber, email: row.emailAddress, phoneType: row.phoneType },
-      `Unrecognized phoneType - defaulting to ${DEFAULT_PHONE_TYPE}`,
+      { row: rowNumber, email: row[COL_EMAIL], phoneType: row[COL_PHONE_TYPE] },
+      `Unrecognized ${COL_PHONE_TYPE} - defaulting to ${DEFAULT_PHONE_TYPE}`,
     );
   }
 
-  return { [phoneType]: row.phone };
+  return { [phoneType]: phone };
 }
 
-// Compare address lines only; isValidated is not part of the match
-function addressKey(address: CsvAddress): string {
-  return [
-    address.address1,
-    address.address2,
-    address.cityOrTown,
-    address.stateOrProvince,
-    address.postalOrZipCode,
-    address.countryCode,
-  ]
-    .map((value) => value.trim().toLowerCase())
-    .join("|");
-}
-
-// Build the contacts for a row. Always returns at least 1 Billing and 1 Shipping type:
-// a shipping address that matches billing is merged into the billing contact, and with
-// no shipping addresses the billing contact is also the primary shipping address.
-function buildContacts(
-  row: AccountCsvRow,
+/**
+ * Build the single contact for a row from its Billing Address. It is both the primary
+ * Billing and primary Shipping contact. Returns undefined (with a warning) when the
+ * address is missing or can't be parsed; the account is still created without it.
+ */
+function buildBillingContact(
+  row: CustomerCsvRow,
   rowNumber: number,
-): CustomerContact[] {
-  const phoneNumbers = buildPhoneNumbers(row, rowNumber);
-
-  const toContact = (
-    address: CsvAddress,
-    types: CustomerContact["types"],
-  ): CustomerContact => ({
-    firstName: row.firstName || undefined,
-    lastNameOrSurname: row.lastName || undefined,
-    email: row.emailAddress,
-    companyOrOrganization: row.companyOrOrganization || undefined,
-    phoneNumbers,
-    types,
-    address: {
-      address1: address.address1,
-      address2: address.address2 || undefined,
-      cityOrTown: address.cityOrTown,
-      stateOrProvince: address.stateOrProvince || undefined,
-      postalOrZipCode: address.postalOrZipCode,
-      countryCode: address.countryCode,
-      addressType: "Residential",
-      isValidated: address.isValidated,
-    },
-  });
-
-  const billing = readAddress(row, "billing");
-  const billingContact = toContact(billing, [
-    { name: "Billing", isPrimary: true },
-  ]);
-  const contacts: CustomerContact[] = [billingContact];
-
-  const shippingAddresses = getShippingAddresses(row);
-  if (shippingAddresses.length === 0) {
-    billingContact.types!.push({ name: "Shipping", isPrimary: true });
-    return contacts;
+): CustomerContact | undefined {
+  const rawAddress = row[COL_BILLING_ADDRESS];
+  const address = parseAddress(rawAddress);
+  if (!address) {
+    logger.warn(
+      { row: rowNumber, email: row[COL_EMAIL], billingAddress: rawAddress },
+      rawAddress
+        ? "Could not parse Billing Address - account will be created without a contact"
+        : "No Billing Address - account will be created without a contact",
+    );
+    return undefined;
   }
 
-  const billingKey = addressKey(billing);
-  const seenShippingKeys = new Set<string>();
-  shippingAddresses.forEach((shipping, index) => {
-    const isPrimary = index === 0;
-    const key = addressKey(shipping);
+  const companyOrOrganization = row[COL_CUSTOMER_NAME];
+  const { firstName, lastName } = splitFullName(row[COL_PRIMARY_CONTACT]);
 
-    if (key === billingKey) {
-      billingContact.types!.push({ name: "Shipping", isPrimary });
-      billingContact.address!.isValidated =
-        billing.isValidated || shipping.isValidated;
-      seenShippingKeys.add(key);
-      return;
-    }
-    if (seenShippingKeys.has(key)) {
-      logger.warn(
-        { row: rowNumber, email: row.emailAddress, prefix: shipping.prefix },
-        "Duplicate shipping address - skipping",
-      );
-      return;
-    }
-
-    seenShippingKeys.add(key);
-    contacts.push(toContact(shipping, [{ name: "Shipping", isPrimary }]));
-  });
-
-  return contacts;
+  return {
+    firstName,
+    lastNameOrSurname: lastName,
+    email: row[COL_EMAIL],
+    companyOrOrganization,
+    phoneNumbers: buildPhoneNumbers(row, rowNumber),
+    types: [
+      { name: "Billing", isPrimary: true },
+      { name: "Shipping", isPrimary: true },
+    ],
+    address: {
+      ...address,
+      addressType: companyOrOrganization ? "Commercial" : "Residential",
+      isValidated: true,
+    },
+  };
 }
 
 // Custom attributes persist through Add-Account-And-Login, so tenant~accountnumber and
 // tenant~is-verified are sent here. Contacts don't persist, so they're added afterwards
 // with addAccountContact.
-function buildAccountPayload(row: AccountCsvRow): CustomerAccountAndAuthInfo {
-  const email = row.emailAddress!;
-  const attributes: CustomerAttribute[] = [];
-  if (row.fnoAccountNumber) {
-    attributes.push({
+function buildAccountPayload(row: CustomerCsvRow): CustomerAccountAndAuthInfo {
+  const email = row[COL_EMAIL]!;
+  const customerAccount = row[COL_CUSTOMER_ACCOUNT]!;
+  const { firstName, lastName } = splitFullName(row[COL_PRIMARY_CONTACT]);
+  const attributes: CustomerAttribute[] = [
+    {
       fullyQualifiedName: ACCOUNT_NUMBER_ATTRIBUTE_FQN,
-      values: [row.fnoAccountNumber],
-    });
-  }
-  // Blank, "null", or any unrecognized value is sent as false
-  attributes.push({
-    fullyQualifiedName: IS_VERIFIED_ATTRIBUTE_FQN,
-    values: [parseBoolean(row["is-verified"])],
-  });
+      values: [customerAccount],
+    },
+    {
+      fullyQualifiedName: IS_VERIFIED_ATTRIBUTE_FQN,
+      values: [true],
+    },
+  ];
   return {
     account: {
       emailAddress: email,
       userName: email,
-      externalId: email,
-      firstName: row.firstName || undefined,
-      lastName: row.lastName || undefined,
-      companyOrOrganization: row.companyOrOrganization || undefined,
-      acceptsMarketing: parseBoolean(row.acceptsMarketing),
+      externalId: customerAccount,
+      firstName,
+      lastName,
+      companyOrOrganization: row[COL_CUSTOMER_NAME],
+      taxExempt: parseBoolean(row[COL_TAX_EXEMPT]),
+      acceptsMarketing: false,
       isActive: true,
       attributes,
     },
@@ -411,11 +478,11 @@ async function addContacts(
 }
 
 /**
- * Creates a Kibo B2C account for each row of the CSV, with its tenant~accountnumber and
- * tenant~is-verified attributes, then adds its billing and shipping contacts. All API calls are throttled
- * through the shared limiter.
+ * Creates a Kibo B2C account for each row of the CSV, with its tenant~accountnumber,
+ * tenant~is-verified and taxExempt values, then adds its billing/shipping contact. All
+ * API calls are throttled through the shared limiter.
  *
- * @param csvFilePath - Path to the accounts CSV
+ * @param csvFilePath - Path to the customers CSV
  */
 export async function importB2CAccountsFromCSV(csvFilePath: string) {
   const rows = readAccountsCsv(csvFilePath);
@@ -425,9 +492,16 @@ export async function importB2CAccountsFromCSV(csvFilePath: string) {
     created: 0,
     skipped: 0,
     failed: 0,
+    noAddress: 0,
     contactFailed: 0,
   };
   const failedRows: Array<{ row: number; email?: string; error: string }> = [];
+  const noAddressRows: Array<{
+    row: number;
+    email?: string;
+    accountId: number;
+    billingAddress?: string;
+  }> = [];
   const contactFailures: Array<{
     row: number;
     email?: string;
@@ -438,12 +512,13 @@ export async function importB2CAccountsFromCSV(csvFilePath: string) {
   for (const [index, row] of rows.entries()) {
     // +2: 1-based, plus the header line, so it matches the line number in the CSV
     const rowNumber = index + 2;
-    const email = row.emailAddress;
+    const email = row[COL_EMAIL];
+    const customerAccount = row[COL_CUSTOMER_ACCOUNT];
 
     const invalidReason = validateRow(row);
     if (invalidReason) {
       logger.warn(
-        { row: rowNumber, email, reason: invalidReason },
+        { row: rowNumber, email, customerAccount, reason: invalidReason },
         "Skipping invalid row",
       );
       summary.skipped++;
@@ -454,23 +529,15 @@ export async function importB2CAccountsFromCSV(csvFilePath: string) {
       const existingAccountId = await findExistingAccountId(email!);
       if (existingAccountId) {
         logger.info(
-          { row: rowNumber, email, customerAccountId: existingAccountId },
+          { row: rowNumber, email, customerAccount, customerAccountId: existingAccountId },
           "Account already exists - skipping",
         );
         summary.skipped++;
         continue;
       }
 
-      // Built before the account is created so an address problem is caught before anything is written
-      const contacts = buildContacts(row, rowNumber);
-
-      const fnoAccountNumber = row.fnoAccountNumber;
-      if (!fnoAccountNumber) {
-        logger.warn(
-          { row: rowNumber, email },
-          `No fnoAccountNumber - ${ACCOUNT_NUMBER_ATTRIBUTE_FQN} will not be set`,
-        );
-      }
+      // Built before the account is created so address problems are logged up front
+      const contact = buildBillingContact(row, rowNumber);
 
       const payload = buildAccountPayload(row);
       const authTicket = await limiter.schedule(() =>
@@ -487,21 +554,23 @@ export async function importB2CAccountsFromCSV(csvFilePath: string) {
           row: rowNumber,
           email,
           customerAccountId: accountId,
-          fnoAccountNumber,
-          isVerified: parseBoolean(row["is-verified"]),
+          customerAccount,
+          taxExempt: payload.account?.taxExempt,
         },
         "Created customer account",
       );
       summary.created++;
 
-      // Sanity check on the response we already have; no extra API call
+      // Sanity check on the response we already have; no extra API call.
+      // Kibo matches FQNs case-insensitively and echoes its own casing
+      // (e.g. "Tenant~is-verified"), so compare lower-cased.
       const savedFqns = new Set(
-        (authTicket.customerAccount?.attributes || []).map(
-          (attribute) => attribute.fullyQualifiedName,
+        (authTicket.customerAccount?.attributes || []).map((attribute) =>
+          attribute.fullyQualifiedName?.toLowerCase(),
         ),
       );
       for (const sent of payload.account?.attributes || []) {
-        if (!savedFqns.has(sent.fullyQualifiedName)) {
+        if (!savedFqns.has(sent.fullyQualifiedName?.toLowerCase())) {
           logger.warn(
             { row: rowNumber, email, accountId, values: sent.values },
             `${sent.fullyQualifiedName} missing from Add-Account-And-Login response`,
@@ -509,14 +578,28 @@ export async function importB2CAccountsFromCSV(csvFilePath: string) {
         }
       }
 
-      const failedContacts = await addContacts(accountId, contacts, rowNumber);
+      if (!contact) {
+        summary.noAddress++;
+        noAddressRows.push({
+          row: rowNumber,
+          email,
+          accountId,
+          billingAddress: row[COL_BILLING_ADDRESS],
+        });
+        continue;
+      }
+
+      const failedContacts = await addContacts(accountId, [contact], rowNumber);
       if (failedContacts.length > 0) {
         summary.contactFailed++;
         contactFailures.push({ row: rowNumber, email, accountId, failedContacts });
       }
     } catch (error) {
       const msg = errorMessage(error);
-      logger.error({ row: rowNumber, email, error: msg }, "Error importing row");
+      logger.error(
+        { row: rowNumber, email, customerAccount, error: msg },
+        "Error importing row",
+      );
       summary.failed++;
       failedRows.push({ row: rowNumber, email, error: msg });
     }
@@ -525,6 +608,9 @@ export async function importB2CAccountsFromCSV(csvFilePath: string) {
   logger.info(summary, "B2C account import summary");
   if (failedRows.length > 0) {
     logger.error({ failedRows }, "Rows that failed to import");
+  }
+  if (noAddressRows.length > 0) {
+    logger.warn({ noAddressRows }, "Accounts created without an address contact");
   }
   if (contactFailures.length > 0) {
     logger.error({ contactFailures }, "Accounts with contacts that failed");
