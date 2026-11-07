@@ -9,6 +9,8 @@ import {
 
 dotenv.config();
 
+// TODO: STILL UNDER DEVELOPMENT - REFACTOR/VERIFY
+
 // Initialize Pino logger with multiple transports
 const transport = pino.transport({
   targets: [

@@ -15,7 +15,12 @@ const logger = pino({
       {
         target: "pino/file",
         options: {
-          destination: path.join(__dirname, "..", "logs", "create-pricelist-from-csv.log"),
+          destination: path.join(
+            __dirname,
+            "..",
+            "logs",
+            "create-pricelist-from-csv.log",
+          ),
         },
         level: "info",
       },
@@ -28,7 +33,9 @@ async function main() {
   const csvFilePath = process.argv[2];
 
   if (!csvFilePath) {
-    logger.error("No CSV file path provided. Usage: ts-node lib/createPriceListfromCSV.ts <path-to-csv>");
+    logger.error(
+      "No CSV file path provided. Usage: ts-node lib/createPriceListfromCSV.ts <path-to-csv>",
+    );
     process.exit(1);
   }
 
@@ -62,10 +69,15 @@ async function main() {
     logger.info({ row: index + 1, data: record }, "CSV row");
   });
 
+  // TODO: create a price list and add products
+
   logger.info("Done logging CSV contents");
 }
 
 main().catch((error) => {
-  logger.error({ error: error instanceof Error ? error.message : String(error) }, "Unhandled error");
+  logger.error(
+    { error: error instanceof Error ? error.message : String(error) },
+    "Unhandled error",
+  );
   process.exit(1);
 });

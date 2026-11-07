@@ -2,11 +2,11 @@ import * as dotenv from "dotenv";
 import pino from "pino";
 import { Configuration } from "@kibocommerce/rest-sdk";
 import { ResponseError } from "@kibocommerce/rest-sdk/client-runtime";
-import {
-  HeadlessAppApi,
-} from "@kibocommerce/rest-sdk/clients/AppDevelopment";
+import { HeadlessAppApi } from "@kibocommerce/rest-sdk/clients/AppDevelopment";
 
 dotenv.config();
+
+// TODO: STILL UNDER DEVELOPMENT - REFACTOR/VERIFY
 
 // ── Pino logger (console + file) ──────────────────────────────────────────────
 const transport = pino.transport({
@@ -29,10 +29,7 @@ const transport = pino.transport({
   ],
 });
 
-const logger = pino(
-  { level: process.env.LOG_LEVEL || "info" },
-  transport,
-);
+const logger = pino({ level: process.env.LOG_LEVEL || "info" }, transport);
 
 // ── SDK configuration ─────────────────────────────────────────────────────────
 const configuration = new Configuration({
@@ -58,9 +55,10 @@ async function main() {
     // ── Step 1: Get build jobs for the branch ───────────────────────────────
     // The SDK Configuration handles JWT auth automatically via clientId/sharedSecret
     logger.info({ branchName }, "Step 1 — Fetching build jobs...");
-    const buildJobsResponse = await headlessAppClient.getApplicationBuildJobs(
-      { branchName, maxResults: 100 },
-    );
+    const buildJobsResponse = await headlessAppClient.getApplicationBuildJobs({
+      branchName,
+      maxResults: 100,
+    });
 
     const jobs = buildJobsResponse?.jobs ?? [];
     logger.info(
@@ -101,9 +99,10 @@ async function main() {
       }
 
       logger.info({ branchName, jobId: job.jobId }, "Fetching build log...");
-      const buildLog = await headlessAppClient.getApplicationBuildLog(
-        { branchName, jobId: job.jobId },
-      );
+      const buildLog = await headlessAppClient.getApplicationBuildLog({
+        branchName,
+        jobId: job.jobId,
+      });
 
       const steps = buildLog?.steps ?? [];
       logger.info(
