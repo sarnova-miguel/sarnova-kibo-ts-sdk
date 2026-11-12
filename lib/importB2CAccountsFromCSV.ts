@@ -2,17 +2,14 @@
  * This script imports B2C shopper accounts from a customer CSV into Kibo.
  *
  * Expected headers (row 1), one customer per row:
- *   Tax Exempt, Payment Type, Credit Limit, Overdraft Allowance, Customer Account,
- *   Customer Name, Billing Address, Primary Contact, Customer email
+ *   Tax Exempt, Customer Account, Customer Name, Billing Address, Primary Contact,
+ *   Customer email
  * Optional: Phone, Phone Type
  *
  * For each row it creates the account (Add-Account-And-Login) with the Customer Account
  * in the tenant~accountnumber attribute and externalId, tenant~is-verified = true, and
  * taxExempt from the Tax Exempt column. It then parses the single-cell Billing Address
  * ("street, city, state zip") and adds it as the primary Billing + Shipping contact.
- * When Payment Type contains "Net Terms", it also creates a purchase order account with
- * the Credit Limit and Overdraft Allowance columns (overdraft type "Amount", blank = 0)
- * and a "net-30" payment term.
  * Cells containing "N/A" are treated as blank. Rows whose email already exists in Kibo
  * are skipped.
  *
@@ -30,7 +27,6 @@ import {
   CustomerAccountAndAuthInfo,
   CustomerAttribute,
   CustomerContact,
-  CustomerPurchaseOrderAccount,
 } from "@kibocommerce/rest-sdk/clients/Customer";
 
 dotenv.config();
@@ -41,15 +37,9 @@ const IS_VERIFIED_ATTRIBUTE_FQN = "tenant~is-verified";
 // reset-password flow (see userResetPw.ts). Plain string literal so "$$" stays literal.
 const TEMP_PASSWORD = "TempPa$$word123!";
 const DEFAULT_COUNTRY_CODE = "US";
-const DEFAULT_PO_PAYMENT_TERM_CODE = "net-30";
-// The API accepts "Percent" or "Amount"; the CSV values are dollar amounts
-const PO_OVERDRAFT_ALLOWANCE_TYPE = "Amount";
 
 // CSV header names (after normalization: BOM stripped, whitespace trimmed)
 const COL_TAX_EXEMPT = "Tax Exempt";
-const COL_PAYMENT_TYPE = "Payment Type";
-const COL_CREDIT_LIMIT = "Credit Limit";
-const COL_OVERDRAFT_ALLOWANCE = "Overdraft Allowance";
 const COL_CUSTOMER_ACCOUNT = "Customer Account";
 const COL_CUSTOMER_NAME = "Customer Name";
 const COL_BILLING_ADDRESS = "Billing Address";
@@ -175,9 +165,6 @@ const customerAccountClient = new CustomerAccountApi(configuration);
 
 type CustomerCsvRow = {
   [COL_TAX_EXEMPT]?: string;
-  [COL_PAYMENT_TYPE]?: string;
-  [COL_CREDIT_LIMIT]?: string;
-  [COL_OVERDRAFT_ALLOWANCE]?: string;
   [COL_CUSTOMER_ACCOUNT]?: string;
   [COL_CUSTOMER_NAME]?: string;
   [COL_BILLING_ADDRESS]?: string;
@@ -430,69 +417,6 @@ function buildAccountPayload(row: CustomerCsvRow): CustomerAccountAndAuthInfo {
   };
 }
 
-// Payment Type such as "Net Terms (Purchase Order)"
-export function isNetTerms(row: CustomerCsvRow): boolean {
-  return (row[COL_PAYMENT_TYPE] || "").toLowerCase().includes("net terms");
-}
-
-// "$10,000" / "10000" / "2500.50" -> number; undefined if blank or not a number
-export function parseAmount(value: string | undefined): number | undefined {
-  if (!value) return undefined;
-  const cleaned = value.replace(/[$,\s]/g, "");
-  if (!cleaned) return undefined;
-  const amount = Number(cleaned);
-  return Number.isFinite(amount) ? amount : undefined;
-}
-
-type PurchaseOrderAccountResult =
-  | { ok: true; payload: CustomerPurchaseOrderAccount }
-  | { ok: false; error: string };
-
-/**
- * Build the purchase order account for a Net Terms row. accountId is filled in when the
- * API is called, so this can run before the shopper account exists. Credit Limit is
- * required; a blank Overdraft Allowance becomes 0.
- */
-function buildPurchaseOrderAccount(row: CustomerCsvRow): PurchaseOrderAccountResult {
-  const rawCreditLimit = row[COL_CREDIT_LIMIT];
-  const creditLimit = parseAmount(rawCreditLimit);
-  if (creditLimit === undefined) {
-    return {
-      ok: false,
-      error: rawCreditLimit
-        ? `Invalid ${COL_CREDIT_LIMIT}: "${rawCreditLimit}"`
-        : `Missing ${COL_CREDIT_LIMIT}`,
-    };
-  }
-
-  const rawOverdraft = row[COL_OVERDRAFT_ALLOWANCE];
-  const overdraftAllowance = rawOverdraft ? parseAmount(rawOverdraft) : 0;
-  if (overdraftAllowance === undefined) {
-    return {
-      ok: false,
-      error: `Invalid ${COL_OVERDRAFT_ALLOWANCE}: "${rawOverdraft}"`,
-    };
-  }
-
-  return {
-    ok: true,
-    payload: {
-      isEnabled: true,
-      creditLimit,
-      // New account with nothing spent yet
-      availableBalance: creditLimit,
-      overdraftAllowance,
-      overdraftAllowanceType: PO_OVERDRAFT_ALLOWANCE_TYPE,
-      customerPurchaseOrderPaymentTerms: [
-        {
-          siteId: Number(process.env.SITE_ID),
-          code: DEFAULT_PO_PAYMENT_TERM_CODE,
-        },
-      ],
-    },
-  };
-}
-
 // Kibo filter values escape special characters with "^"
 function escapeFilterValue(value: string): string {
   return value.replace(/[\^\/"',{}()]/g, (char) => `^${char}`);
@@ -570,8 +494,6 @@ export async function importB2CAccountsFromCSV(csvFilePath: string) {
     failed: 0,
     noAddress: 0,
     contactFailed: 0,
-    poCreated: 0,
-    poFailed: 0,
   };
   const failedRows: Array<{ row: number; email?: string; error: string }> = [];
   const noAddressRows: Array<{
@@ -585,12 +507,6 @@ export async function importB2CAccountsFromCSV(csvFilePath: string) {
     email?: string;
     accountId: number;
     failedContacts: FailedContact[];
-  }> = [];
-  const poFailures: Array<{
-    row: number;
-    email?: string;
-    accountId: number;
-    error: string;
   }> = [];
 
   for (const [index, row] of rows.entries()) {
@@ -622,14 +538,6 @@ export async function importB2CAccountsFromCSV(csvFilePath: string) {
 
       // Built before the account is created so address problems are logged up front
       const contact = buildBillingContact(row, rowNumber);
-      // Same for the purchase order account; the shopper account is still created
-      const purchaseOrder = isNetTerms(row) ? buildPurchaseOrderAccount(row) : undefined;
-      if (purchaseOrder && !purchaseOrder.ok) {
-        logger.warn(
-          { row: rowNumber, email, paymentType: row[COL_PAYMENT_TYPE], error: purchaseOrder.error },
-          "Net Terms row has invalid purchase order data - account will be created without a PO account",
-        );
-      }
 
       const payload = buildAccountPayload(row);
       const authTicket = await limiter.schedule(() =>
@@ -670,43 +578,6 @@ export async function importB2CAccountsFromCSV(csvFilePath: string) {
         }
       }
 
-      if (purchaseOrder) {
-        if (!purchaseOrder.ok) {
-          summary.poFailed++;
-          poFailures.push({ row: rowNumber, email, accountId, error: purchaseOrder.error });
-        } else {
-          try {
-            const created = await limiter.schedule(() =>
-              customerAccountClient.createCustomerPurchaseOrderAccount({
-                accountId,
-                customerPurchaseOrderAccount: { ...purchaseOrder.payload, accountId },
-              }),
-            );
-            logger.info(
-              {
-                row: rowNumber,
-                email,
-                accountId,
-                purchaseOrderAccountId: created.id,
-                creditLimit: purchaseOrder.payload.creditLimit,
-                overdraftAllowance: purchaseOrder.payload.overdraftAllowance,
-                paymentTerm: DEFAULT_PO_PAYMENT_TERM_CODE,
-              },
-              "Created purchase order account",
-            );
-            summary.poCreated++;
-          } catch (error) {
-            const msg = errorMessage(error);
-            logger.error(
-              { row: rowNumber, email, accountId, error: msg },
-              "Error creating purchase order account",
-            );
-            summary.poFailed++;
-            poFailures.push({ row: rowNumber, email, accountId, error: msg });
-          }
-        }
-      }
-
       if (!contact) {
         summary.noAddress++;
         noAddressRows.push({
@@ -743,9 +614,6 @@ export async function importB2CAccountsFromCSV(csvFilePath: string) {
   }
   if (contactFailures.length > 0) {
     logger.error({ contactFailures }, "Accounts with contacts that failed");
-  }
-  if (poFailures.length > 0) {
-    logger.error({ poFailures }, "Accounts whose purchase order account failed");
   }
 
   return summary;
