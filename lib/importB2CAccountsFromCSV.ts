@@ -4,11 +4,12 @@
  * Expected headers (row 1), one customer per row:
  *   Tax Exempt, Customer Account, Customer Name, Billing Address, Primary Contact,
  *   Customer email
- * Optional: Phone, Phone Type
+ * Optional: Phone (saved as the contact's home phone; defaults to 555-555-5555)
+ * Optional: Customer Set (the account's customerSet; defaults to "default")
  *
  * For each row it creates the account (Add-Account-And-Login) with the Customer Account
- * in the tenant~accountnumber attribute and externalId, tenant~is-verified = true, and
- * taxExempt from the Tax Exempt column. It then parses the single-cell Billing Address
+ * in the tenant~accountnumber attribute and externalId, tenant~is-verified = true,
+ * taxExempt from the Tax Exempt column, and customerSet from the Customer Set column. It then parses the single-cell Billing Address
  * ("street, city, state zip") and adds it as the primary Billing + Shipping contact.
  * Cells containing "N/A" are treated as blank. Rows whose email already exists in Kibo
  * are skipped.
@@ -37,6 +38,8 @@ const IS_VERIFIED_ATTRIBUTE_FQN = "tenant~is-verified";
 // reset-password flow (see userResetPw.ts). Plain string literal so "$$" stays literal.
 const TEMP_PASSWORD = "TempPa$$word123!";
 const DEFAULT_COUNTRY_CODE = "US";
+// Customer set every account is assigned to when the row has no Customer Set value
+const DEFAULT_CUSTOMER_SET = "default";
 
 // CSV header names (after normalization: BOM stripped, whitespace trimmed)
 const COL_TAX_EXEMPT = "Tax Exempt";
@@ -45,13 +48,13 @@ const COL_CUSTOMER_NAME = "Customer Name";
 const COL_BILLING_ADDRESS = "Billing Address";
 const COL_PRIMARY_CONTACT = "Primary Contact";
 const COL_EMAIL = "Customer email";
-// Not in the current export yet; used when present
+// Optional column; when blank the contact gets DEFAULT_PHONE_NUMBER
 const COL_PHONE = "Phone";
-const COL_PHONE_TYPE = "Phone Type";
+// Optional column; when blank (or "N/A") the account gets DEFAULT_CUSTOMER_SET
+const COL_CUSTOMER_SET = "Customer Set";
 
-const PHONE_TYPES = ["home", "mobile", "work"] as const;
-type PhoneType = (typeof PHONE_TYPES)[number];
-const DEFAULT_PHONE_TYPE: PhoneType = "mobile";
+// Used when the row has no Phone value; Kibo contacts always get a home phone
+const DEFAULT_PHONE_NUMBER = "555-555-5555";
 
 // Full state / territory name (lowercase) -> 2-letter code
 const US_STATES: Record<string, string> = {
@@ -171,7 +174,7 @@ type CustomerCsvRow = {
   [COL_PRIMARY_CONTACT]?: string;
   [COL_EMAIL]?: string;
   [COL_PHONE]?: string;
-  [COL_PHONE_TYPE]?: string;
+  [COL_CUSTOMER_SET]?: string;
   [column: string]: string | undefined;
 };
 
@@ -320,25 +323,9 @@ function validateRow(row: CustomerCsvRow): string | undefined {
   return undefined;
 }
 
-function buildPhoneNumbers(
-  row: CustomerCsvRow,
-  rowNumber: number,
-): CustomerContact["phoneNumbers"] {
-  const phone = row[COL_PHONE];
-  if (!phone) return undefined;
-
-  const requestedType = (row[COL_PHONE_TYPE] || "").trim().toLowerCase();
-  let phoneType: PhoneType = DEFAULT_PHONE_TYPE;
-  if (PHONE_TYPES.includes(requestedType as PhoneType)) {
-    phoneType = requestedType as PhoneType;
-  } else if (requestedType) {
-    logger.warn(
-      { row: rowNumber, email: row[COL_EMAIL], phoneType: row[COL_PHONE_TYPE] },
-      `Unrecognized ${COL_PHONE_TYPE} - defaulting to ${DEFAULT_PHONE_TYPE}`,
-    );
-  }
-
-  return { [phoneType]: phone };
+// Always a home phone; rows without a Phone value (blank or "N/A") get DEFAULT_PHONE_NUMBER
+function buildPhoneNumbers(row: CustomerCsvRow): CustomerContact["phoneNumbers"] {
+  return { home: row[COL_PHONE] ?? DEFAULT_PHONE_NUMBER };
 }
 
 /**
@@ -370,7 +357,7 @@ function buildBillingContact(
     lastNameOrSurname: lastName,
     email: row[COL_EMAIL],
     companyOrOrganization,
-    phoneNumbers: buildPhoneNumbers(row, rowNumber),
+    phoneNumbers: buildPhoneNumbers(row),
     types: [
       { name: "Billing", isPrimary: true },
       { name: "Shipping", isPrimary: true },
@@ -409,6 +396,8 @@ function buildAccountPayload(row: CustomerCsvRow): CustomerAccountAndAuthInfo {
       lastName,
       companyOrOrganization: row[COL_CUSTOMER_NAME],
       taxExempt: parseBoolean(row[COL_TAX_EXEMPT]),
+      // normalizeCell turns blank / "N/A" into undefined, so both fall back to the default
+      customerSet: row[COL_CUSTOMER_SET] ?? DEFAULT_CUSTOMER_SET,
       acceptsMarketing: false,
       isActive: true,
       attributes,
@@ -556,6 +545,7 @@ export async function importB2CAccountsFromCSV(csvFilePath: string) {
           customerAccountId: accountId,
           customerAccount,
           taxExempt: payload.account?.taxExempt,
+          customerSet: payload.account?.customerSet,
         },
         "Created customer account",
       );
@@ -576,6 +566,19 @@ export async function importB2CAccountsFromCSV(csvFilePath: string) {
             `${sent.fullyQualifiedName} missing from Add-Account-And-Login response`,
           );
         }
+      }
+      const savedCustomerSet = authTicket.customerAccount?.customerSet;
+      if (savedCustomerSet !== payload.account?.customerSet) {
+        logger.warn(
+          {
+            row: rowNumber,
+            email,
+            accountId,
+            sent: payload.account?.customerSet,
+            saved: savedCustomerSet,
+          },
+          "customerSet in Add-Account-And-Login response doesn't match what was sent",
+        );
       }
 
       if (!contact) {

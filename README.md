@@ -8,8 +8,14 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 
 - [Quick Links](#-quick-links)
 - [Getting Started](#-getting-started)
+  - Prerequisites
   - Configure Environment Variables
   - Install Dependencies
+  - Run a Script
+- [Project Structure](#-project-structure)
+- [Environment Variable Reference](#-environment-variable-reference)
+- [Recommended Run Order](#-recommended-run-order)
+- [Testing](#-testing)
 - [Logs](#-logs)
 - [Scripts Overview](#️-scripts-overview)
   - [1. 🆕 `newSandboxSetup.ts`](#1--newsandboxsetupts)
@@ -25,14 +31,18 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
   - [11. 📥 `importTenantProducts.ts`](#11--importtenantproductsts)
   - [12. 🎛️ `exportTenantProductVariations.ts`](#12-️-exporttenantproductvariationsts)
   - [13. 🔁 `importTenantProductVariations.ts`](#13--importtenantproductvariationsts)
-  - [14. 🗂️ `listWebinyFiles.ts`](#14-️-listwebinyfilests)
-  - [15. 📚 `listWebinyCmsEntries.ts`](#15--listwebinycmsentriests)
-  - [16. 📄 `listWebinyCmsEntry.ts`](#16--listwebinycmsentryts)
-  - [17. 📚 `listWebinyCmsEntryGraphQLManageAPI.ts`](#17--listwebinycmsentrygraphqlmanageapits)
-  - [18. 🗂️ `getWebinyCmsFolder.ts`](#18-️-getwebinycmsfolderts)
-  - [19. ➕ `createWebinyCmsFolder.ts`](#19--createwebinycmsfolderts)
-  - [20. 🚚 `moveEntryToFolder.ts`](#20--moveentrytofolderts)
-  - [21. 🧨 `deleteAllWebinyContent.ts`](#21--deleteallwebinycontentts)
+  - [14. 👥 `importB2CAccountsFromCSV.ts`](#14--importb2caccountsfromcsvts)
+  - [15. 🧾 `importHistoricalOrdersFromCSV.ts`](#15--importhistoricalordersfromcsvts)
+  - [16. 🗂️ `listWebinyFiles.ts`](#16-️-listwebinyfilests)
+  - [17. 📚 `listWebinyCmsEntries.ts`](#17--listwebinycmsentriests)
+  - [18. 📄 `listWebinyCmsEntry.ts`](#18--listwebinycmsentryts)
+  - [19. 📚 `listWebinyCmsEntryGraphQLManageAPI.ts`](#19--listwebinycmsentrygraphqlmanageapits)
+  - [20. 🗂️ `getWebinyCmsFolder.ts`](#20-️-getwebinycmsfolderts)
+  - [21. ➕ `createWebinyCmsFolder.ts`](#21--createwebinycmsfolderts)
+  - [22. 🚚 `moveEntryToFolder.ts`](#22--moveentrytofolderts)
+  - [23. 🧨 `deleteAllWebinyContent.ts`](#23--deleteallwebinycontentts)
+  - [24. 🔀 `listAndMigrateWebinyCmsEntry.ts`](#24--listandmigratewebinycmsentryts)
+- [Experimental / In-progress Scripts](#-experimental--in-progress-scripts)
 
 ---
 
@@ -51,6 +61,12 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 ## 🚀 Getting Started
 
 **IMPORTANT:** Before running any scripts, you must configure your environment variables in a `.env` file at the root of the project.
+
+### Prerequisites
+
+- **Node.js 20 or later** (developed on Node 22). Jest 30 supports Node 18.14+, 20, 22 and 24+.
+- **npm**. `package-lock.json` is the lockfile to keep in sync. A `pnpm-lock.yaml` is also committed, so if you use pnpm, update both lockfiles when dependencies change.
+- Kibo API credentials (Client ID and Shared Secret) for the target tenant. The Webiny scripts also need a Webiny API token.
 
 1. **Configure Environment Variables**
    - Create `.env` file at the root of the project
@@ -91,7 +107,7 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
    ```
 
    This installs `ts-node` and `typescript` locally — no global install is
-   required.
+   required. It also installs the Webiny SDK (`@webiny/sdk`) used by the Webiny scripts.
 
 3. **Run a Script**
 
@@ -114,32 +130,109 @@ This repository contains utilities for setting up and managing Sarnova sandbox e
 
 ---
 
+## 📁 Project Structure
+
+```text
+kibo-ts-sdk/
+├── lib/            # Runnable scripts (one script per file, run with ts-node)
+│   └── data/       # JSON templates and sample CSVs used as script input
+├── tests/          # Jest test suites (*.test.ts)
+├── exports/        # CSV output from the export/import scripts (gitignored, created on demand)
+├── logs/           # Pino log files, one per script (gitignored, created on demand)
+├── docs/           # Reserved for documentation (currently empty)
+├── .env            # Your tenant credentials and configuration (gitignored)
+├── jest.config.js
+├── tsconfig.json
+└── package.json
+```
+
+---
+
+## 🔧 Environment Variable Reference
+
+All scripts load `.env` from the project root with `dotenv`. The script sections below show the same variables in context.
+
+### Kibo (all Kibo scripts)
+
+| Variable | Required | Used by |
+|---|---|---|
+| `TENANT_ID` | Yes | All Kibo scripts. `deleteAllWebinyContent.ts` also uses it as the Webiny tenant (see below) |
+| `SITE_ID` | Yes | All Kibo scripts |
+| `CLIENT_ID` | Yes | All Kibo scripts |
+| `SHARED_SECRET` | Yes | All Kibo scripts |
+| `CATALOG` | Yes | All Kibo scripts except `copyPasteDocs.ts` and `createDocTypeListDocs.ts` |
+| `MASTER_CATALOG` | Yes | All Kibo scripts |
+| `API_ENV` | Yes | All Kibo scripts (e.g. `sandbox`) |
+| `PCI_HOST` | Yes | All Kibo scripts |
+| `AUTH_HOST` | Yes | All Kibo scripts |
+| `LOG_LEVEL` | No (default `info`) | All scripts |
+
+### Kibo (script-specific)
+
+| Variable | Required | Used by |
+|---|---|---|
+| `WEBSITE_NAME` | Yes, for this script | `newSandboxSetup.ts` |
+| `EMAIL_ADDRESS` | Yes, for this script | `newSandboxSetup.ts` |
+| `DEST_TENANT_ID` | Yes, for this script | `copyPasteDocs.ts` |
+| `DEST_SITE_ID` | Yes, for this script | `copyPasteDocs.ts` |
+| `DOCUMENT_LIST_NAME` | Yes, for this script | `copyPasteDocs.ts` |
+| `SANDBOX_PAYMENTS_ENDPOINT` | Yes, for these scripts | `cartToCompletedOrder.ts`, `cartToCheckoutToOrder.ts` |
+| `MIN_TIME_MS` | No (default `500`) | `importHistoricalOrdersFromCSV.ts`: minimum ms between API calls |
+| `MAX_CONCURRENT` | No (default `1`) | `importHistoricalOrdersFromCSV.ts`: maximum API calls in flight |
+
+### Webiny
+
+| Variable | Required | Used by |
+|---|---|---|
+| `WEBINY_API_TOKEN` | Yes | All Webiny scripts |
+| `WEBINY_API_URL` | Yes, unless the script takes `WEBINY_MANAGE_API_URL` instead | All Webiny scripts except `listWebinyCmsEntryGraphQLManageAPI.ts`. Main API (`/graphql`) |
+| `WEBINY_MANAGE_API_URL` | Yes for `listWebinyCmsEntryGraphQLManageAPI.ts`; optional elsewhere (derived from `WEBINY_API_URL`) | `listWebinyCmsEntryGraphQLManageAPI.ts`, `moveEntryToFolder.ts`, `deleteAllWebinyContent.ts`, `moveWebinyCmsEntry.ts` |
+| `WEBINY_TENANT` | No (default `root`) | All Webiny scripts. `deleteAllWebinyContent.ts` uses `TENANT_ID` first |
+| `WEBINY_LOCALE` | No (default `en-US`) | `deleteAllWebinyContent.ts` |
+| `WEBINY_ENTRY_ID` | No (script has a default) | `listWebinyCmsEntry.ts`, `listAndMigrateWebinyCmsEntry.ts`; fallback for `WEBINY_ENTRY_REVISION` |
+| `WEBINY_ENTRY_REVISION` | Yes, for these scripts | `moveEntryToFolder.ts`, `moveWebinyCmsEntry.ts` (`<entryId>#<version>`) |
+| `WEBINY_CMS_MODEL_ID` | Yes, for these scripts | `createWebinyCmsFolder.ts`, `moveEntryToFolder.ts`, `moveWebinyCmsEntry.ts` |
+| `WEBINY_CMS_MODEL_SINGULAR` | No | `moveEntryToFolder.ts`, `moveWebinyCmsEntry.ts` |
+| `WEBINY_FOLDER_ID` | Yes, for this script | `getWebinyCmsFolder.ts` |
+| `WEBINY_FOLDER_TITLE` / `WEBINY_FOLDER_SLUG` / `WEBINY_FOLDER_PARENT_ID` | No | `createWebinyCmsFolder.ts` |
+| `WEBINY_TARGET_FOLDER_ID` | Yes, for these scripts | `moveEntryToFolder.ts`, `moveWebinyCmsEntry.ts` (`ROOT` for the model root) |
+| `WEBINY_SOURCE_API_URL` / `WEBINY_SOURCE_API_TOKEN` / `WEBINY_SOURCE_TENANT` | No (fall back to `WEBINY_API_URL` / `WEBINY_API_TOKEN` / `WEBINY_TENANT`) | `listAndMigrateWebinyCmsEntry.ts` |
+| `WEBINY_TARGET_API_URL` / `WEBINY_TARGET_API_TOKEN` / `WEBINY_TARGET_TENANT` | No (fall back to `WEBINY_API_URL` / `WEBINY_API_TOKEN` / `root`) | `listAndMigrateWebinyCmsEntry.ts` |
+| `WEBINY_CONFIRM_DELETE_ALL` | Yes, for this script; must be set to `yes` in the **shell**, not `.env` | `deleteAllWebinyContent.ts` |
+
+---
+
+## 🧪 Testing
+
+Tests use [Jest](https://jestjs.io/) with `ts-jest` and live in `tests/` (configured in `jest.config.js`). Kibo API clients are mocked, so tests don't call a real tenant.
+
+```bash
+npm test
+```
+
+Run a single suite:
+
+```bash
+npx jest tests/importHistoricalOrdersFromCSV.test.ts
+```
+
+| Suite | Covers |
+|---|---|
+| `exportTenantProducts.test.ts` | Product catalog CSV export |
+| `importTenantProducts.test.ts` | Product catalog import, including aborting on duplicate categories |
+| `exportTenantProductVariations.test.ts` | Variation code export |
+| `importTenantProductVariations.test.ts` | Variation code import, including missing CSV and API failure cases |
+| `importHistoricalOrdersFromCSV.test.ts` | Row grouping, value conversion, validation, order building, account matching, retries, CLI arguments and the end-to-end import |
+
+---
+
 ## 📜 Logs
 
-[Pino](https://getpino.io/#/) utilized for logging. All scripts generate detailed logs in the terminal and in the `logs/` directory:
+[Pino](https://getpino.io/#/) is used for logging. Each script logs to the terminal and to its own file in the `logs/` directory (created on demand, gitignored).
 
-- `add-sandbox-products.log` - Product creation logs
-- `delete-sandbox-products.log` - Deletion operation logs
-- `document-type-list-creation.log` - Document type, list, and document creation logs
-- `copy-paste-documents.log` - Document copy/paste operation logs
-- `cart-to-completed-order.log` - Cart to completed order process logs
-- `cart-to-checkout-to-order.log` - Cart to checkout to order process logs
-- `add-subscription-attributes.log` - Subscription attribute creation logs
-- `user-login.log` - User account creation and login logs
-- `export-tenant-products.log` - Tenant product data export logs
-- `import-tenant-products.log` - Tenant product data import logs
-- `export-tenant-product-variations.log` - Tenant product variation export logs
-- `import-tenant-product-variations.log` - Tenant product variation import logs
-- `list-webiny-files.log` - Webiny File Manager file listing logs
-- `list-webiny-cms-entries.log` - Webiny CMS entries listing logs
-- `list-webiny-cms-entry.log` - Webiny CMS single entry retrieval logs
-- `list-webiny-cms-entry-graphql-manage-api.log` - Webiny CMS entry listing via raw Manage API GraphQL logs
-- `get-webiny-cms-folder.log` - Webiny ACO folder retrieval logs
-- `create-webiny-cms-folder.log` - Webiny ACO folder creation logs
-- `move-entry-to-folder.log` - Webiny CMS entry folder move logs
-- `delete-all-webiny-content.log` - Webiny tenant-wide content wipe logs
+Log files use the kebab-case form `logs/<script-name>.log`. For example, `importTenantProducts.ts` writes to `logs/import-tenant-products.log`. Some names differ from their script's file name, so check the script's section under [Scripts Overview](#️-scripts-overview) for its exact log file.
 
-Logs include timestamps, operation status, entity details, and error messages for troubleshooting.
+Logs include timestamps, operation status, entity details, and error messages for troubleshooting. Set `LOG_LEVEL` in `.env` to change how much is logged.
 
 ---
 
@@ -162,6 +255,8 @@ Logs include timestamps, operation status, entity details, and error messages fo
 - `createChannels()` - Creates three default sales channels
 - `updateGeneralSettings()` - Configures site-wide settings
 
+**Logging:** Console output only. This script does not write a file to `logs/`.
+
 **Usage:**
 To run the script, use the following command:
 
@@ -181,10 +276,10 @@ npx ts-node .\lib\newSandboxSetup.ts
 
 **What it does:**
 
-- Creates product attributes from `data/productAttributes.json`
-- Creates product types from `data/productTypes.json`
-- Creates category hierarchy from `data/productCategories.json`
-- Creates products from `data/products.json`
+- Creates product attributes from `lib/data/productAttributes.json`
+- Creates product types from `lib/data/productTypes.json`
+- Creates category hierarchy from `lib/data/productCategories.json`
+- Creates products from `lib/data/products.json`
 
 **Key Features:**
 
@@ -274,21 +369,21 @@ npx ts-node .\lib\deleteProdsCatsTypesAttributes.ts
 
 ### 4. 📋 `createDocTypeListDocs.ts`
 
-**Purpose:** Create a document type, document list, and documents for the sandbox environment. Use the template data files in the `data` folder to customize your data.
+**Purpose:** Create a document type, document list, and documents for the sandbox environment. Use the template data files in the `lib/data` folder to customize your data.
 
 **Location:** `lib/createDocTypeListDocs.ts`
 
 **What it does:**
 
-- Creates a document type from `data/documentTypeTemplate.json`
-- Creates a document list from `data/documentListTemplate.json`
-- Creates documents from `data/documentTemplate.json` and publishes them
+- Creates a document type from `lib/data/documentTypeTemplate.json`
+- Creates a document list from `lib/data/documentListTemplate.json`
+- Creates documents from `lib/data/documentTemplate.json` and publishes them
 
 **Key Features:**
 
 - Rate limiting (500ms between API calls) for API throttling
-- Structured logging to both console and `logs/createDocTypeListDocs.log`
-- Document List is scoped to the site specified in the .env file. Update the scopeId in the `data/documentListTemplate.json` file before running the script.
+- Structured logging to both console and `logs/document-type-list-creation.log`
+- Document List is scoped to the site specified in the .env file. Update the scopeId in the `lib/data/documentListTemplate.json` file before running the script.
 
 **Usage:**
 To run the script, use the following command:
@@ -726,17 +821,169 @@ npx ts-node .\lib\importTenantProductVariations.ts
 
 ---
 
-### 14. 🗂️ `listWebinyFiles.ts`
+### 14. 👥 `importB2CAccountsFromCSV.ts`
+
+**Purpose:** Bulk-create B2C shopper accounts in Kibo from a legacy-system CSV, one row per account, including billing/shipping contacts and the legacy account number.
+
+**Location:** `lib/importB2CAccountsFromCSV.ts`
+
+**What it does:**
+
+- Checks if a customer account already exists for each row's email using `CustomerAccountApi.getAccounts()` with an `emailAddress eq` filter, and skips the row if it does
+- Creates the account with `CustomerAccountApi.addAccountAndLogin()`, using the email as `emailAddress`, `userName`, and `externalId`, and the temporary password `TempPa$$word123!`
+- Stores the legacy `fnoAccountNumber` in the `tenant~accountnumber` account attribute and the `is-verified` flag in the `tenant~is-verified` account attribute, by sending both in the same `addAccountAndLogin()` payload (`account.attributes`). Custom attributes persist through Add-Account-And-Login
+- Sets `customerSet` on every account from the optional `Customer Set` column, falling back to `default` when the column is missing, blank, or `N/A`
+- Adds the billing and shipping contacts with `CustomerAccountApi.addAccountContact()`. Contacts are added after the account is created because they don't persist through Add-Account-And-Login
+
+**CSV Columns:**
+
+| Group | Columns |
+|---|---|
+| Account | `fnoAccountNumber`, `is-verified` (boolean), `emailAddress` (required), `firstName`, `lastName`, `companyOrOrganization`, `acceptsMarketing` |
+| Phone | `Phone` (optional): saved as the contact's home phone; `555-555-5555` when blank |
+| Customer Set | `Customer Set` (optional): the account's `customerSet`; `default` when blank |
+| Billing (required) | `billingAddress1`, `billingAddress2`, `billingCityOrTown`, `billingStateOrProvince`, `billingPostalOrZipCode`, `billingCountryCode`, `billingIsValidated` |
+| Shipping (optional) | `shippingAddress1` … `shippingCountryCode`, `shippingIsValidated` |
+| Extra shipping (optional) | Same fields with a numbered prefix: `shipping2Address1` … `shipping2IsValidated`, `shipping3…`, and so on |
+
+- Boolean columns (`is-verified`, `acceptsMarketing`, `*IsValidated`) accept `true`, `1`, or `yes`; anything else, including blank or `null`, is `false`
+- If all shipping columns are blank, the billing address is also the primary shipping address
+- A shipping address identical to billing is merged into the billing contact instead of creating a duplicate
+- With multiple shipping addresses, only the first is marked primary
+- See `lib/data/b2c-accounts-sample.csv` for examples
+
+**Key Features:**
+
+- Rate limiting (500ms between API calls via Bottleneck) for API throttling
+- Structured logging to both console and `logs/import-b2c-accounts.log`
+- Skips accounts that already exist (idempotent re-runs)
+- Validates each row (email, required billing/shipping fields) before calling the API
+- Per-row and per-contact error isolation: a failure is logged and the import continues
+- End-of-run summary with `created`, `skipped`, `failed`, and `contactFailed` counts, plus details of each failure
+
+**Prerequisites:**
+
+- The `tenant~accountnumber` and `tenant~is-verified` customer attributes must already exist in Kibo Admin (**System → Schema → Customer Attributes**). If either doesn't, the account create itself is expected to fail
+
+**Execution Order (per row):**
+
+1. Validate the row
+2. Check if an account already exists for the email
+3. Create the account with the temporary password and the `tenant~accountnumber` and `tenant~is-verified` attributes
+4. Add each billing/shipping contact
+
+**Usage:**
+To run the script, use the following command:
+
+```bash
+npx ts-node .\lib\importB2CAccountsFromCSV.ts .\lib\data\b2c-accounts-sample.csv
+```
+
+**Output:** Per-row progress (account ID, account number, contact IDs) and the import summary are logged to the console and persisted to `logs/import-b2c-accounts.log`.
+
+---
+
+### 15. 🧾 `importHistoricalOrdersFromCSV.ts`
+
+**Purpose:** Import historical (already completed) orders from a legacy-system CSV into Kibo and attach each one to the customer account created by `importB2CAccountsFromCSV.ts`.
+
+**Location:** `lib/importHistoricalOrdersFromCSV.ts`
+
+**What it does:**
+
+- Reads the CSV and groups line-item rows into orders by `orderNumber`, keeping the order they first appear in the file
+- Validates each order, then builds the Kibo `Order` payload from the CSV columns
+- Skips the order if one with the same `externalId` (the legacy order number) already exists in Kibo
+- Finds the Kibo customer account whose `externalId` matches the order's `customerAccountId` (the legacy account number)
+- Creates the order with `OrderApi.createOrder()`, then compares Kibo's response with what was sent and logs any differences as warnings
+
+**CSV Format:**
+
+Headers are Kibo `Order` field paths in dot notation, such as `billingInfo.paymentType` or `fulfillmentInfo.fulfillmentContact.address.address1`. There is one row per line item; order-level columns are repeated on every row of the order.
+
+| Column group | Handling |
+|---|---|
+| Order-level (e.g. `email`, `currencyCode`, `submittedDate`, `billingInfo.*`, `fulfillmentInfo.*`, `subtotal`, `total`) | Copied into the order. Values must be the same on every row of the order |
+| `items.*` | One order item per row (e.g. `items.product.productCode`, `items.quantity`, `items.total`) |
+| `payments.*` | A single payment. Its `billingInfo` is copied from the order-level `billingInfo.*` columns; any `payments.billingInfo.*` columns take precedence field by field |
+| `payments.interactions.*` | A single interaction on that payment |
+| `notes.<field>` | A single order note. `notes.text` is truncated to 250 characters, with a warning |
+| `extendedProperties.<key>` | One extended property per column, sent as `{ key, value }` |
+| `_*` | Helper columns (e.g. `_sourceRow`); logged at debug level, never sent to Kibo |
+
+- Blank cells and `N/A` are left out of the payload
+- `isTaxExempt` and `payments.interactions.isManual` accept `true`/`1`/`yes`/`y` or `false`/`0`/`no`/`n`; `items.quantity` and `items.lineId` must be whole numbers; columns ending in `total` or `amount` (or starting with `amount`) must be numbers
+
+**Mapping to Kibo:**
+
+- `isImport` and `isHistoricalImport` are always sent as `true`
+- `status`, `paymentStatus` and `fulfillmentStatus` are always sent as `Completed`, `Paid` and `Fulfilled`
+- Matching CSV columns for these fields are ignored, with a warning if they hold a different value
+- `orderNumber` (e.g. `SS-803219`) is sent as `externalId`; Kibo assigns its own numeric `orderNumber`
+- The legacy `customerAccountId` is sent as the `tenant~accountNumber` order attribute, and `customerAccountId` is replaced with the Kibo account ID
+- The `tenant~fnoOrderStatus` order attribute is always sent as `Shipped`
+
+**Customer Account Matching:**
+
+Several Kibo accounts can share one legacy account number, so the order's `email` is used to choose between them:
+
+- **One account** with that number: it's used, even if its email differs from the order's (logged as a warning)
+- **Several accounts**: the one whose email matches the order's email (case-insensitive) is used. If none match or more than one does, the order is skipped
+- **No accounts**: the order is skipped
+
+Skipped orders are listed at the end of the run, so you can fix the accounts and rerun.
+
+**Key Features:**
+
+- Rate limiting via one Bottleneck limiter for all API calls (default 500ms between calls, 1 at a time; set `MIN_TIME_MS` / `MAX_CONCURRENT` to change)
+- Retries 429, 5xx and network errors up to 3 times with exponential backoff (1s, 2s, 4s); other errors, such as a 400 validation error, fail immediately
+- Skips orders that already exist (idempotent re-runs)
+- `--dry-run` runs validation, the existing-order check and the account lookup, but doesn't create orders
+- `--limit N` processes only the first N orders in the file
+- Warns when the sum of `items.total` doesn't match `total - shippingTotal - handlingTotal` (tolerance 0.01); the order is still imported
+- Caches account lookups by legacy account number, since many orders share a customer
+- Per-order error isolation: a failure is logged and the import continues
+- End-of-run summary with `created`, `wouldCreate`, `skippedExisting`, `skippedInvalid`, `missingAccount`, `failed` and `ordersWithWarnings` counts, plus the invalid, unmatched and failed orders with their CSV line numbers
+- Structured logging to both console and `logs/import-historical-orders.log`
+
+**Prerequisites:**
+
+- Run `importB2CAccountsFromCSV.ts` first, so the customer accounts and their `externalId` values exist
+- The `tenant~accountNumber` and `tenant~fnoOrderStatus` attributes must exist as **Order** attributes in Kibo Admin. If one isn't defined, the response check logs a warning that it's missing from the created order
+
+**Execution Order (per order):**
+
+1. Validate the order (`orderNumber`, `email`, `customerAccountId`, and `items.product.productCode` / `items.quantity` on every row)
+2. Build the order payload
+3. Check if an order with that `externalId` already exists
+4. Look up and select the Kibo customer account
+5. Create the order (skipped with `--dry-run`)
+6. Compare Kibo's response with what was sent
+
+**Usage:**
+To run the script, use the following command:
+
+```bash
+npx ts-node .\lib\importHistoricalOrdersFromCSV.ts <path-to-csv> [--dry-run] [--limit N]
+```
+
+For example, check the first 10 orders without creating anything:
+
+```bash
+npx ts-node .\lib\importHistoricalOrdersFromCSV.ts .\path\to\orders.csv --dry-run --limit 10
+```
+
+**Output:** Per-order progress, warnings, the Kibo order ID and number of each created order, and the import summary are logged to the console and persisted to `logs/import-historical-orders.log`.
+
+---
+
+### 16. 🗂️ `listWebinyFiles.ts`
 
 **Purpose:** List every file in a Webiny CMS File Manager via the Webiny SDK and log each file's metadata using Pino.
 
 **Location:** `lib/listWebinyFiles.ts`
 
-**Note:** This script uses a different SDK than the rest of the project (Webiny instead of Kibo). Before running, install the Webiny SDK and add the Webiny-specific variables to your `.env` file.
-
-```bash
-npm install @webiny/sdk
-```
+**Note:** This script uses a different SDK than the rest of the project (Webiny instead of Kibo). The Webiny SDK (`@webiny/sdk`) is already a project dependency, so `npm install` covers it. Add the Webiny-specific variables to your `.env` file before running.
 
 ```env
   # Webiny File Manager Configuration
@@ -763,7 +1010,7 @@ npm install @webiny/sdk
 - The Webiny SDK initialization options (`endpoint`, `token`, `tenant`) are documented in the [Webiny SDK Overview](https://www.webiny.com/docs/reference/sdk/overview).
 - `listFiles()` requires a `fields` array specifying which file fields to return — see the [File Manager SDK Reference](https://www.webiny.com/docs/reference/sdk/file-manager).
 - The API token must be created in **Settings → Access Management → API Keys** in the Webiny Admin and granted at least read permission on the File Manager. See the [GraphQL API Overview](https://www.webiny.com/docs/headless-cms/graphql-api-overview) for details on tokens and tenant scoping.
-- **Folder type:** the `location.folderId` on each file references an ACO folder whose `type` is **`FmFile`** (the literal string registered by `FoldersFeature.register(child, { type: "FmFile" })` in `@webiny/app-file-manager`). This is distinct from CMS entry folders, which use `cms:<modelId>` — see [`createWebinyCmsFolder.ts`](#19--createwebinycmsfolderts).
+- **Folder type:** the `location.folderId` on each file references an ACO folder whose `type` is **`FmFile`** (the literal string registered by `FoldersFeature.register(child, { type: "FmFile" })` in `@webiny/app-file-manager`). This is distinct from CMS entry folders, which use `cms:<modelId>` — see [`createWebinyCmsFolder.ts`](#21--createwebinycmsfolderts).
 - **Supported file types:** the File Manager is MIME-type agnostic and accepts **any file type**. The MIME type stored on each file is whatever the uploader provided (validated up to 255 characters per [RFC 6838](https://datatracker.ietf.org/doc/html/rfc6838)); when no MIME type is detected, Webiny falls back to `application/octet-stream` (the same fallback used by Amazon S3). Out of the box, only the following categories have a built-in renderer in the Admin UI — every other type is stored normally but rendered with a default icon unless a custom [`FileManagerFileTypePlugin`](https://www.webiny.com/docs/5.x/file-manager/extending/create-a-file-type-plugin) is registered:
   - **Images** — `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, and any other `image/*` MIME type (rendered with an inline thumbnail preview)
   - **All other types** (e.g. `video/mp4`, `video/quicktime`, `video/*`, `audio/*`, `application/pdf`, `application/zip`, `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` and similar Office MIME types, `text/*`, `application/json`, `application/octet-stream`) — accepted and stored, rendered with the default fallback icon unless a custom file type plugin or [custom file preview](https://www.webiny.com/docs/5.x/file-manager/extending/customize-file-preview) is registered for them
@@ -779,17 +1026,13 @@ npx ts-node .\lib\listWebinyFiles.ts
 
 ---
 
-### 15. 📚 `listWebinyCmsEntries.ts`
+### 17. 📚 `listWebinyCmsEntries.ts`
 
 **Purpose:** List every entry of a Webiny Headless CMS content model via the Webiny SDK and log each entry's metadata using Pino.
 
 **Location:** `lib/listWebinyCmsEntries.ts`
 
-**Note:** This script uses the Webiny SDK. Before running, install the Webiny SDK (if not already installed) and add the Webiny-specific variables to your `.env` file.
-
-```bash
-npm install @webiny/sdk
-```
+**Note:** This script uses the Webiny SDK (`@webiny/sdk`, installed by `npm install`). Add the Webiny-specific variables to your `.env` file before running.
 
 ```env
   # Webiny CMS Configuration
@@ -829,17 +1072,13 @@ npx ts-node .\lib\listWebinyCmsEntries.ts
 
 ---
 
-### 16. 📄 `listWebinyCmsEntry.ts`
+### 18. 📄 `listWebinyCmsEntry.ts`
 
 **Purpose:** Fetch a single Webiny Headless CMS entry by `entryId` for a given content model via the Webiny SDK and log its metadata using Pino.
 
 **Location:** `lib/listWebinyCmsEntry.ts`
 
-**Note:** This script uses the Webiny SDK. Before running, install the Webiny SDK (if not already installed) and add the Webiny-specific variables to your `.env` file.
-
-```bash
-npm install @webiny/sdk
-```
+**Note:** This script uses the Webiny SDK (`@webiny/sdk`, installed by `npm install`). Add the Webiny-specific variables to your `.env` file before running.
 
 ```env
   # Webiny CMS Configuration
@@ -879,7 +1118,7 @@ npx ts-node .\lib\listWebinyCmsEntry.ts
 
 ---
 
-### 17. 📚 `listWebinyCmsEntryGraphQLManageAPI.ts`
+### 19. 📚 `listWebinyCmsEntryGraphQLManageAPI.ts`
 
 **Purpose:** List every entry of a Webiny Headless CMS content model by issuing a raw GraphQL query against the Webiny Manage API (no SDK) and log each entry's metadata using Pino.
 
@@ -924,7 +1163,7 @@ npx ts-node .\lib\listWebinyCmsEntryGraphQLManageAPI.ts
 
 ---
 
-### 18. 🗂️ `getWebinyCmsFolder.ts`
+### 20. 🗂️ `getWebinyCmsFolder.ts`
 
 **Purpose:** Fetch a single Webiny ACO (Advanced Content Organization) folder by `id` via the Webiny Main GraphQL API and log its metadata using Pino.
 
@@ -974,7 +1213,7 @@ npx ts-node .\lib\getWebinyCmsFolder.ts
 
 ---
 
-### 19. ➕ `createWebinyCmsFolder.ts`
+### 21. ➕ `createWebinyCmsFolder.ts`
 
 **Purpose:** Create a new Webiny ACO folder for a Headless CMS content model via the Webiny Main GraphQL API and log the created folder's metadata using Pino.
 
@@ -1026,7 +1265,7 @@ npx ts-node .\lib\createWebinyCmsFolder.ts
 
 ---
 
-### 20. 🚚 `moveEntryToFolder.ts`
+### 22. 🚚 `moveEntryToFolder.ts`
 
 **Purpose:** Move a single Webiny Headless CMS entry into a different ACO folder (or to the model's root) by issuing the per-model `move<SingularApiName>` mutation against the Webiny Manage API and log the result using Pino.
 
@@ -1082,7 +1321,7 @@ npx ts-node .\lib\moveEntryToFolder.ts
 
 **⚠️ WARNING:** The script below permanently deletes **all** Webiny content (entries, folders, content models, and content model groups; NOT files/images) for the target tenant. Use with extreme caution! ⚠️
 
-### 21. 🧨 `deleteAllWebinyContent.ts`
+### 23. 🧨 `deleteAllWebinyContent.ts`
 
 **Purpose:** Wipe a Webiny tenant by deleting every entry of every content model, every CMS ACO folder, every content model, and every content model group, in the order required by Webiny's referential integrity.
 
@@ -1147,60 +1386,64 @@ npx ts-node .\lib\deleteAllWebinyContent.ts
 
 ---
 
-### 22. 👥 `importB2CAccountsFromCSV.ts`
+### 24. 🔀 `listAndMigrateWebinyCmsEntry.ts`
 
-**Purpose:** Bulk-create B2C shopper accounts in Kibo from a legacy-system CSV, one row per account, including billing/shipping contacts and the legacy account number.
+**Purpose:** Copy a single Webiny Headless CMS entry from one Webiny tenant (or instance) to another via the Webiny SDK.
 
-**Location:** `lib/importB2CAccountsFromCSV.ts`
+**Location:** `lib/listAndMigrateWebinyCmsEntry.ts`
+
+**Note:** This script uses the Webiny SDK (`@webiny/sdk`, installed by `npm install`). The source and target each have their own variables, which fall back to the shared `WEBINY_*` variables when not set. Add them to your `.env` file before running.
+
+```env
+  # Source Webiny tenant
+  WEBINY_SOURCE_API_URL=https://source-webiny.example.com/graphql  # Falls back to WEBINY_API_URL
+  WEBINY_SOURCE_API_TOKEN=source_api_token                         # Falls back to WEBINY_API_TOKEN
+  WEBINY_SOURCE_TENANT=root                                        # Falls back to WEBINY_TENANT, then "root"
+
+  # Target Webiny tenant
+  WEBINY_TARGET_API_URL=https://target-webiny.example.com/graphql  # Falls back to WEBINY_API_URL
+  WEBINY_TARGET_API_TOKEN=target_api_token                         # Falls back to WEBINY_API_TOKEN
+  WEBINY_TARGET_TENANT=root                                        # Defaults to "root"
+
+  WEBINY_ENTRY_ID=your_entry_id  # Optional, overrides the default entryId in the script
+```
 
 **What it does:**
 
-- Checks if a customer account already exists for each row's email using `CustomerAccountApi.getAccounts()` with an `emailAddress eq` filter, and skips the row if it does
-- Creates the account with `CustomerAccountApi.addAccountAndLogin()`, using the email as `emailAddress`, `userName`, and `externalId`, and the temporary password `TempPa$$word123!`
-- Stores the legacy `fnoAccountNumber` in the `tenant~accountnumber` account attribute and the `is-verified` flag in the `tenant~is-verified` account attribute, by sending both in the same `addAccountAndLogin()` payload (`account.attributes`). Custom attributes persist through Add-Account-And-Login
-- Adds the billing and shipping contacts with `CustomerAccountApi.addAccountContact()`. Contacts are added after the account is created because they don't persist through Add-Account-And-Login
-
-**CSV Columns:**
-
-| Group | Columns |
-|---|---|
-| Account | `fnoAccountNumber`, `is-verified` (boolean), `emailAddress` (required), `firstName`, `lastName`, `companyOrOrganization`, `acceptsMarketing` |
-| Phone | `phone`, `phoneType` (`home`, `mobile`, or `work`; defaults to `mobile`) |
-| Billing (required) | `billingAddress1`, `billingAddress2`, `billingCityOrTown`, `billingStateOrProvince`, `billingPostalOrZipCode`, `billingCountryCode`, `billingIsValidated` |
-| Shipping (optional) | `shippingAddress1` … `shippingCountryCode`, `shippingIsValidated` |
-| Extra shipping (optional) | Same fields with a numbered prefix: `shipping2Address1` … `shipping2IsValidated`, `shipping3…`, and so on |
-
-- Boolean columns (`is-verified`, `acceptsMarketing`, `*IsValidated`) accept `true`, `1`, or `yes`; anything else, including blank or `null`, is `false`
-- If all shipping columns are blank, the billing address is also the primary shipping address
-- A shipping address identical to billing is merged into the billing contact instead of creating a duplicate
-- With multiple shipping addresses, only the first is marked primary
-- See `lib/data/b2c-accounts-sample.csv` for examples
+- Initializes two Webiny SDK clients, one for the source tenant and one for the target tenant
+- Fetches the entry from the source with `sdk.cms.getEntry()` for the configured `modelId` and `entryId`
+- Creates a new entry in the target with `sdk.cms.createEntry()`, using the source entry's `values`
+- Logs the source entry and the created entry
 
 **Key Features:**
 
-- Rate limiting (500ms between API calls via Bottleneck) for API throttling
-- Structured logging to both console and `logs/import-b2c-accounts.log`
-- Skips accounts that already exist (idempotent re-runs)
-- Validates each row (email, required billing/shipping fields) before calling the API
-- Per-row and per-contact error isolation: a failure is logged and the import continues
-- End-of-run summary with `created`, `skipped`, `failed`, and `contactFailed` counts, plus details of each failure
+- Source and target can be different tenants on the same Webiny instance, or different instances
+- Configurable `modelId` (defaults to `aedCollection`) and the source/target field lists at the top of the script
+- Only the requested `values.*` fields (`values.contentId`, `values.siteId` by default) are copied; add any other fields the model needs to `sourceEntryFields`
+- Exits with an error if the source or target URL or token is missing, or the source entry has no values
+- Result-pattern error handling via `result.isFail()` / `result.error.message`
+- Structured logging to both console and `logs/list-and-migrate-webiny-cms-entry.log`
 
 **Prerequisites:**
 
-- The `tenant~accountnumber` and `tenant~is-verified` customer attributes must already exist in Kibo Admin (**System → Schema → Customer Attributes**). If either doesn't, the account create itself is expected to fail
-
-**Execution Order (per row):**
-
-1. Validate the row
-2. Check if an account already exists for the email
-3. Create the account with the temporary password and the `tenant~accountnumber` and `tenant~is-verified` attributes
-4. Add each billing/shipping contact
+- The content model (same `modelId` and fields) must already exist in the target tenant
+- The source token needs read permission and the target token needs write permission on the content model
 
 **Usage:**
-To run the script, use the following command:
+To run the script, use the following command (set `WEBINY_ENTRY_ID` or update the default `entryId`, and update `modelId` in the script first if needed):
 
 ```bash
-npx ts-node .\lib\importB2CAccountsFromCSV.ts .\lib\data\b2c-accounts-sample.csv
+npx ts-node .\lib\listAndMigrateWebinyCmsEntry.ts
 ```
 
-**Output:** Per-row progress (account ID, account number, contact IDs) and the import summary are logged to the console and persisted to `logs/import-b2c-accounts.log`.
+**Output:** The source entry and the created target entry are logged to the console and persisted to `logs/list-and-migrate-webiny-cms-entry.log`.
+
+---
+
+## 🧪 Experimental / In-progress Scripts
+
+These scripts are in `lib/` but aren't finished or have been replaced. Use them with care.
+
+| Script | Purpose | Log file |
+|---|---|---|
+| `moveWebinyCmsEntry.ts` | Moves a Webiny CMS entry to another folder by updating its `wbyAco_location` with the per-model `update<SingularApiName>` mutation on the Manage API. Uses the same variables as #22. **Use [`moveEntryToFolder.ts`](#22--moveentrytofolderts) instead**, which uses the dedicated `move<SingularApiName>` mutation. | `logs/move-webiny-cms-entry.log` |

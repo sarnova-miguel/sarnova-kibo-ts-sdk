@@ -69,6 +69,7 @@ import {
   importHistoricalOrdersFromCSV,
   isRetryableError,
   parseArgs,
+  selectAccount,
   validateOrder,
 } from "../lib/importHistoricalOrdersFromCSV";
 
@@ -201,6 +202,7 @@ describe("buildOrder", () => {
         {
           paymentType: "CreditCard",
           amountRequested: 110,
+          billingInfo: { paymentType: "CreditCard", billingContact: { address: { cityOrTown: "Moberly" } } },
           interactions: [{ interactionType: "Capture", amount: 110, isManual: true }],
         },
       ],
@@ -213,9 +215,51 @@ describe("buildOrder", () => {
     });
   });
 
-  it("sends the legacy account number as the tenant~accountNumber order attribute", () => {
+  it("copies the order billingInfo onto the payment as a separate object", () => {
+    const { order } = buildOrder(group([row()]));
+    const paymentBillingInfo = order.payments![0].billingInfo!;
+    expect(paymentBillingInfo).toEqual(order.billingInfo);
+    expect(paymentBillingInfo).not.toBe(order.billingInfo);
+    expect(paymentBillingInfo.billingContact).not.toBe(order.billingInfo!.billingContact);
+    expect(paymentBillingInfo.billingContact!.address).not.toBe(order.billingInfo!.billingContact!.address);
+  });
+
+  it("lets payments.billingInfo.* columns override the order billingInfo field by field", () => {
+    const { order } = buildOrder(
+      group([
+        row({
+          "billingInfo.billingContact.firstName": "Don",
+          "payments.billingInfo.billingContact.address.cityOrTown": "Columbia",
+        }),
+      ]),
+    );
+    expect(order.payments![0].billingInfo).toEqual({
+      paymentType: "CreditCard",
+      billingContact: { firstName: "Don", address: { cityOrTown: "Columbia" } },
+    });
+    expect(order.billingInfo!.billingContact!.address!.cityOrTown).toBe("Moberly");
+  });
+
+  it("doesn't create a payment just to hold billingInfo", () => {
+    const { order } = buildOrder(
+      group([
+        row({
+          "payments.paymentType": undefined,
+          "payments.amountRequested": undefined,
+          "payments.interactions.interactionType": undefined,
+          "payments.interactions.amount": undefined,
+          "payments.interactions.isManual": undefined,
+        }),
+      ]),
+    );
+    expect(order).not.toHaveProperty("payments");
+    expect(order.billingInfo).toBeDefined();
+  });
+
+  it("sends tenant~fnoOrderStatus Shipped and the legacy account number as tenant~accountNumber", () => {
     const { order } = buildOrder(group([row()]));
     expect(order.attributes).toEqual([
+      { fullyQualifiedName: "tenant~fnoOrderStatus", values: ["Shipped"] },
       { fullyQualifiedName: "tenant~accountNumber", values: ["C0001"] },
     ]);
   });
@@ -297,7 +341,10 @@ describe("compareCreatedOrder", () => {
     status: "Completed",
     paymentStatus: "Paid",
     fulfillmentStatus: "Fulfilled",
-    attributes: [{ fullyQualifiedName: "tenant~accountNumber", values: ["C0001"] }],
+    attributes: [
+      { fullyQualifiedName: "tenant~fnoOrderStatus", values: ["Shipped"] },
+      { fullyQualifiedName: "tenant~accountNumber", values: ["C0001"] },
+    ],
   };
 
   it("returns no warnings when Kibo kept the values, ignoring attribute name casing", () => {
@@ -305,7 +352,10 @@ describe("compareCreatedOrder", () => {
       compareCreatedOrder(sent, {
         ...sent,
         total: 110.004,
-        attributes: [{ fullyQualifiedName: "Tenant~AccountNumber", values: ["C0001"] }],
+        attributes: [
+          { fullyQualifiedName: "Tenant~AccountNumber", values: ["C0001"] },
+          { fullyQualifiedName: "Tenant~FnoOrderStatus", values: ["Shipped"] },
+        ],
       }),
     ).toEqual([]);
   });
@@ -327,16 +377,23 @@ describe("compareCreatedOrder", () => {
     ]);
   });
 
-  it("reports a missing or changed account number attribute", () => {
+  it("reports missing or changed attributes", () => {
     expect(compareCreatedOrder(sent, { ...sent, attributes: [] })).toEqual([
+      "tenant~fnoOrderStatus missing from Kibo's response - is it defined as an Order attribute?",
       "tenant~accountNumber missing from Kibo's response - is it defined as an Order attribute?",
     ]);
     expect(
       compareCreatedOrder(sent, {
         ...sent,
-        attributes: [{ fullyQualifiedName: "tenant~accountNumber", values: ["other"] }],
+        attributes: [
+          { fullyQualifiedName: "tenant~fnoOrderStatus", values: ["Open"] },
+          { fullyQualifiedName: "tenant~accountNumber", values: ["other"] },
+        ],
       }),
-    ).toEqual(['tenant~accountNumber is ["other"] in Kibo\'s response; sent ["C0001"]']);
+    ).toEqual([
+      'tenant~fnoOrderStatus is ["Open"] in Kibo\'s response; sent ["Shipped"]',
+      'tenant~accountNumber is ["other"] in Kibo\'s response; sent ["C0001"]',
+    ]);
   });
 });
 
@@ -362,6 +419,37 @@ describe("parseArgs", () => {
     expect(parseArgs([]).error).toBe("No CSV file path provided");
     expect(parseArgs(["a.csv", "--limit", "0"]).error).toBe("--limit needs a positive whole number");
     expect(parseArgs(["a.csv", "--force"]).error).toBe("Unknown option --force");
+  });
+});
+
+describe("selectAccount", () => {
+  const a = { id: 1, emailAddress: "a@example.com" };
+  const b = { id: 2, emailAddress: "b@example.com" };
+
+  it("skips when no account has the legacy number", () => {
+    expect(selectAccount([], "C1", "a@example.com")).toEqual({
+      error: "No Kibo customer account with externalId 'C1'",
+    });
+  });
+
+  it("uses the only account, warning when its email differs", () => {
+    expect(selectAccount([a], "C1", "a@example.com")).toEqual({ accountId: 1, matchedBy: "single account" });
+    const selection = selectAccount([a], "C1", "other@example.com");
+    expect(selection).toMatchObject({ accountId: 1, matchedBy: "single account" });
+    expect(selection.warning).toContain("not order email 'other@example.com'");
+  });
+
+  it("picks the account whose email matches, ignoring case and spaces", () => {
+    expect(selectAccount([a, b], "C1", " B@Example.com ")).toEqual({ accountId: 2, matchedBy: "email match" });
+  });
+
+  it("skips when several accounts share the number and none or several match the email", () => {
+    expect(selectAccount([a, b], "C1", "c@example.com").error).toBe(
+      "2 Kibo accounts have externalId 'C1' but none has email 'c@example.com' (account IDs: 1, 2)",
+    );
+    expect(selectAccount([a, { id: 3, emailAddress: "A@example.com" }, b], "C1", "a@example.com").error).toBe(
+      "2 Kibo accounts have externalId 'C1' and email 'a@example.com' (account IDs: 1, 3)",
+    );
   });
 });
 
@@ -410,7 +498,10 @@ describe("importHistoricalOrdersFromCSV", () => {
       status: "Completed",
       paymentStatus: "Paid",
       fulfillmentStatus: "Fulfilled",
-      attributes: [{ fullyQualifiedName: "tenant~accountNumber", values: ["C-OK"] }],
+      attributes: [
+        { fullyQualifiedName: "tenant~fnoOrderStatus", values: ["Shipped"] },
+        { fullyQualifiedName: "tenant~accountNumber", values: ["C-OK"] },
+      ],
     });
     expect(firstOrder.items).toHaveLength(2);
     // Account lookups are cached per legacy account number
@@ -443,5 +534,23 @@ describe("importHistoricalOrdersFromCSV", () => {
 
     expect(summary).toMatchObject({ totalOrders: 1, wouldCreate: 1, created: 0 });
     expect(createOrderMock).not.toHaveBeenCalled();
+  });
+
+  it("uses the order email to choose between accounts that share a legacy number", async () => {
+    csvText = csvFrom([
+      row({ orderNumber: "M1", customerAccountId: "C-MULTI", email: "b@example.com" }),
+      row({ orderNumber: "M2", customerAccountId: "C-MULTI", email: "nobody@example.com" }),
+    ]);
+    getAccountsMock.mockResolvedValue({
+      items: [
+        { id: 100, emailAddress: "a@example.com" },
+        { id: 200, emailAddress: "B@example.com" },
+      ],
+    });
+
+    const summary = await importHistoricalOrdersFromCSV("orders.csv");
+
+    expect(summary).toMatchObject({ created: 1, missingAccount: 1 });
+    expect((createOrderMock.mock.calls[0][0] as any).order.customerAccountId).toBe(200);
   });
 });

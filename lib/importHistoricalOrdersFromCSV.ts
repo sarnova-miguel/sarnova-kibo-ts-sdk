@@ -6,7 +6,9 @@
  * order-level columns are repeated on every row of the order and rows are grouped by
  * orderNumber. Column groups with special handling:
  *   items.*                  one order item per row
- *   payments.*               a single payment
+ *   payments.*               a single payment. Its billingInfo is copied from the
+ *                            order-level billingInfo.* columns; payments.billingInfo.*
+ *                            columns, if present, take precedence field by field
  *   payments.interactions.*  a single interaction on that payment
  *   notes.<field>            a single order note (notes.text max 250 characters)
  *   extendedProperties.<key> one extended property per column, { key, value }
@@ -20,9 +22,16 @@
  *   - orderNumber (legacy, e.g. "SS-803219") is sent as externalId. Kibo assigns its own
  *     numeric orderNumber.
  *   - customerAccountId (legacy account number, e.g. "C0905557") is looked up against the
- *     Kibo customer account externalId set by importB2CAccountsFromCSV.ts. Orders whose
- *     account isn't found are skipped. The legacy number is also sent as the order
- *     attribute tenant~accountNumber (must be defined as an Order attribute in Kibo Admin).
+ *     Kibo customer account externalId set by importB2CAccountsFromCSV.ts. Several Kibo
+ *     accounts can share a legacy number, so the order's email picks the account:
+ *       - one account with that number: used even if its email differs (logged as a warning)
+ *       - several accounts: the one whose emailAddress matches the order email
+ *         (case-insensitive) is used; if none or more than one match, the order is skipped
+ *       - no accounts: the order is skipped
+ *     The legacy number is also sent as the order attribute tenant~accountNumber (must be
+ *     defined as an Order attribute in Kibo Admin).
+ *   - The order attribute tenant~fnoOrderStatus is always sent as "Shipped" (must be
+ *     defined as an Order attribute in Kibo Admin).
  *   - Orders whose externalId already exists in Kibo are skipped, so reruns are safe.
  *
  * All API calls are throttled through one Bottleneck limiter, and 429 / 5xx / network
@@ -48,6 +57,10 @@ dotenv.config();
 
 // Custom order attribute that holds the legacy customer account number
 const ACCOUNT_NUMBER_ATTRIBUTE_FQN = "tenant~accountNumber";
+
+// Custom order attribute set to the same value on every imported order
+const FNO_ORDER_STATUS_ATTRIBUTE_FQN = "tenant~fnoOrderStatus";
+const IMPORTED_FNO_ORDER_STATUS = "Shipped";
 
 // Historical orders are already done, so every imported order gets these values
 const IMPORTED_ORDER_STATUSES = {
@@ -343,6 +356,28 @@ function setPath(target: JsonObject, dotPath: string, value: unknown): void {
   current[keys[keys.length - 1]] = value;
 }
 
+function isPlainObject(value: unknown): value is JsonObject {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Deep-copy `defaults` into `target`, filling only keys `target` doesn't already have.
+ * Nested objects are merged the same way; values already in `target` win.
+ */
+function mergeDefaults(target: JsonObject, defaults: JsonObject): JsonObject {
+  for (const [key, value] of Object.entries(defaults)) {
+    if (isPlainObject(value)) {
+      const existing = isPlainObject(target[key]) ? (target[key] as JsonObject) : undefined;
+      if (target[key] === undefined || existing) {
+        target[key] = mergeDefaults(existing ?? {}, value);
+      }
+    } else if (target[key] === undefined) {
+      target[key] = value;
+    }
+  }
+  return target;
+}
+
 function orderLevelColumns(rows: OrderCsvRow[]): string[] {
   const columns = new Set<string>();
   for (const row of rows) {
@@ -447,7 +482,15 @@ export function buildOrder(group: OrderGroup): BuildOrderResult {
   order.items = items;
 
   if (Object.keys(interaction).length > 0) payment.interactions = [interaction];
-  if (Object.keys(payment).length > 0) order.payments = [payment];
+  if (Object.keys(payment).length > 0) {
+    // The payment carries its own billing contact / address; fill it from the order-level
+    // billingInfo, keeping any payments.billingInfo.* values from the CSV
+    if (isPlainObject(order.billingInfo)) {
+      const paymentBillingInfo = isPlainObject(payment.billingInfo) ? payment.billingInfo : {};
+      payment.billingInfo = mergeDefaults(paymentBillingInfo, order.billingInfo);
+    }
+    order.payments = [payment];
+  }
 
   if (typeof note.text === "string" && note.text.length > NOTE_MAX_LENGTH) {
     warnings.push(
@@ -480,13 +523,15 @@ export function buildOrder(group: OrderGroup): BuildOrderResult {
     order[field] = value;
   }
 
+  const attributes: Array<{ fullyQualifiedName: string; values: string[] }> = [
+    { fullyQualifiedName: FNO_ORDER_STATUS_ATTRIBUTE_FQN, values: [IMPORTED_FNO_ORDER_STATUS] },
+  ];
   // Keep the legacy account number on the order; customerAccountId becomes the Kibo ID
   const legacyAccountNumber = first[COL_CUSTOMER_ACCOUNT_ID];
   if (legacyAccountNumber) {
-    order.attributes = [
-      { fullyQualifiedName: ACCOUNT_NUMBER_ATTRIBUTE_FQN, values: [legacyAccountNumber] },
-    ];
+    attributes.push({ fullyQualifiedName: ACCOUNT_NUMBER_ATTRIBUTE_FQN, values: [legacyAccountNumber] });
   }
+  order.attributes = attributes;
 
   // Line items should add up to the order total minus shipping and handling
   if (typeof order[COL_TOTAL] === "number") {
@@ -550,23 +595,19 @@ export function compareCreatedOrder(sent: Order, created: Order): string[] {
   }
 
   // Kibo matches FQNs case-insensitively and echoes its own casing, so compare lower-cased
-  const findAttribute = (order: Order) =>
-    order.attributes?.find(
-      (attribute) =>
-        attribute.fullyQualifiedName?.toLowerCase() === ACCOUNT_NUMBER_ATTRIBUTE_FQN.toLowerCase(),
+  for (const sentAttribute of sent.attributes ?? []) {
+    const fqn = sentAttribute.fullyQualifiedName;
+    if (!fqn) continue;
+    const createdAttribute = created.attributes?.find(
+      (attribute) => attribute.fullyQualifiedName?.toLowerCase() === fqn.toLowerCase(),
     );
-  const sentAttribute = findAttribute(sent);
-  if (sentAttribute) {
-    const createdAttribute = findAttribute(created);
     if (!createdAttribute) {
-      warnings.push(
-        `${ACCOUNT_NUMBER_ATTRIBUTE_FQN} missing from Kibo's response - is it defined as an Order attribute?`,
-      );
+      warnings.push(`${fqn} missing from Kibo's response - is it defined as an Order attribute?`);
     } else if (
       JSON.stringify(createdAttribute.values ?? []) !== JSON.stringify(sentAttribute.values ?? [])
     ) {
       warnings.push(
-        `${ACCOUNT_NUMBER_ATTRIBUTE_FQN} is ${JSON.stringify(createdAttribute.values)} in Kibo's response; ` +
+        `${fqn} is ${JSON.stringify(createdAttribute.values)} in Kibo's response; ` +
           `sent ${JSON.stringify(sentAttribute.values)}`,
       );
     }
@@ -584,20 +625,87 @@ async function findExistingOrderId(externalId: string): Promise<string | undefin
   return existing.items?.[0]?.id ?? undefined;
 }
 
-// Legacy account number -> Kibo account ID (null = not found). Many orders share a customer.
-const accountIdCache = new Map<string, number | null>();
+export type KiboAccountSummary = { id: number; emailAddress?: string };
 
-async function findAccountIdByExternalId(externalId: string): Promise<number | undefined> {
-  if (!accountIdCache.has(externalId)) {
-    const accounts = await limiter.schedule(() =>
+// Several Kibo accounts can share one legacy account number; more than this is unexpected
+const ACCOUNT_LOOKUP_PAGE_SIZE = 200;
+
+// Legacy account number -> every Kibo account with that externalId. Many orders share a customer.
+const accountsByExternalId = new Map<string, KiboAccountSummary[]>();
+
+async function findAccountsByExternalId(externalId: string): Promise<KiboAccountSummary[]> {
+  let accounts = accountsByExternalId.get(externalId);
+  if (!accounts) {
+    const response = await limiter.schedule(() =>
       customerAccountClient.getAccounts({
         filter: `externalId eq '${escapeFilterValue(externalId)}'`,
-        pageSize: 1,
+        pageSize: ACCOUNT_LOOKUP_PAGE_SIZE,
       }),
     );
-    accountIdCache.set(externalId, accounts.items?.[0]?.id ?? null);
+    accounts = (response.items ?? [])
+      .filter((account) => typeof account.id === "number")
+      .map((account) => ({ id: account.id as number, emailAddress: account.emailAddress ?? undefined }));
+    accountsByExternalId.set(externalId, accounts);
   }
-  return accountIdCache.get(externalId) ?? undefined;
+  return accounts;
+}
+
+export type AccountSelection = {
+  accountId?: number;
+  matchedBy?: "single account" | "email match";
+  // Set when no account could be chosen; the order is skipped
+  error?: string;
+  // Set when an account was chosen but its email differs from the order's
+  warning?: string;
+};
+
+const normalizeEmail = (email: string | undefined) => (email ?? "").trim().toLowerCase();
+
+/**
+ * Choose the Kibo account for an order from the accounts sharing its legacy account number.
+ * One account: use it (warn if the email differs). Several: the email must match exactly one.
+ */
+export function selectAccount(
+  accounts: KiboAccountSummary[],
+  legacyAccountNumber: string,
+  orderEmail: string,
+): AccountSelection {
+  if (accounts.length === 0) {
+    return { error: `No Kibo customer account with externalId '${legacyAccountNumber}'` };
+  }
+
+  const emailMatches = accounts.filter(
+    (account) => normalizeEmail(account.emailAddress) === normalizeEmail(orderEmail),
+  );
+
+  if (accounts.length === 1) {
+    const [account] = accounts;
+    const selection: AccountSelection = { accountId: account.id, matchedBy: "single account" };
+    if (emailMatches.length === 0) {
+      selection.warning =
+        `Only Kibo account for '${legacyAccountNumber}' (id ${account.id}) has email ` +
+        `'${account.emailAddress ?? ""}', not order email '${orderEmail}' - attaching anyway`;
+    }
+    return selection;
+  }
+
+  if (emailMatches.length === 1) {
+    return { accountId: emailMatches[0].id, matchedBy: "email match" };
+  }
+
+  const ids = (list: KiboAccountSummary[]) => list.map((account) => account.id).join(", ");
+  if (emailMatches.length === 0) {
+    return {
+      error:
+        `${accounts.length} Kibo accounts have externalId '${legacyAccountNumber}' but none has ` +
+        `email '${orderEmail}' (account IDs: ${ids(accounts)})`,
+    };
+  }
+  return {
+    error:
+      `${emailMatches.length} Kibo accounts have externalId '${legacyAccountNumber}' and ` +
+      `email '${orderEmail}' (account IDs: ${ids(emailMatches)})`,
+  };
 }
 
 export type ImportOptions = {
@@ -681,13 +789,25 @@ export async function importHistoricalOrdersFromCSV(
         continue;
       }
 
-      const customerAccountId = await findAccountIdByExternalId(customerAccount!);
-      if (!customerAccountId) {
-        const error = `No Kibo customer account with externalId '${customerAccount}'`;
+      // validateOrder guarantees customerAccountId and email are present
+      const orderEmail = group.rows[0][COL_EMAIL]!;
+      const accounts = await findAccountsByExternalId(customerAccount!);
+      const selection = selectAccount(accounts, customerAccount!, orderEmail);
+      if (selection.error || selection.accountId === undefined) {
+        const error = selection.error ?? "No Kibo customer account selected";
         orderLogger.warn(error + " - skipping");
         summary.missingAccount++;
         missingAccountOrders.push({ ...context, errors: [error] });
         continue;
+      }
+      const customerAccountId = selection.accountId;
+      orderLogger.debug(
+        { customerAccountId, matchedBy: selection.matchedBy, accountsWithLegacyNumber: accounts.length },
+        "Matched Kibo customer account",
+      );
+      if (selection.warning) {
+        warnings.push(selection.warning);
+        orderLogger.warn(selection.warning);
       }
       order.customerAccountId = customerAccountId;
 
@@ -742,7 +862,7 @@ export async function importHistoricalOrdersFromCSV(
   if (missingAccountOrders.length > 0) {
     logger.warn(
       { missingAccountOrders },
-      "Orders skipped because the customer account isn't in Kibo - import the accounts and rerun",
+      "Orders skipped because they couldn't be matched to a Kibo customer account - fix the accounts and rerun",
     );
   }
   if (failedOrders.length > 0) {
