@@ -7,7 +7,7 @@
  * Optional: Phone (saved as the contact's home phone; defaults to 555-555-5555)
  * Optional: Customer Set (the account's customerSet; defaults to "default")
  *
- * For each row it creates the account (Add-Account-And-Login) with the Customer Account
+ * For each row it creates the account (Add-Account-And-Login API) with the Customer Account
  * in the tenant~accountnumber attribute and externalId, tenant~is-verified = true,
  * taxExempt from the Tax Exempt column, and customerSet from the Customer Set column. It then parses the single-cell Billing Address
  * ("street, city, state zip") and adds it as the primary Billing + Shipping contact.
